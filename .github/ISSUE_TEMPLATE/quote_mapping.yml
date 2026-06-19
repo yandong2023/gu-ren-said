@@ -1,0 +1,75 @@
+name: Add quote / slang mapping
+description: Suggest a new modern expression to classical quote mapping.
+title: "[Mapping] "
+labels: ["data", "mapping"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve Gu Ren Said.
+
+        Please remember: no hallucinated citations. The classical quote must be real and traceable.
+
+  - type: input
+    id: modern_expression
+    attributes:
+      label: Modern expression / slang
+      description: The modern phrase, slang, or emotion you want to match.
+      placeholder: "我 emo 了 / 包的 / 太卷了 / 我真的会谢"
+    validations:
+      required: true
+
+  - type: textarea
+    id: classical_quote
+    attributes:
+      label: Classical quote
+      description: The exact classical Chinese quote.
+      placeholder: "抽刀断水水更流，举杯消愁愁更愁。"
+    validations:
+      required: true
+
+  - type: input
+    id: source
+    attributes:
+      label: Source
+      description: Dynasty, author, title/book, and source if available.
+      placeholder: "唐·李白《宣州谢朓楼饯别校书叔云》 / 全唐诗"
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: Add surrounding text to avoid taking the quote out of context.
+      placeholder: "弃我去者，昨日之日不可留；乱我心者，今日之日多烦忧。"
+    validations:
+      required: false
+
+  - type: textarea
+    id: why_match
+    attributes:
+      label: Why does it match?
+      description: Explain the semantic connection. Do not only do literal matching.
+      placeholder: "This quote expresses unresolved sorrow, which is close to the low, chaotic feeling of 'emo'."
+    validations:
+      required: true
+
+  - type: input
+    id: themes
+    attributes:
+      label: Themes / tags
+      placeholder: "忧愁, 失意, 烦闷"
+    validations:
+      required: false
+
+  - type: dropdown
+    id: verified
+    attributes:
+      label: Have you verified the source?
+      options:
+        - "Yes, I checked a reliable source"
+        - "Not yet"
+        - "There may be disputed versions"
+    validations:
+      required: true
