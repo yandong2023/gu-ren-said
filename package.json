@@ -1,0 +1,30 @@
+{
+  "name": "gu-ren-said",
+  "version": "0.1.0",
+  "private": false,
+  "description": "古人早就说过：现代话/网络热梗反查真实古诗文出处，生成适合传播的手机卡片。",
+  "license": "MIT",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "db:seed": "tsx scripts/seed.ts"
+  },
+  "dependencies": {
+    "@vercel/analytics": "latest",
+    "better-sqlite3": "^11.9.1",
+    "html-to-image": "^1.11.11",
+    "next": "^15.3.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/node": "^22.13.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.8.0"
+  }
+}

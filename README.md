@@ -45,7 +45,7 @@
 - **真实出处**：每条结果包含原句、作者、朝代、篇名、出处。
 - **几乎 0 token**：默认用 SQLite FTS5 + 语义映射，本地检索即可完成。
 - **适合传播**：移动端优先，生成 3:4 分享卡片，适合小红书、朋友圈、视频号封面。
-- **开源友好**：一个 Next.js 项目即可启动；SQLite 数据库可本地生成。
+- **开源友好**：Next.js 项目即可启动；SQLite 数据库可本地生成。
 - **可扩展向量检索**：预留 sqlite-vec 扩展位，后续可加入 embedding 检索。
 
 ## 技术方案
@@ -55,7 +55,7 @@
         ↓
 热梗语义映射：emo → 忧愁 / 失意 / 烦闷
         ↓
-SQLite FTS5 关键词召回
+SQLite FTS5 关键词召回 / 内置数据兜底
         ↓
 语义主题 + 情绪 + 人工权重 rerank
         ↓
@@ -80,7 +80,7 @@ pnpm dev
 http://localhost:3000
 ```
 
-如果没有执行 `pnpm db:seed`，项目仍会使用 `lib/quotes.ts` 里的内置数据做内存检索。
+如果没有执行 `pnpm db:seed`，项目仍会使用 `lib/data.ts` 里的内置数据做内存检索。
 
 ## 项目结构
 
@@ -95,13 +95,11 @@ http://localhost:3000
 │   ├── QuoteCard.tsx            # 分享卡片 + 下载 PNG
 │   └── SearchExperience.tsx     # 首页交互
 ├── data/
-│   ├── schema.sql               # SQLite / FTS5 schema
-│   └── README.md
+│   └── schema.sql               # SQLite / FTS5 schema
 ├── lib/
-│   ├── quotes.ts                # 精选古诗文种子数据
-│   ├── slang.ts                 # 网络热梗语义映射
-│   ├── rank.ts                  # rerank 逻辑
-│   ├── db.server.ts             # SQLite 查询
+│   ├── data.ts                  # 精选古诗文 + 热梗映射
+│   ├── search.ts                # 扩展查询 + rerank
+│   ├── db.server.ts             # 可选 SQLite 查询
 │   └── types.ts
 └── scripts/
     └── seed.ts                  # 生成 data/quotes.db
