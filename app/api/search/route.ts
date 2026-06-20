@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { expandQuery, mergeResults, searchInMemory } from "@/lib/search";
 import { getDbStatus, searchSqlite } from "@/lib/db.server";
+import { enhanceWithDeepSeek } from "@/lib/deepseek.server";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -20,14 +21,19 @@ export async function POST(request: NextRequest) {
   }
 
   const expanded = expandQuery(query);
-  const sqliteResults = searchSqlite(expanded, limit);
-  const memoryResults = searchInMemory(expanded, limit);
-  const results = mergeResults(sqliteResults, memoryResults).slice(0, limit);
+  const sqliteResults = searchSqlite(expanded, Math.max(limit, 8));
+  const memoryResults = searchInMemory(expanded, Math.max(limit, 8));
+  const candidates = mergeResults(sqliteResults, memoryResults).slice(0, Math.max(limit, 8));
+  const enhancedResults = await enhanceWithDeepSeek(query, candidates);
+  const results = enhancedResults.slice(0, limit);
 
   return NextResponse.json({
     query,
     expanded,
     db: getDbStatus(),
+    enhancer: {
+      deepseek: Boolean(process.env.DEEPSEEK_API_KEY) && process.env.DEEPSEEK_ENABLED !== "0"
+    },
     results
   });
 }
