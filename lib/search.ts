@@ -1,5 +1,9 @@
 import { QUOTES, SLANG_MAPPINGS } from "./data";
+import { EXTRA_QUOTES, EXTRA_SLANG_MAPPINGS } from "./extra-data";
 import type { ExpandedQuery, QuoteRecord, SearchResult } from "./types";
+
+const ALL_QUOTES = [...EXTRA_QUOTES, ...QUOTES];
+const ALL_SLANG_MAPPINGS = [...EXTRA_SLANG_MAPPINGS, ...SLANG_MAPPINGS];
 
 const STOP_WORDS = new Set(["我", "你", "他", "她", "它", "的", "了", "啊", "呀", "吧", "吗", "呢", "很", "太", "真", "真的", "有点"]);
 const LOW_SIGNAL_CHARS = new Set(["好", "看", "说", "想", "人", "事", "不", "有", "没", "真", "太", "这", "那"]);
@@ -38,7 +42,7 @@ export function expandQuery(input: string): ExpandedQuery {
   let emotion: string | undefined;
   let intentExplanation: string | undefined;
 
-  for (const mapping of SLANG_MAPPINGS) {
+  for (const mapping of ALL_SLANG_MAPPINGS) {
     const hit = mapping.patterns.some((pattern) => normalized.includes(pattern.toLowerCase()));
     if (!hit) continue;
     mapping.keywords.forEach((keyword) => terms.add(keyword));
@@ -91,7 +95,7 @@ export function scoreQuote(quote: QuoteRecord, expanded: ExpandedQuery): SearchR
 }
 
 export function searchInMemory(expanded: ExpandedQuery, limit = 8): SearchResult[] {
-  return QUOTES.map((quote) => scoreQuote(quote, expanded)).filter((item) => item.score > 18 || item.matchedBy.length > 0).sort((a, b) => b.score - a.score).slice(0, limit);
+  return ALL_QUOTES.map((quote) => scoreQuote(quote, expanded)).filter((item) => item.score > 18 || item.matchedBy.length > 0).sort((a, b) => b.score - a.score).slice(0, limit);
 }
 
 export function mergeResults(...groups: SearchResult[][]): SearchResult[] {
