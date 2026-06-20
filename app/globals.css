@@ -73,6 +73,15 @@ textarea::placeholder { color: rgba(123, 97, 77, 0.72); }
 .secondary-btn, .ghost-btn { flex: 1 1 110px; padding: 11px 12px; font-weight: 700; font-size: 13px; }
 .secondary-btn { color: #fff8ef; background: #3a2418; }
 .ghost-btn { color: #593721; background: rgba(255,255,255,0.72); border: 1px solid var(--line); }
+.share-notice { padding: 11px 13px; border-radius: 16px; color: #71462d; background: rgba(255, 250, 242, 0.76); border: 1px solid rgba(182, 93, 66, 0.14); font-size: 13px; line-height: 1.65; }
+.share-preview { padding: 12px; border-radius: 20px; background: rgba(255, 250, 242, 0.76); border: 1px solid var(--line); }
+.share-preview img { display: block; width: 100%; border-radius: 16px; box-shadow: 0 12px 30px rgba(74, 42, 22, 0.12); }
+.share-preview span { display: block; margin-top: 9px; color: var(--muted); font-size: 12px; line-height: 1.6; }
+.source-detail { border-radius: 18px; background: rgba(255, 250, 242, 0.66); border: 1px solid var(--line); overflow: hidden; }
+.source-detail summary { cursor: pointer; padding: 13px 15px; color: #5c3925; font-weight: 800; font-size: 14px; list-style-position: inside; }
+.source-detail-body { padding: 0 15px 15px; color: var(--muted); font-size: 13px; line-height: 1.8; }
+.source-detail-body strong { display: block; color: var(--ink); margin-bottom: 8px; }
+.source-detail-body p { margin: 0; max-height: 220px; overflow: auto; white-space: pre-wrap; }
 .empty-state { margin: 18px 0; padding: 18px; border-radius: 22px; background: rgba(255,255,255,0.6); color: var(--muted); border: 1px solid var(--line); }
 .tech-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-top: 42px; }
 .tech-item { padding: 18px; border: 1px solid var(--line); border-radius: 22px; background: rgba(255,255,255,0.5); }
