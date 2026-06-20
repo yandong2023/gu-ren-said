@@ -12,6 +12,24 @@ function quoteBlob(quote: QuoteRecord): string {
   return normalizeText([quote.quote, quote.title, quote.author, quote.dynasty, quote.context, quote.translation, quote.themes.join(" "), quote.modernMeanings.join(" "), quote.emotion, quote.scene.join(" ")].join(" "));
 }
 
+function addChinesePhraseTerms(normalized: string, terms: Set<string>) {
+  const compact = normalizeText(normalized);
+  if (compact.length > 18 || !/[\u4e00-\u9fa5]/.test(compact)) return;
+
+  for (const char of compact) {
+    if (/^[\u4e00-\u9fa5]$/.test(char) && !STOP_WORDS.has(char) && !LOW_SIGNAL_CHARS.has(char)) terms.add(char);
+  }
+
+  for (let size = 2; size <= 4; size += 1) {
+    for (let i = 0; i <= compact.length - size; i += 1) {
+      const phrase = compact.slice(i, i + size);
+      if (!/^[\u4e00-\u9fa5]+$/.test(phrase)) continue;
+      if (Array.from(phrase).every((char) => LOW_SIGNAL_CHARS.has(char) || STOP_WORDS.has(char))) continue;
+      terms.add(phrase);
+    }
+  }
+}
+
 export function expandQuery(input: string): ExpandedQuery {
   const normalized = input.trim().toLowerCase().replace(/\s+/g, " ");
   const rawTerms = normalized.split(/[\s,，。！？!?.、/\\]+/).map((item) => item.trim()).filter(Boolean).filter((item) => !STOP_WORDS.has(item));
@@ -29,13 +47,9 @@ export function expandQuery(input: string): ExpandedQuery {
     intentExplanation = intentExplanation ?? mapping.explanation;
   }
 
-  if (normalized.length <= 12) {
-    for (const char of normalized) {
-      if (/^[\u4e00-\u9fa5]$/.test(char) && !STOP_WORDS.has(char) && !LOW_SIGNAL_CHARS.has(char)) terms.add(char);
-    }
-  }
+  addChinesePhraseTerms(normalized, terms);
 
-  return { original: input, normalized, terms: Array.from(terms).slice(0, 32), themes: Array.from(themes), emotion, intentExplanation };
+  return { original: input, normalized, terms: Array.from(terms).slice(0, 48), themes: Array.from(themes), emotion, intentExplanation };
 }
 
 function makeReason(quote: QuoteRecord, expanded: ExpandedQuery): string {
