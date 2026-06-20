@@ -44,7 +44,7 @@ textarea::placeholder { color: rgba(123, 97, 77, 0.72); }
 .primary-btn, .secondary-btn, .ghost-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 0; border-radius: 999px; transition: transform 0.16s ease, box-shadow 0.16s ease, background 0.16s ease; }
 .primary-btn { padding: 13px 18px; min-width: 136px; color: #fff8ef; background: linear-gradient(135deg, #3a2418, #a45438 70%, #d99345); box-shadow: 0 16px 36px rgba(120, 59, 35, 0.24); font-weight: 700; }
 .primary-btn:hover, .secondary-btn:hover, .ghost-btn:hover { transform: translateY(-1px); }
-.primary-btn:disabled { opacity: 0.68; cursor: not-allowed; }
+.primary-btn:disabled, .secondary-btn:disabled, .ghost-btn:disabled { opacity: 0.68; cursor: not-allowed; transform: none; }
 .hint { color: var(--muted); font-size: 13px; }
 .examples { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 16px; }
 .example-chip { border: 1px solid rgba(82, 50, 30, 0.1); border-radius: 999px; padding: 8px 12px; color: #674833; background: rgba(255,255,255,0.62); font-size: 13px; }
@@ -68,9 +68,9 @@ textarea::placeholder { color: rgba(123, 97, 77, 0.72); }
 .explain-line { color: var(--muted); font-size: 13px; line-height: 1.7; }
 .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
 .tag { padding: 5px 8px; border-radius: 999px; background: rgba(182, 93, 66, 0.1); color: #8b432f; font-size: 11px; }
-.watermark { margin-top: 14px; color: rgba(44, 27, 18, 0.42); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; }
-.card-actions { display: flex; gap: 10px; }
-.secondary-btn, .ghost-btn { flex: 1; padding: 11px 14px; font-weight: 700; }
+.watermark { margin-top: 14px; color: rgba(44, 27, 18, 0.48); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; }
+.card-actions { display: flex; gap: 9px; flex-wrap: wrap; }
+.secondary-btn, .ghost-btn { flex: 1 1 110px; padding: 11px 12px; font-weight: 700; font-size: 13px; }
 .secondary-btn { color: #fff8ef; background: #3a2418; }
 .ghost-btn { color: #593721; background: rgba(255,255,255,0.72); border: 1px solid var(--line); }
 .empty-state { margin: 18px 0; padding: 18px; border-radius: 22px; background: rgba(255,255,255,0.6); color: var(--muted); border: 1px solid var(--line); }
