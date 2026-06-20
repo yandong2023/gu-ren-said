@@ -1,5 +1,5 @@
 {
   "framework": "nextjs",
   "installCommand": "npm install",
-  "buildCommand": "npm run build"
+  "buildCommand": "TANG_FILES=6 SONG_CI_FILES=4 MAX_REMOTE_QUOTES=12000 npm run db:seed && npm run build"
 }
