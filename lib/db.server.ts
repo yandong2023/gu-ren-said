@@ -61,8 +61,9 @@ export function searchSqlite(expanded: ExpandedQuery, limit = 12): SearchResult[
       FROM quotes_fts f
       JOIN quotes q ON q.id = f.quote_id
       WHERE quotes_fts MATCH ?
+      ORDER BY rank
       LIMIT ?
-    `).all(matchQuery, Math.max(limit * 3, 20)) as Record<string, unknown>[];
+    `).all(matchQuery, Math.max(limit * 8, 60)) as Record<string, unknown>[];
 
     return rows.map(rowToQuote).map((quote) => {
       const result = scoreQuote(quote, expanded);
