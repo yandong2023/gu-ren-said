@@ -31,5 +31,8 @@ jobs:
       - name: Seed SQLite database
         run: pnpm db:seed
 
+      - name: Query relevance tests
+        run: pnpm test:queries
+
       - name: Build
         run: pnpm build
