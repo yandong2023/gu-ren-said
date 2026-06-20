@@ -80,7 +80,7 @@ function inferThemes(text: string, tags: string[] = []): { themes: string[]; emo
   return { themes: Array.from(themes).slice(0, 6), emotion };
 }
 
-function makeRecord(item: ChinesePoetryItem, quote: string, index: number, sourceKind: "tang" | "song-ci", fileOffset: number): QuoteRecord | null {
+function makeRecord(item: ChinesePoetryItem, quote: string, workIndex: number, paragraphIndex: number, sourceKind: "tang" | "song-ci", fileOffset: number): QuoteRecord | null {
   const cleanedQuote = cleanText(quote);
   if (!isUsefulQuote(cleanedQuote)) return null;
 
@@ -93,9 +93,10 @@ function makeRecord(item: ChinesePoetryItem, quote: string, index: number, sourc
   const dynasty = sourceKind === "tang" ? "唐" : "宋";
   const sourceLabel = `${sourceName} / chinese-poetry`;
   const popularBonus = tags.some((tag) => tag.includes("三百首") || tag.includes("小学") || tag.includes("初中")) ? 18 : 0;
+  const sourceId = item.id ? slug(item.id) : slug(`${author}-${title}`);
 
   return {
-    id: `${sourceKind}-${fileOffset}-${slug(item.id ?? `${author}-${title}`)}-${index}`,
+    id: `${sourceKind}-${fileOffset}-${workIndex}-${sourceId}-${paragraphIndex}`,
     quote: cleanedQuote,
     title,
     author,
@@ -133,10 +134,11 @@ async function importChinesePoetry(): Promise<QuoteRecord[]> {
       const url = makeUrl(offset);
       try {
         const items = await fetchJson(url);
-        for (const item of items) {
+        for (let workIndex = 0; workIndex < items.length; workIndex += 1) {
+          const item = items[workIndex];
           const paragraphs = item.paragraphs ?? [];
           for (let paragraphIndex = 0; paragraphIndex < paragraphs.length; paragraphIndex += 1) {
-            const record = makeRecord(item, paragraphs[paragraphIndex], paragraphIndex, kind, offset);
+            const record = makeRecord(item, paragraphs[paragraphIndex], workIndex, paragraphIndex, kind, offset);
             if (!record) continue;
             sourceRecords.push(record);
             if (sourceRecords.length >= maxRecords) break;
