@@ -1,5 +1,5 @@
-import { QUOTES, SLANG_MAPPINGS } from "@/lib/data";
-import type { ExpandedQuery, QuoteRecord, SearchResult } from "@/lib/types";
+import { QUOTES, SLANG_MAPPINGS } from "./data";
+import type { ExpandedQuery, QuoteRecord, SearchResult } from "./types";
 
 const STOP_WORDS = new Set(["我", "你", "他", "她", "它", "的", "了", "啊", "呀", "吧", "吗", "呢", "很", "太", "真", "真的", "有点"]);
 const LOW_SIGNAL_CHARS = new Set(["好", "看", "说", "想", "人", "事", "不", "有", "没", "真", "太", "这", "那"]);
