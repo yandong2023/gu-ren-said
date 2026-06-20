@@ -1,0 +1,44 @@
+<svg width="1280" height="720" viewBox="0 0 1280 720" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1280" height="720" fill="#FBF2E8"/>
+  <text x="80" y="86" font-family="Arial, 'Microsoft YaHei', sans-serif" font-size="42" font-weight="900" fill="#2C1B12">从一句现代话，到一张可分享的古诗文卡片</text>
+  <text x="80" y="132" font-family="Arial, 'Microsoft YaHei', sans-serif" font-size="22" fill="#7B614D">每条结果都保留原句、出处、解释和原文，方便核对、学习和分享。</text>
+
+  <g transform="translate(92 178)">
+    <rect width="310" height="430" rx="28" fill="#F6E2C7" stroke="#E2C8A7"/>
+    <rect x="18" y="18" width="274" height="394" rx="22" fill="#FFFAF2" stroke="#E8D9C7"/>
+    <rect x="38" y="40" width="120" height="34" rx="17" fill="#E9E5D7"/>
+    <text x="58" y="63" font-family="Arial, 'Microsoft YaHei', sans-serif" font-size="15" font-weight="700" fill="#586B46">古人早就说过</text>
+    <text x="38" y="118" font-family="Arial, 'Microsoft YaHei', sans-serif" font-size="17" font-weight="700" fill="#8B6042">现代人说：你真好看</text>
+    <text x="38" y="184" font-family="serif" font-size="34" font-weight="700" fill="#2C1B12">巧笑倩兮，</text>
+    <text x="38" y="232" font-family="serif" font-size="34" font-weight="700" fill="#2C1B12">美目盼兮。</text>
+    <text x="38" y="278" font-family="Arial, 'Microsoft YaHei', sans-serif" font-size="16" font-weight="700" fill="#6C4B35">——先秦·佚名《硕人》</text>
+    <text x="38" y="344" font-family="Arial, 'Microsoft YaHei', sans-serif" font-size="13" fill="#7B614D">夸人笑容和眼神之美。</text>
+    <text x="38" y="386" font-family="Arial, 'Microsoft YaHei', sans-serif" font-size="12" fill="#9B897A">GURENSAID.COM · 每句都有出处</text>
+  </g>
+
+  <g transform="translate(486 178)">
+    <rect width="310" height="430" rx="28" fill="#F6E2C7" stroke="#E2C8A7"/>
+    <rect x="18" y="18" width="274" height="394" rx="22" fill="#FFFAF2" stroke="#E8D9C7"/>
+    <rect x="38" y="40" width="120" height="34" rx="17" fill="#E9E5D7"/>
+    <text x="58" y="63" font-family="Arial, 'Microsoft YaHei', sans-serif" font-size="15" font-weight="700" fill="#586B46">古人早就说过</text>
+    <text x="38" y="118" font-family="Arial, 'Microsoft YaHei', sans-serif" font-size="17" font-weight="700" fill="#8B6042">现代人说：我爱你</text>
+    <text x="38" y="184" font-family="serif" font-size="33" font-weight="700" fill="#2C1B12">愿得一心人，</text>
+    <text x="38" y="232" font-family="serif" font-size="33" font-weight="700" fill="#2C1B12">白头不相离。</text>
+    <text x="38" y="278" font-family="Arial, 'Microsoft YaHei', sans-serif" font-size="16" font-weight="700" fill="#6C4B35">——汉·卓文君《白头吟》</text>
+    <text x="38" y="344" font-family="Arial, 'Microsoft YaHei', sans-serif" font-size="13" fill="#7B614D">表达一心相守、白头不离。</text>
+    <text x="38" y="386" font-family="Arial, 'Microsoft YaHei', sans-serif" font-size="12" fill="#9B897A">GURENSAID.COM · 每句都有出处</text>
+  </g>
+
+  <g transform="translate(880 178)">
+    <rect width="310" height="430" rx="28" fill="#F6E2C7" stroke="#E2C8A7"/>
+    <rect x="18" y="18" width="274" height="394" rx="22" fill="#FFFAF2" stroke="#E8D9C7"/>
+    <rect x="38" y="40" width="120" height="34" rx="17" fill="#E9E5D7"/>
+    <text x="58" y="63" font-family="Arial, 'Microsoft YaHei', sans-serif" font-size="15" font-weight="700" fill="#586B46">古人早就说过</text>
+    <text x="38" y="118" font-family="Arial, 'Microsoft YaHei', sans-serif" font-size="17" font-weight="700" fill="#8B6042">现代人说：我 emo 了</text>
+    <text x="38" y="184" font-family="serif" font-size="31" font-weight="700" fill="#2C1B12">抽刀断水水更流，</text>
+    <text x="38" y="232" font-family="serif" font-size="31" font-weight="700" fill="#2C1B12">举杯消愁愁更愁。</text>
+    <text x="38" y="278" font-family="Arial, 'Microsoft YaHei', sans-serif" font-size="16" font-weight="700" fill="#6C4B35">——唐·李白《宣州谢朓楼饯别校书叔云》</text>
+    <text x="38" y="344" font-family="Arial, 'Microsoft YaHei', sans-serif" font-size="13" fill="#7B614D">表达愁绪难以排解。</text>
+    <text x="38" y="386" font-family="Arial, 'Microsoft YaHei', sans-serif" font-size="12" fill="#9B897A">GURENSAID.COM · 每句都有出处</text>
+  </g>
+</svg>
