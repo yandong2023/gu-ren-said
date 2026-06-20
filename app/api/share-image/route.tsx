@@ -22,7 +22,7 @@ export async function GET(request: Request) {
   const author = readParam(url, "author", "李白");
   const dynasty = readParam(url, "dynasty", "唐");
   const title = readParam(url, "title", "宣州谢朓楼饯别校书叔云");
-  const persona = readParam(url, "persona", "李白式 emo 人");
+  const persona = readParam(url, "persona", "古人嘴替：把 emo 说得有文化");
   const slogan = readParam(url, "slogan", "你的破防，古人早就替你押过韵。");
   const quoteLines = splitText(quote, 11);
 
@@ -64,12 +64,12 @@ export async function GET(request: Request) {
                 fontWeight: 800
               }}
             >
-              我的古人嘴替人格
+              古人嘴替生成器
             </div>
           </div>
 
           <div style={{ marginTop: 34, fontSize: 38, color: "#8b6042", fontWeight: 800 }}>现代人说：{query}</div>
-          <div style={{ marginTop: 30, fontSize: 52, color: "#b65d42", fontWeight: 900 }}>{persona}</div>
+          <div style={{ marginTop: 30, fontSize: 50, color: "#b65d42", fontWeight: 900 }}>{persona}</div>
           <div style={{ marginTop: 14, fontSize: 30, color: "#7b614d" }}>{slogan}</div>
 
           <div style={{ marginTop: 48, display: "flex", flexDirection: "column", gap: 10 }}>
@@ -82,7 +82,7 @@ export async function GET(request: Request) {
           <div style={{ flex: 1 }} />
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", color: "#9b897a", fontSize: 22, letterSpacing: 2 }}>
             <span>GURENSAID.COM · 每句都有出处</span>
-            <span>来测你的古人嘴替</span>
+            <span>把你的现代话换成古人说法</span>
           </div>
         </div>
       </div>
