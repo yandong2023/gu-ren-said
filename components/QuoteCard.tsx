@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { getSharePersona } from "@/lib/share-persona";
 import type { SearchResult } from "@/lib/types";
 
 const SITE_URL = "https://gurensaid.com";
@@ -20,16 +21,20 @@ export default function QuoteCard({ result, query, compact = false }: Props) {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const sourceText = `——${result.dynasty}·${result.author}《${result.title}》`;
   const fullSourceText = `${result.dynasty}·${result.author}《${result.title}》`;
+  const shareCopy = getSharePersona(result);
   const shareText = [
+    shareCopy.name,
+    shareCopy.slogan,
+    "",
     `现代人说：${query || result.modernMeanings[0] || "我 emo 了"}`,
     "",
-    "古人说：",
+    "古人嘴替：",
     result.quote,
     sourceText,
     "",
     result.reason || result.translation,
     "",
-    `来自：${SITE_URL}`
+    `来生成你的古人嘴替：${SITE_URL}`
   ].join("\n");
 
   async function copyToClipboard(text: string) {
@@ -63,7 +68,7 @@ export default function QuoteCard({ result, query, compact = false }: Props) {
     const ok = await copyToClipboard(shareText);
     setCopied(ok);
     if (showNotice) {
-      setNotice(ok ? "分享文案已复制，可以直接粘贴到微信、朋友圈或小红书。" : "当前浏览器不允许自动复制，可以手动长按卡片保存或复制页面文字。");
+      setNotice(ok ? "有趣文案已复制，可以直接粘贴到微信、朋友圈或小红书。" : "当前浏览器不允许自动复制，可以手动长按卡片保存或复制页面文字。");
     }
     window.setTimeout(() => setCopied(false), 1500);
     return ok;
@@ -92,7 +97,7 @@ export default function QuoteCard({ result, query, compact = false }: Props) {
       setPreviewUrl(dataUrl);
       const copiedOk = await copyText(false);
       setNotice(copiedOk
-        ? "分享图已生成，文案也已复制。微信里请长按下方图片保存，再发给朋友或朋友圈。"
+        ? "分享图已生成，有趣文案也已复制。微信里请长按下方图片保存，再发给朋友或朋友圈。"
         : "分享图已生成。微信里请长按下方图片保存，再发给朋友或朋友圈。"
       );
     } catch {
@@ -117,7 +122,7 @@ export default function QuoteCard({ result, query, compact = false }: Props) {
       setPreviewUrl(dataUrl);
 
       const link = document.createElement("a");
-      link.download = `古人早就说过-${result.author}.png`;
+      link.download = `古人嘴替-${result.author}.png`;
       link.href = dataUrl;
       document.body.appendChild(link);
       link.click();
@@ -135,13 +140,15 @@ export default function QuoteCard({ result, query, compact = false }: Props) {
     <article className="result-card">
       <div className="share-card" ref={cardRef}>
         <div className="share-card-inner">
-          <span className="card-kicker">古人早就说过</span>
+          <span className="card-kicker">古人嘴替生成器</span>
+          <div className="persona-line">{shareCopy.name}</div>
+          <div className="persona-slogan">{shareCopy.slogan}</div>
           <div className="modern-line">现代人说：{query || result.modernMeanings[0]}</div>
           <h3 className="quote-line">{result.quote}</h3>
           <div className="source-line">{sourceText}</div>
           <div className="card-spacer" />
           <div className="explain-line">{result.reason || result.translation}</div>
-          <div className="tags">{result.themes.slice(0, 4).map((tag) => <span className="tag" key={tag}>#{tag}</span>)}</div>
+          <div className="tags"><span className="tag">#{shareCopy.tag}</span>{result.themes.slice(0, 3).map((tag) => <span className="tag" key={tag}>#{tag}</span>)}</div>
           <div className="watermark">gurensaid.com · 每句都有出处</div>
         </div>
       </div>
