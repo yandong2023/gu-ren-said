@@ -1,0 +1,33 @@
+<svg width="1280" height="760" viewBox="0 0 1280 760" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1280" height="760" fill="#FBF2E8"/>
+  <circle cx="184" cy="88" r="310" fill="#E4AA53" fill-opacity="0.20"/>
+  <circle cx="1100" cy="30" r="270" fill="#B65D42" fill-opacity="0.12"/>
+  <rect x="68" y="72" width="1144" height="616" rx="46" fill="#FFF8EE" stroke="#E5D2BA" stroke-width="2"/>
+  <text x="108" y="156" font-family="Arial, 'Microsoft YaHei', sans-serif" font-size="28" font-weight="700" fill="#586B46">古人早就说过</text>
+  <text x="108" y="244" font-family="Arial, 'Microsoft YaHei', sans-serif" font-size="76" font-weight="900" fill="#2C1B12">网络热梗，</text>
+  <text x="108" y="338" font-family="Arial, 'Microsoft YaHei', sans-serif" font-size="76" font-weight="900" fill="#B65D42">古人早就说过。</text>
+  <text x="108" y="408" font-family="Arial, 'Microsoft YaHei', sans-serif" font-size="25" fill="#7B614D">输入一句现代话，找到意思相近的古诗文原句。</text>
+  <text x="108" y="448" font-family="Arial, 'Microsoft YaHei', sans-serif" font-size="25" fill="#7B614D">适合写作文、发朋友圈、小红书配图和亲子语文启蒙。</text>
+
+  <rect x="108" y="494" width="570" height="108" rx="24" fill="#FFFDF8" stroke="#E8D9C7" stroke-width="2"/>
+  <text x="138" y="552" font-family="Arial, 'Microsoft YaHei', sans-serif" font-size="28" font-weight="700" fill="#2C1B12">我爱你</text>
+  <rect x="484" y="620" width="194" height="62" rx="31" fill="url(#btn)"/>
+  <text x="532" y="660" font-family="Arial, 'Microsoft YaHei', sans-serif" font-size="24" font-weight="700" fill="#FFF8EF">反查古文</text>
+
+  <rect x="760" y="116" width="344" height="520" rx="40" fill="#875435"/>
+  <rect x="778" y="134" width="308" height="484" rx="32" fill="#FFEED7" stroke="#FDF7EC" stroke-width="3"/>
+  <rect x="804" y="162" width="256" height="428" rx="26" fill="#FFF8EE" stroke="#E7D8C2" stroke-width="2"/>
+  <rect x="824" y="184" width="112" height="38" rx="19" fill="#E9E5D7"/>
+  <text x="846" y="210" font-family="Arial, 'Microsoft YaHei', sans-serif" font-size="16" font-weight="700" fill="#586B46">古人早就说过</text>
+  <text x="824" y="270" font-family="Arial, 'Microsoft YaHei', sans-serif" font-size="21" font-weight="700" fill="#8B6042">现代人说：我爱你</text>
+  <text x="824" y="350" font-family="serif" font-size="39" font-weight="700" fill="#2C1B12">愿得一心人，</text>
+  <text x="824" y="404" font-family="serif" font-size="39" font-weight="700" fill="#2C1B12">白头不相离。</text>
+  <text x="824" y="452" font-family="Arial, 'Microsoft YaHei', sans-serif" font-size="18" font-weight="700" fill="#6C4B35">——汉·卓文君《白头吟》</text>
+  <text x="824" y="538" font-family="Arial, 'Microsoft YaHei', sans-serif" font-size="14" fill="#7B614D">GURENSAID.COM · 每句都有出处</text>
+  <defs>
+    <linearGradient id="btn" x1="484" y1="620" x2="678" y2="682" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#3A2418"/>
+      <stop offset="1" stop-color="#D99345"/>
+    </linearGradient>
+  </defs>
+</svg>
