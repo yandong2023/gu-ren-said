@@ -472,16 +472,15 @@ Embedding 语义召回
 - 一句“包的”，李白早就说过
 - 这些网络用语，古人早就讲过
 
-## Related ideas
+## Product principle
 
-这个项目的思想和 citation-first 产品类似：
+这个项目遵循 source-first 的产品思路：
 
 ```text
-litsource: 现代观点 → 医学文献出处
-Gu Ren Said: 现代话 / 热梗 → 古诗文真实出处
+可信来源 → 匹配解释 → 分享表达
 ```
 
-核心都是：
+核心是：
 
 > 先找可信来源，再生成解释。
 
