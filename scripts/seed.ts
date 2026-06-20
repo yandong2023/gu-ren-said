@@ -10,6 +10,8 @@ const SCHEMA_PATH = path.join(DATA_DIR, "schema.sql");
 
 const SHOULD_IMPORT_CHINESE_POETRY = process.env.IMPORT_CHINESE_POETRY !== "0";
 const MAX_REMOTE_QUOTES = Number.parseInt(process.env.MAX_REMOTE_QUOTES ?? "12000", 10);
+const MAX_TANG_QUOTES = Number.parseInt(process.env.MAX_TANG_QUOTES ?? "8000", 10);
+const MAX_SONG_CI_QUOTES = Number.parseInt(process.env.MAX_SONG_CI_QUOTES ?? "4000", 10);
 const TANG_FILES = Number.parseInt(process.env.TANG_FILES ?? "6", 10);
 const SONG_CI_FILES = Number.parseInt(process.env.SONG_CI_FILES ?? "4", 10);
 
@@ -124,10 +126,9 @@ async function fetchJson(url: string): Promise<ChinesePoetryItem[]> {
 async function importChinesePoetry(): Promise<QuoteRecord[]> {
   if (!SHOULD_IMPORT_CHINESE_POETRY || MAX_REMOTE_QUOTES <= 0) return [];
 
-  const records: QuoteRecord[] = [];
-
-  async function importFiles(kind: "tang" | "song-ci", fileCount: number, makeUrl: (offset: number) => string) {
-    for (let i = 0; i < fileCount && records.length < MAX_REMOTE_QUOTES; i += 1) {
+  async function importFiles(kind: "tang" | "song-ci", fileCount: number, maxRecords: number, makeUrl: (offset: number) => string) {
+    const sourceRecords: QuoteRecord[] = [];
+    for (let i = 0; i < fileCount && sourceRecords.length < maxRecords; i += 1) {
       const offset = i * 1000;
       const url = makeUrl(offset);
       try {
@@ -137,21 +138,23 @@ async function importChinesePoetry(): Promise<QuoteRecord[]> {
           for (let paragraphIndex = 0; paragraphIndex < paragraphs.length; paragraphIndex += 1) {
             const record = makeRecord(item, paragraphs[paragraphIndex], paragraphIndex, kind, offset);
             if (!record) continue;
-            records.push(record);
-            if (records.length >= MAX_REMOTE_QUOTES) break;
+            sourceRecords.push(record);
+            if (sourceRecords.length >= maxRecords) break;
           }
-          if (records.length >= MAX_REMOTE_QUOTES) break;
+          if (sourceRecords.length >= maxRecords) break;
         }
         console.log(`Imported ${items.length} works from ${url}`);
       } catch (error) {
         console.warn(`Skip ${url}: ${error instanceof Error ? error.message : String(error)}`);
       }
     }
+    return sourceRecords;
   }
 
-  await importFiles("tang", TANG_FILES, (offset) => `${TANG_BASE}/poet.tang.${offset}.json`);
-  await importFiles("song-ci", SONG_CI_FILES, (offset) => `${SONG_CI_BASE}/ci.song.${offset}.json`);
-
+  const tangQuotes = await importFiles("tang", TANG_FILES, MAX_TANG_QUOTES, (offset) => `${TANG_BASE}/poet.tang.${offset}.json`);
+  const songCiQuotes = await importFiles("song-ci", SONG_CI_FILES, MAX_SONG_CI_QUOTES, (offset) => `${SONG_CI_BASE}/ci.song.${offset}.json`);
+  const records = [...tangQuotes, ...songCiQuotes].slice(0, MAX_REMOTE_QUOTES);
+  console.log(`Prepared ${tangQuotes.length} Tang quotes and ${songCiQuotes.length} Song ci quotes.`);
   return records;
 }
 
