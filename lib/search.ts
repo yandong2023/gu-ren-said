@@ -2,6 +2,7 @@ import { QUOTES, SLANG_MAPPINGS } from "@/lib/data";
 import type { ExpandedQuery, QuoteRecord, SearchResult } from "@/lib/types";
 
 const STOP_WORDS = new Set(["我", "你", "他", "她", "它", "的", "了", "啊", "呀", "吧", "吗", "呢", "很", "太", "真", "真的", "有点"]);
+const LOW_SIGNAL_CHARS = new Set(["好", "看", "说", "想", "人", "事", "不", "有", "没", "真", "太", "这", "那"]);
 
 function normalizeText(value: string): string {
   return value.toLowerCase().replace(/\s+/g, "");
@@ -30,7 +31,7 @@ export function expandQuery(input: string): ExpandedQuery {
 
   if (normalized.length <= 12) {
     for (const char of normalized) {
-      if (/^[\u4e00-\u9fa5]$/.test(char) && !STOP_WORDS.has(char)) terms.add(char);
+      if (/^[\u4e00-\u9fa5]$/.test(char) && !STOP_WORDS.has(char) && !LOW_SIGNAL_CHARS.has(char)) terms.add(char);
     }
   }
 
@@ -57,17 +58,19 @@ export function scoreQuote(quote: QuoteRecord, expanded: ExpandedQuery): SearchR
   for (const term of expanded.terms) {
     const normalizedTerm = normalizeText(term);
     if (!normalizedTerm) continue;
-    if (quote.modernMeanings.some((meaning) => normalizeText(meaning).includes(normalizedTerm))) { score += 18; matchedBy.add("modern-meaning"); }
-    if (quote.themes.some((theme) => normalizeText(theme).includes(normalizedTerm))) { score += 14; matchedBy.add("theme"); }
-    if (quote.scene.some((scene) => normalizeText(scene).includes(normalizedTerm))) { score += 8; matchedBy.add("scene"); }
-    if (blob.includes(normalizedTerm)) { score += normalizedTerm.length === 1 ? 2 : 7; matchedBy.add("keyword"); }
+    const isSingleChar = normalizedTerm.length === 1;
+
+    if (!isSingleChar && quote.modernMeanings.some((meaning) => normalizeText(meaning).includes(normalizedTerm))) { score += 18; matchedBy.add("modern-meaning"); }
+    if (!isSingleChar && quote.themes.some((theme) => normalizeText(theme).includes(normalizedTerm))) { score += 14; matchedBy.add("theme"); }
+    if (!isSingleChar && quote.scene.some((scene) => normalizeText(scene).includes(normalizedTerm))) { score += 8; matchedBy.add("scene"); }
+    if (blob.includes(normalizedTerm)) { score += isSingleChar ? 1 : 7; matchedBy.add("keyword"); }
   }
 
   for (const theme of expanded.themes) {
     if (quote.themes.includes(theme)) { score += 22; matchedBy.add("semantic-theme"); }
   }
 
-  if (expanded.emotion && expanded.emotion === quote.emotion) { score += 18; matchedBy.add("emotion"); }
+  if (expanded.emotion && expanded.emotion === quote.emotion) { score += 24; matchedBy.add("emotion"); }
   score += Math.min(8, quote.weight / 18);
 
   return { ...quote, score: Number(score.toFixed(2)), matchedBy: Array.from(matchedBy), reason: makeReason(quote, expanded) };
