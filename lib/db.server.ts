@@ -1,8 +1,8 @@
 import fs from "node:fs";
 import path from "node:path";
 import Database from "better-sqlite3";
-import { scoreQuote } from "@/lib/search";
-import type { ExpandedQuery, QuoteRecord, SearchResult } from "@/lib/types";
+import { scoreQuote } from "./search";
+import type { ExpandedQuery, QuoteRecord, SearchResult } from "./types";
 
 const DB_PATH = path.join(process.cwd(), "data", "quotes.db");
 let cachedDb: Database.Database | null = null;
