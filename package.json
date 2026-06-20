@@ -4,6 +4,11 @@
   "private": false,
   "description": "古人早就说过：现代话/网络热梗反查真实古诗文出处，生成适合传播的手机卡片。",
   "license": "MIT",
+  "homepage": "https://gurensaid.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yandong2023/gu-ren-said.git"
+  },
   "packageManager": "pnpm@9.15.9",
   "engines": {
     "node": "22.x"
