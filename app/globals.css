@@ -61,14 +61,16 @@ textarea::placeholder { color: rgba(123, 97, 77, 0.72); }
 .share-card-inner { position: relative; height: 100%; padding: 22px; border-radius: 22px; background: rgba(255, 250, 242, 0.72); border: 1px solid rgba(82, 50, 30, 0.1); display: flex; flex-direction: column; overflow: hidden; }
 .share-card-inner::before { content: ""; position: absolute; inset: 12px; border: 1px solid rgba(88, 107, 70, 0.14); border-radius: 18px; pointer-events: none; }
 .card-kicker { width: fit-content; padding: 6px 10px; border-radius: 999px; background: rgba(88, 107, 70, 0.12); color: var(--green); font-size: 12px; font-weight: 800; }
-.modern-line { margin-top: 18px; color: #8b6042; font-size: 14px; line-height: 1.65; }
-.quote-line { margin: 18px 0 10px; font-family: "Songti SC", "STSong", "Noto Serif SC", serif; font-size: clamp(24px, 6vw, 38px); line-height: 1.34; letter-spacing: 0.02em; }
+.persona-line { margin-top: 14px; color: var(--accent); font-size: 19px; font-weight: 900; line-height: 1.35; letter-spacing: -0.02em; }
+.persona-slogan { margin-top: 7px; color: #7b614d; font-size: 12px; line-height: 1.55; }
+.modern-line { margin-top: 14px; color: #8b6042; font-size: 13px; line-height: 1.65; }
+.quote-line { margin: 14px 0 10px; font-family: "Songti SC", "STSong", "Noto Serif SC", serif; font-size: clamp(22px, 5.4vw, 35px); line-height: 1.28; letter-spacing: 0.02em; }
 .source-line { color: #6c4b35; font-weight: 700; font-size: 14px; }
 .card-spacer { flex: 1; }
-.explain-line { color: var(--muted); font-size: 13px; line-height: 1.7; }
-.tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+.explain-line { color: var(--muted); font-size: 12px; line-height: 1.65; }
+.tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
 .tag { padding: 5px 8px; border-radius: 999px; background: rgba(182, 93, 66, 0.1); color: #8b432f; font-size: 11px; }
-.watermark { margin-top: 14px; color: rgba(44, 27, 18, 0.48); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; }
+.watermark { margin-top: 12px; color: rgba(44, 27, 18, 0.48); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; }
 .card-actions { display: flex; gap: 9px; flex-wrap: wrap; }
 .secondary-btn, .ghost-btn { flex: 1 1 110px; padding: 11px 12px; font-weight: 700; font-size: 13px; }
 .secondary-btn { color: #fff8ef; background: #3a2418; }
@@ -107,5 +109,6 @@ textarea::placeholder { color: rgba(123, 97, 77, 0.72); }
   .results { grid-template-columns: 1fr; }
   .tech-grid { grid-template-columns: 1fr; }
   .share-card-inner { padding: 18px; }
-  .quote-line { font-size: 29px; }
+  .quote-line { font-size: 27px; }
+  .persona-line { font-size: 18px; }
 }
