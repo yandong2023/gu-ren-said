@@ -1,5 +1,10 @@
 # 古人早就说过 / Gu Ren Said
 
+<p align="center">
+  <a href="https://gurensaid.com"><strong>Website</strong></a> ·
+  <a href="https://github.com/yandong2023/gu-ren-said">GitHub</a>
+</p>
+
 > 现代话 / 网络热梗 → 古诗文真实出处 → 手机传播卡片
 
 **Gu Ren Said** helps you find authentic classical Chinese quotes that match modern Chinese slang, emotions, and everyday expressions.
