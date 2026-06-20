@@ -12,6 +12,15 @@ type TestCase = {
   forbiddenTop1Themes?: string[];
 };
 
+const LOVE_IDS = [
+  "zhuo-wenjun-baitou-love",
+  "yue-ren-ge-love",
+  "shijing-jigu-love",
+  "wen-tingyun-hongdou-love",
+  "li-zhiyi-busuanzi-love",
+  "qin-guan-queshen-love"
+];
+
 const TEST_CASES: TestCase[] = [
   {
     query: "你真好看",
@@ -27,6 +36,41 @@ const TEST_CASES: TestCase[] = [
     top1AnyTheme: ["美貌", "惊艳", "赞美"],
     top3AnyId: ["shijing-shuoren-beauty", "li-yannian-beauty", "li-bai-qingpingdiao-beauty", "bai-juyi-changhenge-beauty"],
     forbiddenTop1Themes: ["释怀", "忧愁"]
+  },
+  {
+    query: "我爱你",
+    description: "我爱你应该返回爱情/告白/相守类精选句，不能返回单纯夸外貌",
+    top1AnyTheme: ["爱情", "告白", "相守", "承诺", "相思"],
+    top3AnyId: LOVE_IDS,
+    forbiddenTop1Themes: ["美貌", "友情", "思乡", "释怀"]
+  },
+  {
+    query: "我喜欢你",
+    description: "我喜欢你应该偏告白、心动或暗恋",
+    top1AnyTheme: ["爱情", "告白", "心动", "暗恋"],
+    top3AnyId: ["yue-ren-ge-love", "zhuo-wenjun-baitou-love", "shijing-love"],
+    forbiddenTop1Themes: ["美貌", "友情", "思乡"]
+  },
+  {
+    query: "我想你",
+    description: "我想你应该偏相思和深情，不应该只是泛泛爱情",
+    top1AnyTheme: ["相思", "深情", "爱情"],
+    top3AnyId: ["wen-tingyun-hongdou-love", "li-zhiyi-busuanzi-love", "shijing-love"],
+    forbiddenTop1Themes: ["美貌", "友情", "释怀"]
+  },
+  {
+    query: "我想和你一辈子在一起",
+    description: "一辈子在一起应该偏相守和承诺",
+    top1AnyTheme: ["相守", "承诺", "爱情"],
+    top3AnyId: ["zhuo-wenjun-baitou-love", "shijing-jigu-love", "qin-guan-queshen-love"],
+    forbiddenTop1Themes: ["美貌", "友情", "忧愁"]
+  },
+  {
+    query: "我暗恋你很久了",
+    description: "暗恋应该偏心悦、未说出口、心动",
+    top1AnyTheme: ["暗恋", "心动", "告白", "爱情"],
+    top3AnyId: ["yue-ren-ge-love", "shijing-love"],
+    forbiddenTop1Themes: ["美貌", "友情", "思乡"]
   },
   {
     query: "我 emo 了",
@@ -126,7 +170,7 @@ const TEST_CASES: TestCase[] = [
     query: "有点心动念念不忘",
     description: "心动应该返回爱情/相思/心动类结果",
     top1AnyTheme: ["爱情", "相思", "心动"],
-    top3AnyId: ["shijing-love"]
+    top3AnyId: ["shijing-love", "yue-ren-ge-love", "wen-tingyun-hongdou-love"]
   },
   {
     query: "我们真是同频朋友",
