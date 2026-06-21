@@ -17,24 +17,24 @@ export default function QuoteCard({ result, query, compact = false }: Props) {
   const [copied, setCopied] = useState(false);
   const [downloading, setDownloading] = useState(false);
   const [sharing, setSharing] = useState(false);
+  const [feedbacking, setFeedbacking] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const sourceText = `——${result.dynasty}·${result.author}《${result.title}》`;
   const fullSourceText = `${result.dynasty}·${result.author}《${result.title}》`;
   const shareCopy = getSharePersona(result);
+  const whyText = result.reason || result.translation;
+  const modernText = query || result.modernMeanings[0] || "我 emo 了";
   const shareText = [
-    shareCopy.name,
-    shareCopy.slogan,
+    `现代话：${modernText}`,
     "",
-    `现代人说：${query || result.modernMeanings[0] || "我 emo 了"}`,
-    "",
-    "古人嘴替：",
+    "古诗文表达：",
     result.quote,
-    sourceText,
+    `出处：${fullSourceText}`,
     "",
-    result.reason || result.translation,
+    `为什么适合：${whyText}`,
     "",
-    `来生成你的古人嘴替：${SITE_URL}`
+    `来自：${SITE_URL}`
   ].join("\n");
 
   async function copyToClipboard(text: string) {
@@ -64,14 +64,52 @@ export default function QuoteCard({ result, query, compact = false }: Props) {
     }
   }
 
+  async function copyFormatted(text: string, successText: string) {
+    const ok = await copyToClipboard(text);
+    setCopied(ok);
+    setNotice(ok ? successText : "当前浏览器不允许自动复制，可以手动长按卡片保存或复制页面文字。");
+    window.setTimeout(() => setCopied(false), 1500);
+    return ok;
+  }
+
   async function copyText(showNotice = true) {
     const ok = await copyToClipboard(shareText);
     setCopied(ok);
     if (showNotice) {
-      setNotice(ok ? "有趣文案已复制，可以直接粘贴到微信、朋友圈或小红书。" : "当前浏览器不允许自动复制，可以手动长按卡片保存或复制页面文字。");
+      setNotice(ok ? "完整知识卡片文案已复制，可以直接粘贴到微信、朋友圈或小红书。" : "当前浏览器不允许自动复制，可以手动长按卡片保存或复制页面文字。");
     }
     window.setTimeout(() => setCopied(false), 1500);
     return ok;
+  }
+
+  async function sendFeedback(type: "not_accurate" | "wrong_source" | "better_quote") {
+    let note = "";
+    if (type === "better_quote") {
+      note = window.prompt("可以写下你觉得更贴切的古文、出处或理由：")?.trim() ?? "";
+      if (!note) return;
+    }
+
+    setFeedbacking(true);
+    try {
+      await fetch("/api/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type,
+          query: modernText,
+          resultId: result.id,
+          quote: result.quote,
+          source: fullSourceText,
+          note
+        })
+      });
+      const text = type === "not_accurate" ? "收到反馈：这条结果不够贴切。" : type === "wrong_source" ? "收到反馈：需要核对出处。" : "收到你的推荐，后续会优先核对。";
+      setNotice(text);
+    } catch {
+      setNotice("反馈暂时没有提交成功，可以稍后再试。");
+    } finally {
+      setFeedbacking(false);
+    }
   }
 
   async function createCardImage() {
@@ -97,7 +135,7 @@ export default function QuoteCard({ result, query, compact = false }: Props) {
       setPreviewUrl(dataUrl);
       const copiedOk = await copyText(false);
       setNotice(copiedOk
-        ? "分享图已生成，有趣文案也已复制。微信里请长按下方图片保存，再发给朋友或朋友圈。"
+        ? "分享图已生成，知识卡片文案也已复制。微信里请长按下方图片保存，再发给朋友或朋友圈。"
         : "分享图已生成。微信里请长按下方图片保存，再发给朋友或朋友圈。"
       );
     } catch {
@@ -122,7 +160,7 @@ export default function QuoteCard({ result, query, compact = false }: Props) {
       setPreviewUrl(dataUrl);
 
       const link = document.createElement("a");
-      link.download = `古人嘴替-${result.author}.png`;
+      link.download = `古文反查-${result.author}.png`;
       link.href = dataUrl;
       document.body.appendChild(link);
       link.click();
@@ -140,14 +178,12 @@ export default function QuoteCard({ result, query, compact = false }: Props) {
     <article className="result-card">
       <div className="share-card" ref={cardRef}>
         <div className="share-card-inner">
-          <span className="card-kicker">古人嘴替生成器</span>
-          <div className="persona-line">{shareCopy.name}</div>
-          <div className="persona-slogan">{shareCopy.slogan}</div>
-          <div className="modern-line">现代人说：{query || result.modernMeanings[0]}</div>
+          <span className="card-kicker">古诗文反查卡</span>
+          <div className="modern-line"><span className="knowledge-label">现代话</span>{modernText}</div>
           <h3 className="quote-line">{result.quote}</h3>
-          <div className="source-line">{sourceText}</div>
+          <div className="source-line"><span className="knowledge-label">出处</span>{sourceText}</div>
           <div className="card-spacer" />
-          <div className="explain-line">{result.reason || result.translation}</div>
+          <div className="explain-line"><span className="knowledge-label">为什么适合</span>{whyText}</div>
           <div className="tags"><span className="tag">#{shareCopy.tag}</span>{result.themes.slice(0, 3).map((tag) => <span className="tag" key={tag}>#{tag}</span>)}</div>
           <div className="watermark">gurensaid.com · 每句都有出处</div>
         </div>
@@ -156,8 +192,21 @@ export default function QuoteCard({ result, query, compact = false }: Props) {
         <>
           <div className="card-actions">
             <button className="secondary-btn" type="button" onClick={prepareShareImage} disabled={sharing}>{sharing ? "生成中…" : "生成分享图"}</button>
-            <button className="ghost-btn" type="button" onClick={() => copyText()}>{copied ? "已复制" : "复制文案"}</button>
+            <button className="ghost-btn" type="button" onClick={() => copyText()}>{copied ? "已复制" : "复制完整卡片"}</button>
             <button className="ghost-btn" type="button" onClick={downloadCard} disabled={downloading}>{downloading ? "生成中…" : "下载图片"}</button>
+          </div>
+
+          <div className="copy-row" aria-label="复制常用格式">
+            <button type="button" onClick={() => copyFormatted(result.quote, "原句已复制。")}>复制原句</button>
+            <button type="button" onClick={() => copyFormatted(`${result.quote}${sourceText}`, "原句和出处已复制。")}>复制原句+出处</button>
+            <button type="button" onClick={() => copyFormatted(whyText, "解释已复制。")}>复制解释</button>
+          </div>
+
+          <div className="feedback-row" aria-label="结果反馈">
+            <span>结果反馈：</span>
+            <button type="button" disabled={feedbacking} onClick={() => sendFeedback("not_accurate")}>不够贴切</button>
+            <button type="button" disabled={feedbacking} onClick={() => sendFeedback("wrong_source")}>出处有误</button>
+            <button type="button" disabled={feedbacking} onClick={() => sendFeedback("better_quote")}>我有更好的句子</button>
           </div>
 
           {notice ? <div className="share-notice">{notice}</div> : null}
