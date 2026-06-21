@@ -90,6 +90,36 @@ export const EXTRA_QUOTES: QuoteRecord[] = [
     emotion: "love",
     scene: ["爱情", "异地", "承诺"],
     weight: 112
+  },
+  {
+    id: "shiji-zixu-appearance-judgement",
+    quote: "以貌取人，失之子羽。",
+    title: "仲尼弟子列传",
+    author: "司马迁",
+    dynasty: "西汉",
+    source: "史记",
+    context: "孔子曰：吾以言取人，失之宰予；以貌取人，失之子羽。",
+    translation: "提醒人不能只凭外貌判断，适合把“你真丑”“不好看”这类外貌评价转成更有分寸的反讽。",
+    themes: ["外貌", "判断", "反讽", "负向外貌"],
+    modernMeanings: ["你真丑", "不好看", "难看", "别以貌取人", "不要只看脸"],
+    emotion: "critical",
+    scene: ["外貌", "吐槽", "反思"],
+    weight: 118
+  },
+  {
+    id: "shijing-xiangshu-insult",
+    quote: "相鼠有皮，人而无仪。",
+    title: "相鼠",
+    author: "佚名",
+    dynasty: "先秦",
+    source: "诗经",
+    context: "相鼠有皮，人而无仪；人而无仪，不死何为？",
+    translation: "用鼠尚有皮来反衬人若无礼无仪，语气很重，适合表达对“丑态”“没礼貌”的讽刺。",
+    themes: ["讽刺", "失礼", "吐槽", "负向外貌"],
+    modernMeanings: ["人品丑", "丑态百出", "没礼貌", "太不像话", "你真丑"],
+    emotion: "critical",
+    scene: ["吐槽", "讽刺", "吵架"],
+    weight: 110
   }
 ];
 
@@ -101,5 +131,13 @@ export const EXTRA_SLANG_MAPPINGS: SlangMapping[] = [
     themes: ["爱情", "告白", "相思", "相守", "承诺"],
     emotion: "love",
     explanation: "表达喜欢、表白、想念、相守或长期承诺。"
+  },
+  {
+    id: "appearance-negative",
+    patterns: ["你真丑", "真丑", "丑", "难看", "不好看", "不漂亮", "不美", "不帅", "丑爆", "长得丑", "颜值低", "磕碜", "ugly"],
+    keywords: ["外貌", "反讽", "讽刺", "吐槽", "以貌取人", "失之子羽", "相鼠", "无仪", "妍媸"],
+    themes: ["外貌", "反讽", "讽刺", "吐槽", "负向外貌"],
+    emotion: "critical",
+    explanation: "表达对外貌、难看、丑或以貌取人的吐槽，不应匹配成夸好看。"
   }
 ];
