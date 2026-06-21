@@ -8,7 +8,14 @@
 }
 
 .modern-line { font-weight: 800; }
-.source-line .knowledge-label { margin-bottom: 6px; }
+.source-line .knowledge-label,
+.explain-line .knowledge-label { margin-bottom: 6px; }
+
+.explain-line {
+  padding: 10px 11px;
+  border-radius: 16px;
+  background: rgba(182, 93, 66, 0.07);
+}
 
 .match-reason {
   padding: 11px 13px;
