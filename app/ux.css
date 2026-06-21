@@ -1,0 +1,48 @@
+.knowledge-label {
+  display: block;
+  margin-bottom: 4px;
+  color: rgba(123, 97, 77, 0.76);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+}
+
+.modern-line { font-weight: 800; }
+.source-line .knowledge-label,
+.explain-line .knowledge-label { margin-bottom: 6px; }
+.explain-line {
+  padding: 10px 11px;
+  border-radius: 16px;
+  background: rgba(182, 93, 66, 0.07);
+}
+
+.copy-row,
+.feedback-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.copy-row button,
+.feedback-row button {
+  border: 1px solid rgba(82, 50, 30, 0.12);
+  border-radius: 999px;
+  padding: 8px 10px;
+  color: #674833;
+  background: rgba(255,255,255,0.62);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.copy-row button:hover,
+.feedback-row button:hover { background: #fff; }
+.copy-row button:disabled,
+.feedback-row button:disabled { opacity: 0.6; cursor: not-allowed; }
+.feedback-row span { color: var(--muted); font-size: 12px; font-weight: 800; }
+
+@media (max-width: 640px) {
+  .copy-row button,
+  .feedback-row button { flex: 1 1 96px; }
+  .feedback-row span { width: 100%; }
+}
