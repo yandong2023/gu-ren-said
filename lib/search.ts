@@ -7,9 +7,20 @@ const ALL_SLANG_MAPPINGS = [...EXTRA_SLANG_MAPPINGS, ...SLANG_MAPPINGS];
 
 const STOP_WORDS = new Set(["我", "你", "他", "她", "它", "的", "了", "啊", "呀", "吧", "吗", "呢", "很", "太", "真", "真的", "有点"]);
 const LOW_SIGNAL_CHARS = new Set(["好", "看", "说", "想", "人", "事", "不", "有", "没", "真", "太", "这", "那"]);
+const NEGATIVE_APPEARANCE_PATTERNS = ["你真丑", "真丑", "丑", "难看", "不好看", "不好看", "不漂亮", "不美", "不帅", "丑爆", "丑死", "长得丑", "颜值低", "磕碜", "ugly"];
+const BEAUTY_THEMES = new Set(["美貌", "赞美", "惊艳", "容貌"]);
 
 function normalizeText(value: string): string {
   return value.toLowerCase().replace(/\s+/g, "");
+}
+
+function isNegativeAppearanceQuery(normalized: string) {
+  const compact = normalizeText(normalized);
+  return NEGATIVE_APPEARANCE_PATTERNS.some((pattern) => compact.includes(normalizeText(pattern)));
+}
+
+function isBeautyQuote(quote: QuoteRecord) {
+  return quote.emotion === "beauty" || quote.themes.some((theme) => BEAUTY_THEMES.has(theme));
 }
 
 function quoteBlob(quote: QuoteRecord): string {
@@ -36,6 +47,7 @@ function addChinesePhraseTerms(normalized: string, terms: Set<string>) {
 
 export function expandQuery(input: string): ExpandedQuery {
   const normalized = input.trim().toLowerCase().replace(/\s+/g, " ");
+  const negativeAppearance = isNegativeAppearanceQuery(normalized);
   const rawTerms = normalized.split(/[\s,，。！？!?.、/\\]+/).map((item) => item.trim()).filter(Boolean).filter((item) => !STOP_WORDS.has(item));
   const terms = new Set<string>(rawTerms);
   const themes = new Set<string>();
@@ -43,12 +55,20 @@ export function expandQuery(input: string): ExpandedQuery {
   let intentExplanation: string | undefined;
 
   for (const mapping of ALL_SLANG_MAPPINGS) {
+    if (negativeAppearance && mapping.id === "beauty") continue;
     const hit = mapping.patterns.some((pattern) => normalized.includes(pattern.toLowerCase()));
     if (!hit) continue;
     mapping.keywords.forEach((keyword) => terms.add(keyword));
     mapping.themes.forEach((theme) => themes.add(theme));
     emotion = emotion ?? mapping.emotion;
     intentExplanation = intentExplanation ?? mapping.explanation;
+  }
+
+  if (negativeAppearance) {
+    ["外貌", "反讽", "讽刺", "吐槽", "负向外貌", "以貌取人", "失之子羽", "相鼠", "无仪", "妍媸"].forEach((term) => terms.add(term));
+    ["外貌", "反讽", "讽刺", "吐槽", "负向外貌"].forEach((theme) => themes.add(theme));
+    emotion = "critical";
+    intentExplanation = "表达对外貌评价、难看、丑或以貌取人的吐槽，需要避免误匹配成夸好看。";
   }
 
   addChinesePhraseTerms(normalized, terms);
@@ -65,6 +85,7 @@ function makeReason(quote: QuoteRecord, expanded: ExpandedQuery): string {
 export function scoreQuote(quote: QuoteRecord, expanded: ExpandedQuery): SearchResult {
   const blob = quoteBlob(quote);
   const normalized = normalizeText(expanded.normalized);
+  const negativeAppearance = expanded.themes.includes("负向外貌");
   const matchedBy = new Set<string>();
   let score = quote.weight * 0.18;
 
@@ -90,6 +111,11 @@ export function scoreQuote(quote: QuoteRecord, expanded: ExpandedQuery): SearchR
 
   if (expanded.emotion && expanded.emotion === quote.emotion) { score += 24; matchedBy.add("emotion"); }
   score += Math.min(8, quote.weight / 18);
+
+  if (negativeAppearance && isBeautyQuote(quote)) {
+    score -= 120;
+    matchedBy.add("opposite-beauty-guard");
+  }
 
   return { ...quote, score: Number(score.toFixed(2)), matchedBy: Array.from(matchedBy), reason: makeReason(quote, expanded) };
 }
