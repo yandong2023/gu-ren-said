@@ -24,6 +24,7 @@ export default function QuoteCard({ result, query, compact = false }: Props) {
   const fullSourceText = `${result.dynasty}·${result.author}《${result.title}》`;
   const shareCopy = getSharePersona(result);
   const whyText = result.reason || result.translation;
+  const explainText = result.translation || whyText;
   const modernText = query || result.modernMeanings[0] || "我 emo 了";
   const shareText = [
     `现代话：${modernText}`,
@@ -31,6 +32,8 @@ export default function QuoteCard({ result, query, compact = false }: Props) {
     "古诗文表达：",
     result.quote,
     `出处：${fullSourceText}`,
+    "",
+    `一句解释：${explainText}`,
     "",
     `来自：${SITE_URL}`
   ].join("\n");
@@ -181,6 +184,7 @@ export default function QuoteCard({ result, query, compact = false }: Props) {
           <h3 className="quote-line">{result.quote}</h3>
           <div className="source-line"><span className="knowledge-label">出处</span>{sourceText}</div>
           <div className="card-spacer" />
+          <div className="explain-line"><span className="knowledge-label">一句解释</span>{explainText}</div>
           <div className="tags"><span className="tag">#{shareCopy.tag}</span>{result.themes.slice(0, 3).map((tag) => <span className="tag" key={tag}>#{tag}</span>)}</div>
           <div className="watermark">gurensaid.com · 每句都有出处</div>
         </div>
@@ -198,7 +202,7 @@ export default function QuoteCard({ result, query, compact = false }: Props) {
           <div className="copy-row" aria-label="复制常用格式">
             <button type="button" onClick={() => copyFormatted(result.quote, "原句已复制。")}>复制原句</button>
             <button type="button" onClick={() => copyFormatted(`${result.quote}${sourceText}`, "原句和出处已复制。")}>复制原句+出处</button>
-            <button type="button" onClick={() => copyFormatted(whyText, "解释已复制。")}>复制解释</button>
+            <button type="button" onClick={() => copyFormatted(explainText, "解释已复制。")}>复制解释</button>
           </div>
 
           <div className="feedback-row" aria-label="结果反馈">
