@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     ? `${query}的古诗文表达：${result.quote} ——${result.dynasty}·${result.author}《${result.title}》。`
     : `把“${query}”反查成更有文化的古诗文原句，查看真实出处和原文。`;
   const image = result
-    ? `/api/share-image?q=${encodeURIComponent(query)}&quote=${encodeURIComponent(result.quote)}&author=${encodeURIComponent(result.author)}&dynasty=${encodeURIComponent(result.dynasty)}&title=${encodeURIComponent(result.title)}`
+    ? `/api/share-image?q=${encodeURIComponent(query)}&quote=${encodeURIComponent(result.quote)}&author=${encodeURIComponent(result.author)}&dynasty=${encodeURIComponent(result.dynasty)}&title=${encodeURIComponent(result.title)}&explain=${encodeURIComponent(result.translation || result.reason)}`
     : "/og.svg";
 
   return {
