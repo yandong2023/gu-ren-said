@@ -26,16 +26,17 @@ function applyPlanToExpanded(expanded: ExpandedQuery, plan: Awaited<ReturnType<t
   };
 }
 
-export async function runSearch(query: string, limit = 6, options: { record?: boolean } = {}) {
+export async function runSearch(query: string, limit = 6, options: { record?: boolean; enhance?: boolean } = {}) {
   const safeLimit = Math.min(Math.max(Number(limit ?? 6), 1), 10);
+  const shouldEnhance = options.enhance !== false;
   const baseExpanded = expandQuery(query);
-  const plan = await planQueryWithDeepSeek(query);
+  const plan = shouldEnhance ? await planQueryWithDeepSeek(query) : null;
   const expanded = applyPlanToExpanded(baseExpanded, plan);
 
   const sqliteResults = searchSqlite(expanded, Math.max(safeLimit * 3, 24));
   const memoryResults = searchInMemory(expanded, Math.max(safeLimit * 2, 12));
   const candidates = mergeResults(sqliteResults, memoryResults).slice(0, Math.max(safeLimit * 4, 24));
-  const enhancedResults = await enhanceWithDeepSeek(query, candidates, plan);
+  const enhancedResults = shouldEnhance ? await enhanceWithDeepSeek(query, candidates, plan) : candidates;
   const results = enhancedResults.slice(0, safeLimit);
 
   if (options.record) {
@@ -48,7 +49,7 @@ export async function runSearch(query: string, limit = 6, options: { record?: bo
     plan,
     db: getDbStatus(),
     enhancer: {
-      deepseek: Boolean(process.env.DEEPSEEK_API_KEY) && process.env.DEEPSEEK_ENABLED !== "0"
+      deepseek: shouldEnhance && Boolean(process.env.DEEPSEEK_API_KEY) && process.env.DEEPSEEK_ENABLED !== "0"
     },
     results
   };
