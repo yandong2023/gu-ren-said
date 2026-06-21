@@ -65,7 +65,6 @@ export default async function QueryPage({ params }: PageProps) {
       </nav>
 
       <section className="query-hero">
-        <div className="badge">🪶 独立长尾页 · 可收藏 · 可分享</div>
         <h1>“{query}”，古人怎么说？</h1>
         <p>把这句现代话换成更有文化、更有出处的古人嘴替表达。</p>
       </section>
