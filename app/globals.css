@@ -28,9 +28,10 @@ button { cursor: pointer; }
 a { color: inherit; }
 .shell { width: min(1120px, 100%); margin: 0 auto; padding: 28px 18px 48px; }
 .nav { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 32px; }
-.brand { display: inline-flex; align-items: center; gap: 10px; font-weight: 800; letter-spacing: -0.02em; }
+.brand { display: inline-flex; align-items: center; gap: 10px; font-weight: 800; letter-spacing: -0.02em; text-decoration: none; }
 .brand-mark { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 14px; background: linear-gradient(135deg, #3a2418, #8b4a31); color: #fff7ed; box-shadow: 0 12px 28px rgba(84, 46, 26, 0.2); }
-.nav-pill { display: inline-flex; align-items: center; padding: 9px 14px; border: 1px solid var(--line); border-radius: 999px; color: var(--muted); background: rgba(255,255,255,0.45); backdrop-filter: blur(10px); font-size: 13px; white-space: nowrap; }
+.nav-actions { display: flex; align-items: center; gap: 10px; }
+.nav-pill { display: inline-flex; align-items: center; padding: 9px 14px; border: 1px solid var(--line); border-radius: 999px; color: var(--muted); background: rgba(255,255,255,0.45); backdrop-filter: blur(10px); font-size: 13px; white-space: nowrap; text-decoration: none; }
 .hero { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(340px, 0.95fr); gap: 30px; align-items: start; }
 .hero-copy { padding-top: 28px; }
 .badge { display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 999px; color: #7c3a22; background: rgba(255, 255, 255, 0.55); border: 1px solid rgba(182, 93, 66, 0.16); box-shadow: 0 8px 30px rgba(74, 42, 22, 0.07); font-size: 13px; }
@@ -49,6 +50,11 @@ textarea::placeholder { color: rgba(123, 97, 77, 0.72); }
 .examples { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 16px; }
 .example-chip { border: 1px solid rgba(82, 50, 30, 0.1); border-radius: 999px; padding: 8px 12px; color: #674833; background: rgba(255,255,255,0.62); font-size: 13px; }
 .example-chip:hover { background: #fff; }
+.hot-strip { margin-top: 18px; padding: 16px; border: 1px solid var(--line); border-radius: 24px; background: rgba(255, 255, 255, 0.54); }
+.hot-strip-title { color: #5c3925; font-size: 14px; font-weight: 900; margin-bottom: 12px; }
+.hot-strip-list { display: flex; flex-wrap: wrap; gap: 9px; }
+.hot-chip { display: inline-flex; align-items: center; gap: 7px; padding: 8px 12px; border-radius: 999px; color: #674833; background: rgba(255,255,255,0.72); border: 1px solid rgba(82, 50, 30, 0.1); font-size: 13px; text-decoration: none; }
+.hot-chip span { display: grid; place-items: center; width: 20px; height: 20px; border-radius: 999px; background: rgba(182, 93, 66, 0.12); color: var(--accent); font-size: 11px; font-weight: 900; }
 .preview-stack { position: sticky; top: 20px; min-height: 600px; }
 .phone-frame { width: min(100%, 430px); margin-left: auto; padding: 12px; border-radius: 42px; background: linear-gradient(145deg, rgba(71, 43, 27, 0.96), rgba(132, 73, 41, 0.88)); box-shadow: 0 34px 90px rgba(74, 42, 22, 0.24); }
 .phone-screen { overflow: hidden; border-radius: 33px; background: #fff7ed; border: 1px solid rgba(255,255,255,0.36); }
@@ -56,7 +62,9 @@ textarea::placeholder { color: rgba(123, 97, 77, 0.72); }
 .section-title h2 { margin: 0; font-size: clamp(24px, 3vw, 34px); letter-spacing: -0.04em; }
 .section-title p { margin: 0; color: var(--muted); font-size: 14px; }
 .results { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+.result-link { display: block; text-decoration: none; }
 .result-card { display: flex; flex-direction: column; gap: 12px; }
+.single-result { width: min(430px, 100%); }
 .share-card { width: 100%; aspect-ratio: 3 / 4; border-radius: 30px; padding: 14px; background: linear-gradient(145deg, #f6e2c7, #fff4e7 55%, #edd2b3); box-shadow: 0 26px 60px rgba(92, 55, 32, 0.14); border: 1px solid rgba(82, 50, 30, 0.1); }
 .share-card-inner { position: relative; height: 100%; padding: 22px; border-radius: 22px; background: rgba(255, 250, 242, 0.72); border: 1px solid rgba(82, 50, 30, 0.1); display: flex; flex-direction: column; overflow: hidden; }
 .share-card-inner::before { content: ""; position: absolute; inset: 12px; border: 1px solid rgba(88, 107, 70, 0.14); border-radius: 18px; pointer-events: none; }
@@ -85,6 +93,17 @@ textarea::placeholder { color: rgba(123, 97, 77, 0.72); }
 .source-detail-body strong { display: block; color: var(--ink); margin-bottom: 8px; }
 .source-detail-body p { margin: 0; max-height: 220px; overflow: auto; white-space: pre-wrap; }
 .empty-state { margin: 18px 0; padding: 18px; border-radius: 22px; background: rgba(255,255,255,0.6); color: var(--muted); border: 1px solid var(--line); }
+.query-hero { margin: 12px 0 26px; padding: 24px; border: 1px solid var(--line); border-radius: 28px; background: rgba(255,255,255,0.52); }
+.query-hero h1 { max-width: 850px; margin-bottom: 12px; font-size: clamp(34px, 6vw, 72px); }
+.query-hero p { margin: 0; color: var(--muted); font-size: 18px; line-height: 1.7; }
+.hot-title h1 { font-size: clamp(34px, 6vw, 68px); }
+.hot-ranking { display: grid; gap: 10px; }
+.hot-rank-row { display: grid; grid-template-columns: 48px 1fr auto; align-items: center; gap: 12px; padding: 14px 16px; border-radius: 20px; background: rgba(255,255,255,0.58); border: 1px solid var(--line); text-decoration: none; }
+.hot-rank-row:hover { background: rgba(255,255,255,0.86); }
+.hot-rank-index { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 999px; color: #fff8ef; background: #3a2418; font-weight: 900; }
+.hot-rank-query { font-size: 18px; font-weight: 900; }
+.hot-rank-count { color: var(--muted); font-size: 13px; }
+.related-searches { margin-top: 42px; }
 .tech-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-top: 42px; }
 .tech-item { padding: 18px; border: 1px solid var(--line); border-radius: 22px; background: rgba(255,255,255,0.5); }
 .tech-item strong { display: block; margin-bottom: 8px; }
@@ -106,6 +125,8 @@ textarea::placeholder { color: rgba(123, 97, 77, 0.72); }
   .search-panel { border-radius: 24px; }
   .search-actions { align-items: stretch; flex-direction: column; }
   .primary-btn { width: 100%; }
+  .hot-rank-row { grid-template-columns: 40px 1fr; }
+  .hot-rank-count { grid-column: 2; }
   .results { grid-template-columns: 1fr; }
   .tech-grid { grid-template-columns: 1fr; }
   .share-card-inner { padding: 18px; }
