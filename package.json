@@ -19,7 +19,7 @@
     "start": "next start",
     "lint": "next lint",
     "db:seed": "tsx scripts/seed.ts",
-    "test:queries": "tsx scripts/evaluate-queries.ts"
+    "test:queries": "tsx scripts/evaluate-queries.ts && tsx scripts/evaluate-negative-queries.ts"
   },
   "dependencies": {
     "@vercel/analytics": "latest",
