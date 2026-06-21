@@ -26,7 +26,7 @@ export default async function HotPage() {
       <section className="section-title hot-title">
         <div>
           <h1>大家都在让古人嘴替什么？</h1>
-          <p>这里会根据真实搜索动态更新。高频 query 也会变成独立页面，方便收藏、分享和被搜索引擎收录。</p>
+          <p>看看最近大家最想换成古人说法的现代话、网络梗和日常表达。</p>
         </div>
       </section>
 
@@ -41,7 +41,7 @@ export default async function HotPage() {
       </section>
 
       <section aria-label="热门卡片预览">
-        <div className="section-title"><div><h2>热门古人嘴替卡片</h2><p>点进任意条目，可以打开独立长尾页。</p></div></div>
+        <div className="section-title"><div><h2>热门古人嘴替卡片</h2><p>点开任意一句，看看古人会怎么说。</p></div></div>
         <div className="results">
           {previews.filter((item) => item.result).map(({ item, result }) => (
             <a className="result-link" href={item.href} key={item.href}>
