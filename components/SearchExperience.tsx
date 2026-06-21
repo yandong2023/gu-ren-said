@@ -1,17 +1,23 @@
 "use client";
 
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 import QuoteCard from "@/components/QuoteCard";
 import type { SearchResult } from "@/lib/types";
 
+type HotItem = {
+  query: string;
+  href: string;
+  count: number;
+};
+
 const EXAMPLES = [
   "你真好看",
+  "我爱你",
   "我 emo 了",
   "这事包的",
   "太卷了，想躺平",
   "我真的会谢",
   "这人太牛了",
-  "今天破防了",
   "想家了"
 ];
 
@@ -37,11 +43,23 @@ const PREVIEW: SearchResult = {
 export default function SearchExperience() {
   const [query, setQuery] = useState("你真好看");
   const [results, setResults] = useState<SearchResult[]>([]);
+  const [hotItems, setHotItems] = useState<HotItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const visibleResults = useMemo(() => (results.length ? results : [PREVIEW]), [results]);
+
+  useEffect(() => {
+    let mounted = true;
+    fetch("/api/hot")
+      .then((response) => response.ok ? response.json() : null)
+      .then((payload: { items?: HotItem[] } | null) => {
+        if (mounted && payload?.items) setHotItems(payload.items);
+      })
+      .catch(() => undefined);
+    return () => { mounted = false; };
+  }, []);
 
   async function runSearch(nextQuery = query) {
     const value = nextQuery.trim();
@@ -80,20 +98,20 @@ export default function SearchExperience() {
     <main className="shell">
       <nav className="nav" aria-label="主导航">
         <div className="brand"><span className="brand-mark">古</span><span>古人早就说过</span></div>
-        <div className="nav-pill">真实出处 · 可看原文 · 一键分享</div>
+        <div className="nav-actions"><a className="nav-pill" href="/hot">大家都在嘴替什么</a></div>
       </nav>
 
       <section className="hero">
         <div className="hero-copy">
-          <div className="badge">🪶 把普通口头禅，换成古人早就说过的高级表达</div>
-          <h1>网络热梗，<span className="title-accent">古人早就说过。</span></h1>
+          <div className="badge">🪶 把普通口头禅，换成古人嘴替的高级表达</div>
+          <h1>现代话，<span className="title-accent">古人嘴替。</span></h1>
           <p className="subtitle">输入一句现代话、口头禅或网络梗，找到意思相近的古诗文原句。适合写作文、发朋友圈、小红书配图、亲子语文启蒙，也适合把“烂梗”换成更有出处的表达。</p>
 
           <form className="search-panel" onSubmit={submit}>
-            <textarea value={query} onChange={(event) => setQuery(event.target.value)} placeholder="比如：你真好看 / 我 emo 了 / 太卷了想躺平 / 这事包的" aria-label="输入现代话或网络热梗" />
+            <textarea value={query} onChange={(event) => setQuery(event.target.value)} placeholder="比如：你真好看 / 我爱你 / 我 emo 了 / 太卷了想躺平" aria-label="输入现代话或网络热梗" />
             <div className="search-actions">
               <span className="hint">每句都带作者、篇名和原文，方便学习，也方便分享。</span>
-              <button className="primary-btn" type="submit" disabled={loading}>{loading ? "反查中…" : "反查古文"}</button>
+              <button className="primary-btn" type="submit" disabled={loading}>{loading ? "反查中…" : "生成古人嘴替"}</button>
             </div>
             <div className="examples" aria-label="示例">
               {EXAMPLES.map((example) => (
@@ -101,6 +119,17 @@ export default function SearchExperience() {
               ))}
             </div>
           </form>
+
+          {hotItems.length > 0 ? (
+            <section className="hot-strip" aria-label="大家都在嘴替什么">
+              <div className="hot-strip-title">🔥 大家都在让古人嘴替什么</div>
+              <div className="hot-strip-list">
+                {hotItems.slice(0, 10).map((item, index) => (
+                  <a href={item.href} className="hot-chip" key={item.href}><span>{index + 1}</span>{item.query}</a>
+                ))}
+              </div>
+            </section>
+          ) : null}
         </div>
 
         <aside className="preview-stack" aria-label="传播卡片预览">
