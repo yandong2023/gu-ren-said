@@ -32,8 +32,6 @@ export default function QuoteCard({ result, query, compact = false }: Props) {
     result.quote,
     `出处：${fullSourceText}`,
     "",
-    `为什么适合：${whyText}`,
-    "",
     `来自：${SITE_URL}`
   ].join("\n");
 
@@ -76,7 +74,7 @@ export default function QuoteCard({ result, query, compact = false }: Props) {
     const ok = await copyToClipboard(shareText);
     setCopied(ok);
     if (showNotice) {
-      setNotice(ok ? "完整知识卡片文案已复制，可以直接粘贴到微信、朋友圈或小红书。" : "当前浏览器不允许自动复制，可以手动长按卡片保存或复制页面文字。");
+      setNotice(ok ? "分享文案已复制，可以直接粘贴到微信、朋友圈或小红书。" : "当前浏览器不允许自动复制，可以手动长按卡片保存或复制页面文字。");
     }
     window.setTimeout(() => setCopied(false), 1500);
     return ok;
@@ -135,7 +133,7 @@ export default function QuoteCard({ result, query, compact = false }: Props) {
       setPreviewUrl(dataUrl);
       const copiedOk = await copyText(false);
       setNotice(copiedOk
-        ? "分享图已生成，知识卡片文案也已复制。微信里请长按下方图片保存，再发给朋友或朋友圈。"
+        ? "分享图已生成，文案也已复制。微信里请长按下方图片保存，再发给朋友或朋友圈。"
         : "分享图已生成。微信里请长按下方图片保存，再发给朋友或朋友圈。"
       );
     } catch {
@@ -183,16 +181,17 @@ export default function QuoteCard({ result, query, compact = false }: Props) {
           <h3 className="quote-line">{result.quote}</h3>
           <div className="source-line"><span className="knowledge-label">出处</span>{sourceText}</div>
           <div className="card-spacer" />
-          <div className="explain-line"><span className="knowledge-label">为什么适合</span>{whyText}</div>
           <div className="tags"><span className="tag">#{shareCopy.tag}</span>{result.themes.slice(0, 3).map((tag) => <span className="tag" key={tag}>#{tag}</span>)}</div>
           <div className="watermark">gurensaid.com · 每句都有出处</div>
         </div>
       </div>
       {!compact ? (
         <>
+          <div className="match-reason"><strong>为什么匹配</strong><span>{whyText}</span></div>
+
           <div className="card-actions">
             <button className="secondary-btn" type="button" onClick={prepareShareImage} disabled={sharing}>{sharing ? "生成中…" : "生成分享图"}</button>
-            <button className="ghost-btn" type="button" onClick={() => copyText()}>{copied ? "已复制" : "复制完整卡片"}</button>
+            <button className="ghost-btn" type="button" onClick={() => copyText()}>{copied ? "已复制" : "复制分享文案"}</button>
             <button className="ghost-btn" type="button" onClick={downloadCard} disabled={downloading}>{downloading ? "生成中…" : "下载图片"}</button>
           </div>
 
