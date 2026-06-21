@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import "./globals.css";
+import "./ux.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://gurensaid.com"),
