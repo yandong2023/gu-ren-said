@@ -18,6 +18,10 @@ export function getSharePersona(result: SearchResult): SharePersona {
     return { name: "古人嘴替：把爱说得更重", slogan: "一句现代话，换成古人说法，突然就有了分量。", tag: "爱情" };
   }
 
+  if (result.emotion === "critical" || hasTheme(result, ["负向外貌", "反讽", "讽刺", "失礼"])) {
+    return { name: "古人嘴替：把吐槽说得更有分寸", slogan: "别只说难听话，古人会把话锋藏进典故里。", tag: "反讽" };
+  }
+
   if (result.emotion === "beauty" || hasTheme(result, ["美貌", "惊艳", "容貌"])) {
     return { name: "古人嘴替：把好看夸得更高级", slogan: "别只说“真好看”，古人夸人连眼神都有画面。", tag: "夸夸" };
   }
