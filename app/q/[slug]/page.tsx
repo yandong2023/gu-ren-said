@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import QuoteCard from "@/components/QuoteCard";
-import { getSharePersona } from "@/lib/share-persona";
 import { runSearch } from "@/lib/search-service.server";
 import { absoluteQueryUrl, queryHref, shouldIndexQuery, slugToQuery } from "@/lib/trends.server";
 
@@ -18,13 +17,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const shouldIndex = await shouldIndexQuery(query);
   const payload = await runSearch(query, 1, { enhance: false });
   const result = payload.results[0];
-  const title = `${query}，古人怎么说？｜古人嘴替`;
+  const title = `${query}，古文怎么说？｜古诗文反查`;
   const description = result
-    ? `${query}的古人嘴替：${result.quote} ——${result.dynasty}·${result.author}《${result.title}》。`
-    : `把“${query}”换成更有文化的古人说法，查看真实出处和原文。`;
-  const share = result ? getSharePersona(result) : null;
+    ? `${query}的古诗文表达：${result.quote} ——${result.dynasty}·${result.author}《${result.title}》。`
+    : `把“${query}”反查成更有文化的古诗文原句，查看真实出处和原文。`;
   const image = result
-    ? `/api/share-image?q=${encodeURIComponent(query)}&quote=${encodeURIComponent(result.quote)}&author=${encodeURIComponent(result.author)}&dynasty=${encodeURIComponent(result.dynasty)}&title=${encodeURIComponent(result.title)}&persona=${encodeURIComponent(share?.name ?? "古人嘴替生成器")}&slogan=${encodeURIComponent(share?.slogan ?? "把你的现代话换成古人说法")}`
+    ? `/api/share-image?q=${encodeURIComponent(query)}&quote=${encodeURIComponent(result.quote)}&author=${encodeURIComponent(result.author)}&dynasty=${encodeURIComponent(result.dynasty)}&title=${encodeURIComponent(result.title)}&reason=${encodeURIComponent(result.reason || result.translation)}`
     : "/og.svg";
 
   return {
@@ -61,28 +59,28 @@ export default async function QueryPage({ params }: PageProps) {
     <main className="shell">
       <nav className="nav" aria-label="主导航">
         <a className="brand" href="/"><span className="brand-mark">古</span><span>古人早就说过</span></a>
-        <a className="nav-pill" href="/hot">大家都在嘴替什么</a>
+        <a className="nav-pill" href="/hot">热门反查</a>
       </nav>
 
       <section className="query-hero">
-        <h1>“{query}”，古人怎么说？</h1>
-        <p>把这句现代话换成更有文化、更有出处的古人嘴替表达。</p>
+        <h1>“{query}”，古文怎么说？</h1>
+        <p>找到意思相近的古诗文原句、作者、出处和原文。</p>
       </section>
 
       {top ? (
-        <section aria-label="最佳古人嘴替">
-          <div className="section-title"><div><h2>最佳古人嘴替</h2><p>结果保留原句、出处、解释和原文，方便核对和学习。</p></div></div>
+        <section aria-label="推荐表达">
+          <div className="section-title"><div><h2>推荐表达</h2><p>结果保留原句、出处、解释和原文，方便核对和学习。</p></div></div>
           <div className="single-result">
             <QuoteCard result={top} query={query} />
           </div>
         </section>
       ) : (
-        <div className="empty-state">暂时没有找到足够贴切的古人嘴替。可以回到首页换一种说法再试。</div>
+        <div className="empty-state">暂时没有找到足够贴切的古文表达。可以回到首页换一种说法再试。</div>
       )}
 
       {payload.results.length > 1 ? (
-        <section aria-label="更多相似表达">
-          <div className="section-title"><div><h2>更多相似说法</h2><p>不同句子适合不同语气和场景。</p></div></div>
+        <section aria-label="还能怎么说">
+          <div className="section-title"><div><h2>还能怎么说</h2><p>不同句子适合不同语气和场景。</p></div></div>
           <div className="results">
             {payload.results.slice(1).map((result) => <QuoteCard key={result.id} result={result} query={query} compact />)}
           </div>
