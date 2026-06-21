@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import QuoteCard from "@/components/QuoteCard";
 import type { SearchResult } from "@/lib/types";
 
@@ -16,9 +16,9 @@ const EXAMPLES = [
   "我 emo 了",
   "这事包的",
   "太卷了，想躺平",
-  "我真的会谢",
-  "这人太牛了",
-  "想家了"
+  "我想你",
+  "不要放弃",
+  "我真的会谢"
 ];
 
 const PREVIEW: SearchResult = {
@@ -47,6 +47,7 @@ export default function SearchExperience() {
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const resultsRef = useRef<HTMLElement | null>(null);
 
   const visibleResults = useMemo(() => (results.length ? results : [PREVIEW]), [results]);
 
@@ -77,6 +78,9 @@ export default function SearchExperience() {
       if (!response.ok) throw new Error("搜索服务暂时不可用");
       const payload = (await response.json()) as { results: SearchResult[] };
       setResults(payload.results ?? []);
+      window.setTimeout(() => {
+        resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 80);
     } catch (err) {
       setError(err instanceof Error ? err.message : "搜索失败");
     } finally {
@@ -98,19 +102,19 @@ export default function SearchExperience() {
     <main className="shell">
       <nav className="nav" aria-label="主导航">
         <div className="brand"><span className="brand-mark">古</span><span>古人早就说过</span></div>
-        <div className="nav-actions"><a className="nav-pill" href="/hot">大家都在嘴替什么</a></div>
+        <div className="nav-actions"><a className="nav-pill" href="/hot">热门反查</a></div>
       </nav>
 
       <section className="hero">
         <div className="hero-copy">
-          <div className="badge">🪶 把普通口头禅，换成古人嘴替的高级表达</div>
-          <h1>现代话，<span className="title-accent">古人嘴替。</span></h1>
-          <p className="subtitle">输入一句现代话、口头禅或网络梗，找到意思相近的古诗文原句。适合写作文、发朋友圈、小红书配图、亲子语文启蒙，也适合把“烂梗”换成更有出处的表达。</p>
+          <div className="badge">🪶 真实原句 · 真实出处 · 可看原文</div>
+          <h1>一句现代话，<span className="title-accent">反查古诗文原句。</span></h1>
+          <p className="subtitle">输入现代话、网络梗或日常表达，找到意思相近的古诗文原句、作者、出处和原文。不是 AI 编一句古文，而是从真实古诗文里反查更有文采的表达。</p>
 
           <form className="search-panel" onSubmit={submit}>
             <textarea value={query} onChange={(event) => setQuery(event.target.value)} placeholder="比如：你真好看 / 我爱你 / 我 emo 了 / 太卷了想躺平" aria-label="输入现代话或网络热梗" />
             <div className="search-actions">
-              <span className="hint">每句都带作者、篇名和原文，方便学习，也方便分享。</span>
+              <span className="hint">每句都带作者、篇名和原文，方便核对、学习和分享。</span>
               <button className="primary-btn" type="submit" disabled={loading}>{loading ? "反查中…" : "反查古文"}</button>
             </div>
             <div className="examples" aria-label="示例">
@@ -121,8 +125,8 @@ export default function SearchExperience() {
           </form>
 
           {hotItems.length > 0 ? (
-            <section className="hot-strip" aria-label="大家都在嘴替什么">
-              <div className="hot-strip-title">🔥 大家都在让古人嘴替什么</div>
+            <section className="hot-strip" aria-label="热门反查">
+              <div className="hot-strip-title">🔥 热门反查</div>
               <div className="hot-strip-list">
                 {hotItems.slice(0, 10).map((item, index) => (
                   <a href={item.href} className="hot-chip" key={item.href}><span>{index + 1}</span>{item.query}</a>
@@ -139,8 +143,8 @@ export default function SearchExperience() {
 
       {error ? <div className="empty-state">{error}</div> : null}
 
-      <section aria-label="搜索结果">
-        <div className="section-title"><div><h2>{searched ? "反查结果" : "先看一张传播卡片"}</h2><p>每条结果都保留原句、出处、解释和原文，方便核对和学习。</p></div></div>
+      <section aria-label="搜索结果" ref={resultsRef}>
+        <div className="section-title"><div><h2>{searched ? "反查结果" : "先看一张知识卡片"}</h2><p>每条结果都保留原句、出处、解释和原文，方便核对和学习。</p></div></div>
         {searched && !loading && results.length === 0 ? (
           <div className="empty-state">暂时没有特别贴切的结果。可以把现代话写得更具体，比如“我失恋了很难过”“考试稳了”“想远离内卷”。</div>
         ) : (
@@ -150,7 +154,7 @@ export default function SearchExperience() {
 
       <section className="tech-grid" aria-label="使用场景">
         <div className="tech-item"><strong>写作文更高级</strong><span>把“很难过”“很开心”“很厉害”换成有出处的古诗文表达。</span></div>
-        <div className="tech-item"><strong>发朋友圈更好看</strong><span>一键生成手机卡片，原句、出处和网站域名都在图里。</span></div>
+        <div className="tech-item"><strong>发朋友圈更好看</strong><span>一键生成知识卡片，原句、出处和网站域名都在图里。</span></div>
         <div className="tech-item"><strong>教孩子少用烂梗</strong><span>不是禁止网络用语，而是顺着热梗找到更有文采的表达。</span></div>
         <div className="tech-item"><strong>想学原文也方便</strong><span>结果里可以展开原文和出处，不只看一句漂亮话。</span></div>
       </section>
