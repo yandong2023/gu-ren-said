@@ -111,7 +111,7 @@ export default function SearchExperience() {
             <textarea value={query} onChange={(event) => setQuery(event.target.value)} placeholder="比如：你真好看 / 我爱你 / 我 emo 了 / 太卷了想躺平" aria-label="输入现代话或网络热梗" />
             <div className="search-actions">
               <span className="hint">每句都带作者、篇名和原文，方便学习，也方便分享。</span>
-              <button className="primary-btn" type="submit" disabled={loading}>{loading ? "反查中…" : "生成古人嘴替"}</button>
+              <button className="primary-btn" type="submit" disabled={loading}>{loading ? "反查中…" : "反查古文"}</button>
             </div>
             <div className="examples" aria-label="示例">
               {EXAMPLES.map((example) => (
