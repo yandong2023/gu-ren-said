@@ -26,6 +26,40 @@ export const FALLBACK_TRENDING_QUERIES = [
   "这人太牛了"
 ];
 
+export const SEO_QUERY_WHITELIST = Array.from(new Set([
+  ...FALLBACK_TRENDING_QUERIES,
+  "你好漂亮",
+  "我想和你一辈子在一起",
+  "我暗恋你很久了",
+  "今天破防了",
+  "考试稳了拿下",
+  "不想上班只想回家",
+  "这作品封神了",
+  "这事太离谱",
+  "一个人在外突然想家",
+  "算了不内耗了",
+  "看开了没什么大不了",
+  "别放弃继续扛住",
+  "慢慢变强别急",
+  "开心到飞起",
+  "有点心动念念不忘",
+  "我们真是同频朋友"
+]));
+
+const BLOCKED_PUBLIC_QUERY_PATTERNS = [
+  /傻[逼比屄b]/i,
+  /你是傻/i,
+  /牛[逼比屄b]/i,
+  /卧槽|我靠|草泥马|呆卵|妈的|艹|操你|去死/i,
+  /你真丑|真丑|丑爆|长得丑|难看/i,
+  /猥琐|别浪/i,
+  /^牛福$/i,
+  /^曼巴飞弹$/i,
+  /这个故事告诉我们/i,
+  /把.+说[得的]更有文化/i,
+  /说[得的]更有文化/i
+];
+
 function redisConfig() {
   const url = process.env.UPSTASH_REDIS_REST_URL;
   const token = process.env.UPSTASH_REDIS_REST_TOKEN;
@@ -60,6 +94,10 @@ export function normalizeQuery(query: string) {
   return query.trim().replace(/\s+/g, " ").slice(0, 60);
 }
 
+export function isSeoQueryWhitelisted(query: string) {
+  return SEO_QUERY_WHITELIST.includes(normalizeQuery(query));
+}
+
 export function queryToSlug(query: string) {
   const normalized = normalizeQuery(query).toLowerCase();
   return encodeURIComponent(
@@ -85,11 +123,13 @@ export function queryHref(query: string) {
 
 function looksUnsafeForPublicPage(query: string) {
   const value = normalizeQuery(query);
-  if (value.length < 2 || value.length > 40) return true;
+  if (!value) return true;
+  if (isSeoQueryWhitelisted(value)) return false;
+  if (value.length < 2 || value.length > 18) return true;
   if (/https?:\/\//i.test(value) || /@/.test(value)) return true;
   if (/\d{5,}/.test(value)) return true;
   if (/[\r\n<>]/.test(value)) return true;
-  return false;
+  return BLOCKED_PUBLIC_QUERY_PATTERNS.some((pattern) => pattern.test(value));
 }
 
 export function isPublicQueryCandidate(query: string) {
@@ -177,9 +217,9 @@ export async function getQueryCount(query: string): Promise<number> {
 export async function shouldIndexQuery(query: string) {
   const normalized = normalizeQuery(query);
   if (!isPublicQueryCandidate(normalized)) return false;
-  if (FALLBACK_TRENDING_QUERIES.includes(normalized)) return true;
+  if (isSeoQueryWhitelisted(normalized)) return true;
   const count = await getQueryCount(normalized);
-  return count >= Number(process.env.QUERY_INDEX_MIN_COUNT ?? 5);
+  return count >= Number(process.env.QUERY_INDEX_MIN_COUNT ?? 10);
 }
 
 export function absoluteQueryUrl(query: string) {
