@@ -105,6 +105,10 @@ export function fallbackTrending(limit = 10): TrendingQuery[] {
   }));
 }
 
+function todayKey() {
+  return new Date().toISOString().slice(0, 10);
+}
+
 export async function recordSearchQuery(query: string, results: SearchResult[]) {
   const normalized = normalizeQuery(query);
   if (!isPublicQueryCandidate(normalized)) return;
@@ -138,9 +142,8 @@ export async function recordSearchQuery(query: string, results: SearchResult[]) 
   ]);
 }
 
-export async function getTrendingQueries(limit = 10): Promise<TrendingQuery[]> {
-  const raw = await redisCommand<string[]>(["ZREVRANGE", ALL_TIME_KEY, 0, Math.max(0, limit - 1), "WITHSCORES"]);
-  if (!raw || raw.length === 0) return fallbackTrending(limit);
+function parseTrendingRaw(raw: string[] | null, limit: number): TrendingQuery[] {
+  if (!raw || raw.length === 0) return [];
 
   const items: TrendingQuery[] = [];
   for (let i = 0; i < raw.length; i += 2) {
@@ -155,7 +158,14 @@ export async function getTrendingQueries(limit = 10): Promise<TrendingQuery[]> {
     });
   }
 
-  return items.length > 0 ? items.slice(0, limit) : fallbackTrending(limit);
+  return items.slice(0, limit);
+}
+
+export async function getTrendingQueries(limit = 10, range: "all" | "today" = "all"): Promise<TrendingQuery[]> {
+  const redisKey = range === "today" ? `grs:queries:day:${todayKey()}` : ALL_TIME_KEY;
+  const raw = await redisCommand<string[]>(["ZREVRANGE", redisKey, 0, Math.max(0, limit - 1), "WITHSCORES"]);
+  const items = parseTrendingRaw(raw, limit);
+  return items.length > 0 ? items : fallbackTrending(limit);
 }
 
 export async function getQueryCount(query: string): Promise<number> {
