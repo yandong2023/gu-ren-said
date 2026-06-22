@@ -9,6 +9,11 @@ export const metadata = {
   description: "查看今日、本周和历史最热门的古诗文反查：我爱你、你真好看、我 emo 了、这事包的等。"
 };
 
+type RankedPreview = {
+  item: TrendingQuery;
+  result?: Awaited<ReturnType<typeof runSearch>>["results"][number];
+};
+
 function RankingBlock({ title, description, items, emptyText }: { title: string; description: string; items: TrendingQuery[]; emptyText?: string }) {
   return (
     <section aria-label={title}>
@@ -30,16 +35,28 @@ function RankingBlock({ title, description, items, emptyText }: { title: string;
   );
 }
 
-export default async function HotPage() {
-  const [todayItems, weekItems, allItems] = await Promise.all([
-    getTrendingQueries(10, "today"),
-    getTrendingQueries(10, "week"),
-    getTrendingQueries(10, "all")
-  ]);
-  const previews = await Promise.all(todayItems.slice(0, 6).map(async (item) => {
+async function keepRankedItemsWithResults(items: TrendingQuery[], limit: number): Promise<RankedPreview[]> {
+  const checked = await Promise.all(items.map(async (item) => {
     const payload = await runSearch(item.query, 1, { enhance: false });
-    return { item, result: payload.results[0] };
+    return payload.results[0] ? { item, result: payload.results[0] } : null;
   }));
+  return checked.filter((entry): entry is RankedPreview => Boolean(entry)).slice(0, limit);
+}
+
+export default async function HotPage() {
+  const [todayRawItems, weekRawItems, allRawItems] = await Promise.all([
+    getTrendingQueries(20, "today"),
+    getTrendingQueries(20, "week"),
+    getTrendingQueries(20, "all")
+  ]);
+  const [todayPreviews, weekPreviews, allPreviews] = await Promise.all([
+    keepRankedItemsWithResults(todayRawItems, 10),
+    keepRankedItemsWithResults(weekRawItems, 10),
+    keepRankedItemsWithResults(allRawItems, 10)
+  ]);
+  const todayItems = todayPreviews.map(({ item }) => item);
+  const weekItems = weekPreviews.map(({ item }) => item);
+  const allItems = allPreviews.map(({ item }) => item);
 
   return (
     <main className="shell">
@@ -55,15 +72,15 @@ export default async function HotPage() {
         </div>
       </section>
 
-      <RankingBlock title="今日排行榜" description="今天大家正在查的现代话和网络热梗，只统计今天真实搜索。" items={todayItems} emptyText="今天还没有足够真实搜索数据。" />
-      <RankingBlock title="本周排行榜" description="本周搜索次数最多的古诗文反查，只统计本周真实搜索。" items={weekItems} emptyText="本周还没有足够真实搜索数据。" />
+      <RankingBlock title="今日排行榜" description="今天大家正在查的现代话和网络热梗，只统计今天真实搜索，并过滤暂无有效古文结果的输入。" items={todayItems} emptyText="今天还没有足够真实且有效的搜索数据。" />
+      <RankingBlock title="本周排行榜" description="本周搜索次数最多的古诗文反查，只统计本周真实搜索，并过滤暂无有效古文结果的输入。" items={weekItems} emptyText="本周还没有足够真实且有效的搜索数据。" />
       <RankingBlock title="历史排行榜" description="全站累计搜索次数最高的长期热门词。" items={allItems} />
 
-      {previews.length > 0 ? (
+      {todayPreviews.length > 0 ? (
         <section aria-label="今日热门知识卡片预览">
           <div className="section-title"><div><h2>今日热门知识卡片</h2><p>点开任意一句，查看对应的古诗文原句和出处。</p></div></div>
           <div className="results">
-            {previews.filter((item) => item.result).map(({ item, result }) => (
+            {todayPreviews.slice(0, 6).map(({ item, result }) => (
               <a className="result-link" href={item.href} key={item.href}>
                 <QuoteCard result={result!} query={item.query} compact />
               </a>
