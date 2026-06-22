@@ -198,15 +198,15 @@ export default function SearchExperience() {
   return (
     <main className="shell">
       <nav className="nav" aria-label="主导航">
-        <div className="brand"><span className="brand-mark">古</span><span>古人早就说过</span></div>
+        <div className="brand"><span className="brand-mark">古</span><span>古人曰</span></div>
         <div className="nav-actions"><a className="nav-pill" href="/hot">热门反查</a></div>
       </nav>
 
       <section className="hero">
         <div className="hero-copy">
           <div className="badge">🪶 真实原句 · 真实出处 · 可看原文</div>
-          <h1>一句现代话，<span className="title-accent">反查古诗文原句。</span></h1>
-          <p className="subtitle">输入现代话、网络梗或日常表达，找到意思相近的古诗文原句、作者、出处和原文。不是 AI 编一句古文，而是从真实古诗文里反查更有文采的表达。</p>
+          <h1>现代话 / 网络热梗，<span className="title-accent">古人早就说过。</span></h1>
+          <p className="subtitle">输入现代话、网络热梗或日常表达，找到意思相近的古诗文原句、作者、出处和原文。不是 AI 编一句古文，而是反查古人早就说过的表达。</p>
 
           <form className="search-panel" onSubmit={submit}>
             <textarea value={query} onChange={(event) => setQuery(event.target.value)} placeholder="比如：你真好看 / 我爱你 / 我 emo 了 / 太卷了想躺平" aria-label="输入现代话或网络热梗" />
