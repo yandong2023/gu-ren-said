@@ -1,10 +1,11 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getSharePersona } from "@/lib/share-persona";
 import type { SearchResult } from "@/lib/types";
 
 const SITE_URL = "https://gurensaid.com";
+const FAVORITES_KEY = "grs:favorites";
 
 type Props = {
   result: SearchResult;
@@ -12,12 +13,52 @@ type Props = {
   compact?: boolean;
 };
 
+type FavoriteItem = {
+  id: string;
+  query: string;
+  href: string;
+  quote: string;
+  source: string;
+  at: number;
+};
+
+function queryToSlug(query: string) {
+  return encodeURIComponent(
+    query.trim().toLowerCase()
+      .replace(/[，。！？!?.,、/\\]+/g, " ")
+      .replace(/\s+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 80)
+  );
+}
+
+function queryHref(query: string) {
+  return `/q/${queryToSlug(query)}`;
+}
+
+function readFavorites(): FavoriteItem[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const parsed = JSON.parse(window.localStorage.getItem(FAVORITES_KEY) ?? "[]");
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveFavorites(items: FavoriteItem[]) {
+  if (typeof window === "undefined") return;
+  window.localStorage.setItem(FAVORITES_KEY, JSON.stringify(items));
+  window.dispatchEvent(new Event("grs:favorites-updated"));
+}
+
 export default function QuoteCard({ result, query, compact = false }: Props) {
   const cardRef = useRef<HTMLDivElement | null>(null);
   const [copied, setCopied] = useState(false);
   const [downloading, setDownloading] = useState(false);
   const [sharing, setSharing] = useState(false);
   const [feedbacking, setFeedbacking] = useState(false);
+  const [favorited, setFavorited] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const sourceText = `——${result.dynasty}·${result.author}《${result.title}》`;
@@ -37,6 +78,10 @@ export default function QuoteCard({ result, query, compact = false }: Props) {
     "",
     `来自：${SITE_URL}`
   ].join("\n");
+
+  useEffect(() => {
+    setFavorited(readFavorites().some((item) => item.id === result.id));
+  }, [result.id]);
 
   async function copyToClipboard(text: string) {
     try {
@@ -81,6 +126,30 @@ export default function QuoteCard({ result, query, compact = false }: Props) {
     }
     window.setTimeout(() => setCopied(false), 1500);
     return ok;
+  }
+
+  function toggleFavorite() {
+    const existing = readFavorites();
+    const exists = existing.some((item) => item.id === result.id);
+
+    if (exists) {
+      saveFavorites(existing.filter((item) => item.id !== result.id));
+      setFavorited(false);
+      setNotice("已取消收藏。");
+      return;
+    }
+
+    const favorite: FavoriteItem = {
+      id: result.id,
+      query: modernText,
+      href: queryHref(modernText),
+      quote: result.quote,
+      source: fullSourceText,
+      at: Date.now()
+    };
+    saveFavorites([favorite, ...existing.filter((item) => item.id !== result.id)].slice(0, 30));
+    setFavorited(true);
+    setNotice("已收藏。下次打开首页可以在“我的收藏句子”里看到。");
   }
 
   async function sendFeedback(type: "not_accurate" | "wrong_source" | "better_quote") {
@@ -196,6 +265,7 @@ export default function QuoteCard({ result, query, compact = false }: Props) {
           <div className="card-actions">
             <button className="secondary-btn" type="button" onClick={prepareShareImage} disabled={sharing}>{sharing ? "生成中…" : "生成分享图"}</button>
             <button className="ghost-btn" type="button" onClick={() => copyText()}>{copied ? "已复制" : "复制分享文案"}</button>
+            <button className="ghost-btn" type="button" onClick={toggleFavorite}>{favorited ? "已收藏" : "收藏本句"}</button>
             <button className="ghost-btn" type="button" onClick={downloadCard} disabled={downloading}>{downloading ? "生成中…" : "下载图片"}</button>
           </div>
 
