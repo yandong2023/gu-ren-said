@@ -39,7 +39,7 @@ export async function runSearch(query: string, limit = 6, options: { record?: bo
   const enhancedResults = shouldEnhance ? await enhanceWithDeepSeek(query, candidates, plan) : candidates;
   const results = enhancedResults.filter(hasUsefulSearchSignal).slice(0, safeLimit);
 
-  if (options.record) {
+  if (options.record && results.length > 0) {
     await recordSearchQuery(query, results);
   }
 
