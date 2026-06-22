@@ -4,6 +4,8 @@ const SITE_URL = "https://gurensaid.com";
 const ALL_TIME_KEY = "grs:queries:all";
 const FALLBACK_COUNT = 128;
 
+type TrendingRange = "all" | "today" | "week";
+
 export type TrendingQuery = {
   query: string;
   slug: string;
@@ -149,6 +151,16 @@ function todayKey() {
   return new Date().toISOString().slice(0, 10);
 }
 
+function weekKey() {
+  const now = new Date();
+  const date = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+  const day = date.getUTCDay() || 7;
+  date.setUTCDate(date.getUTCDate() + 4 - day);
+  const yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
+  const week = Math.ceil((((date.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
+  return `${date.getUTCFullYear()}-W${String(week).padStart(2, "0")}`;
+}
+
 export async function recordSearchQuery(query: string, results: SearchResult[]) {
   const normalized = normalizeQuery(query);
   if (!isPublicQueryCandidate(normalized)) return;
@@ -157,12 +169,15 @@ export async function recordSearchQuery(query: string, results: SearchResult[]) 
   const first = results[0];
   const now = new Date().toISOString();
   const dayKey = `grs:queries:day:${now.slice(0, 10)}`;
+  const weekRankKey = `grs:queries:week:${weekKey()}`;
   const metaKey = `grs:query:${slug}`;
 
   await Promise.all([
     redisCommand<number>(["ZINCRBY", ALL_TIME_KEY, 1, normalized]),
     redisCommand<number>(["ZINCRBY", dayKey, 1, normalized]),
     redisCommand<number>(["EXPIRE", dayKey, 60 * 60 * 24 * 14]),
+    redisCommand<number>(["ZINCRBY", weekRankKey, 1, normalized]),
+    redisCommand<number>(["EXPIRE", weekRankKey, 60 * 60 * 24 * 70]),
     first
       ? redisCommand<number>([
           "HSET",
@@ -201,9 +216,14 @@ function parseTrendingRaw(raw: string[] | null, limit: number): TrendingQuery[] 
   return items.slice(0, limit);
 }
 
-export async function getTrendingQueries(limit = 10, range: "all" | "today" = "all"): Promise<TrendingQuery[]> {
-  const redisKey = range === "today" ? `grs:queries:day:${todayKey()}` : ALL_TIME_KEY;
-  const raw = await redisCommand<string[]>(["ZREVRANGE", redisKey, 0, Math.max(0, limit - 1), "WITHSCORES"]);
+function trendingKey(range: TrendingRange) {
+  if (range === "today") return `grs:queries:day:${todayKey()}`;
+  if (range === "week") return `grs:queries:week:${weekKey()}`;
+  return ALL_TIME_KEY;
+}
+
+export async function getTrendingQueries(limit = 10, range: TrendingRange = "all"): Promise<TrendingQuery[]> {
+  const raw = await redisCommand<string[]>(["ZREVRANGE", trendingKey(range), 0, Math.max(0, limit - 1), "WITHSCORES"]);
   const items = parseTrendingRaw(raw, limit);
   return items.length > 0 ? items : fallbackTrending(limit);
 }
