@@ -17,7 +17,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const shouldIndex = await shouldIndexQuery(query);
   const payload = await runSearch(query, 1, { enhance: false });
   const result = payload.results[0];
-  const title = `${query}，古文怎么说？｜古诗文反查`;
+  const title = `${query}，古文怎么说？｜古人曰`;
   const description = result
     ? `${query}的古诗文表达：${result.quote} ——${result.dynasty}·${result.author}《${result.title}》。`
     : `把“${query}”反查成更有文化的古诗文原句，查看真实出处和原文。`;
@@ -58,7 +58,7 @@ export default async function QueryPage({ params }: PageProps) {
   return (
     <main className="shell">
       <nav className="nav" aria-label="主导航">
-        <a className="brand" href="/"><span className="brand-mark">古</span><span>古人早就说过</span></a>
+        <a className="brand" href="/"><span className="brand-mark">古</span><span>古人曰</span></a>
         <a className="nav-pill" href="/hot">热门反查</a>
       </nav>
 
