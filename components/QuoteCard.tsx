@@ -248,7 +248,7 @@ export default function QuoteCard({ result, query, compact = false }: Props) {
     <article className="result-card">
       <div className="share-card" ref={cardRef}>
         <div className="share-card-inner">
-          <span className="card-kicker">古诗文反查卡</span>
+          <span className="card-kicker">古人曰</span>
           <div className="modern-line"><span className="knowledge-label">现代话</span>{modernText}</div>
           <h3 className="quote-line">{result.quote}</h3>
           <div className="source-line"><span className="knowledge-label">出处</span>{sourceText}</div>
