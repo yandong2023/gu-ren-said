@@ -1,11 +1,10 @@
 import type { MetadataRoute } from "next";
-import { absoluteQueryUrl, FALLBACK_TRENDING_QUERIES, getTrendingQueries } from "@/lib/trends.server";
+import { absoluteQueryUrl, SEO_QUERY_WHITELIST } from "@/lib/trends.server";
 
 const SITE_URL = "https://gurensaid.com";
 
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const trending = await getTrendingQueries(30);
-  const querySet = new Set<string>([...FALLBACK_TRENDING_QUERIES, ...trending.map((item) => item.query)]);
+export default function sitemap(): MetadataRoute.Sitemap {
+  const querySet = new Set<string>(SEO_QUERY_WHITELIST);
   const now = new Date();
 
   return [
