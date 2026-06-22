@@ -225,7 +225,8 @@ function trendingKey(range: TrendingRange) {
 export async function getTrendingQueries(limit = 10, range: TrendingRange = "all"): Promise<TrendingQuery[]> {
   const raw = await redisCommand<string[]>(["ZREVRANGE", trendingKey(range), 0, Math.max(0, limit - 1), "WITHSCORES"]);
   const items = parseTrendingRaw(raw, limit);
-  return items.length > 0 ? items : fallbackTrending(limit);
+  if (items.length > 0) return items;
+  return range === "all" ? fallbackTrending(limit) : [];
 }
 
 export async function getQueryCount(query: string): Promise<number> {
