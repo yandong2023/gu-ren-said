@@ -5,7 +5,7 @@ import { getTrendingQueries } from "@/lib/trends.server";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "热门反查｜古人早就说过",
+  title: "热门反查｜古人曰",
   description: "查看全站最热门的古诗文反查：我爱你、你真好看、我 emo 了、这事包的等。"
 };
 
@@ -19,7 +19,7 @@ export default async function HotPage() {
   return (
     <main className="shell">
       <nav className="nav" aria-label="主导航">
-        <a className="brand" href="/"><span className="brand-mark">古</span><span>古人早就说过</span></a>
+        <a className="brand" href="/"><span className="brand-mark">古</span><span>古人曰</span></a>
         <a className="nav-pill" href="/">返回首页</a>
       </nav>
 
