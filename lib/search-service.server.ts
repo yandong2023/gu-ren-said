@@ -1,4 +1,4 @@
-import { expandQuery, mergeResults, searchInMemory } from "./search";
+import { expandQuery, hasUsefulSearchSignal, mergeResults, searchInMemory } from "./search";
 import { getDbStatus, searchSqlite } from "./db.server";
 import { enhanceWithDeepSeek, planQueryWithDeepSeek } from "./deepseek.server";
 import { recordSearchQuery } from "./trends.server";
@@ -35,9 +35,9 @@ export async function runSearch(query: string, limit = 6, options: { record?: bo
 
   const sqliteResults = searchSqlite(expanded, Math.max(safeLimit * 3, 24));
   const memoryResults = searchInMemory(expanded, Math.max(safeLimit * 2, 12));
-  const candidates = mergeResults(sqliteResults, memoryResults).slice(0, Math.max(safeLimit * 4, 24));
+  const candidates = mergeResults(sqliteResults, memoryResults).filter(hasUsefulSearchSignal).slice(0, Math.max(safeLimit * 4, 24));
   const enhancedResults = shouldEnhance ? await enhanceWithDeepSeek(query, candidates, plan) : candidates;
-  const results = enhancedResults.slice(0, safeLimit);
+  const results = enhancedResults.filter(hasUsefulSearchSignal).slice(0, safeLimit);
 
   if (options.record) {
     await recordSearchQuery(query, results);
