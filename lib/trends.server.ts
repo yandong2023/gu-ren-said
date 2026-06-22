@@ -3,6 +3,7 @@ import type { SearchResult } from "./types";
 const SITE_URL = "https://gurensaid.com";
 const ALL_TIME_KEY = "grs:queries:all";
 const FALLBACK_COUNT = 128;
+const BEIJING_OFFSET_MS = 8 * 60 * 60 * 1000;
 
 type TrendingRange = "all" | "today" | "week";
 
@@ -147,12 +148,16 @@ export function fallbackTrending(limit = 10): TrendingQuery[] {
   }));
 }
 
+function beijingDate() {
+  return new Date(Date.now() + BEIJING_OFFSET_MS);
+}
+
 function todayKey() {
-  return new Date().toISOString().slice(0, 10);
+  return beijingDate().toISOString().slice(0, 10);
 }
 
 function weekKey() {
-  const now = new Date();
+  const now = beijingDate();
   const date = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
   const day = date.getUTCDay() || 7;
   date.setUTCDate(date.getUTCDate() + 4 - day);
@@ -168,14 +173,14 @@ export async function recordSearchQuery(query: string, results: SearchResult[]) 
   const slug = queryToSlug(normalized);
   const first = results[0];
   const now = new Date().toISOString();
-  const dayKey = `grs:queries:day:${now.slice(0, 10)}`;
+  const dayRankKey = `grs:queries:day:${todayKey()}`;
   const weekRankKey = `grs:queries:week:${weekKey()}`;
   const metaKey = `grs:query:${slug}`;
 
   await Promise.all([
     redisCommand<number>(["ZINCRBY", ALL_TIME_KEY, 1, normalized]),
-    redisCommand<number>(["ZINCRBY", dayKey, 1, normalized]),
-    redisCommand<number>(["EXPIRE", dayKey, 60 * 60 * 24 * 14]),
+    redisCommand<number>(["ZINCRBY", dayRankKey, 1, normalized]),
+    redisCommand<number>(["EXPIRE", dayRankKey, 60 * 60 * 24 * 14]),
     redisCommand<number>(["ZINCRBY", weekRankKey, 1, normalized]),
     redisCommand<number>(["EXPIRE", weekRankKey, 60 * 60 * 24 * 70]),
     first
