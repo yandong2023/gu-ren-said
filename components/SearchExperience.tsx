@@ -10,6 +10,26 @@ type HotItem = {
   count: number;
 };
 
+type HistoryItem = {
+  query: string;
+  href: string;
+  quote?: string;
+  source?: string;
+  at: number;
+};
+
+type FavoriteItem = {
+  id: string;
+  query: string;
+  href: string;
+  quote: string;
+  source: string;
+  at: number;
+};
+
+const HISTORY_KEY = "grs:history";
+const FAVORITES_KEY = "grs:favorites";
+
 const EXAMPLES = [
   "你真好看",
   "我爱你",
@@ -40,10 +60,55 @@ const PREVIEW: SearchResult = {
   reason: "这句写笑容和眼神之美，用来替代“你真好看”更有文采，也适合分享。"
 };
 
+function queryToSlug(query: string) {
+  return encodeURIComponent(
+    query.trim().toLowerCase()
+      .replace(/[，。！？!?.,、/\\]+/g, " ")
+      .replace(/\s+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 80)
+  );
+}
+
+function queryHref(query: string) {
+  return `/q/${queryToSlug(query)}`;
+}
+
+function readList<T>(key: string): T[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const parsed = JSON.parse(window.localStorage.getItem(key) ?? "[]");
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveList<T>(key: string, items: T[]) {
+  if (typeof window === "undefined") return;
+  window.localStorage.setItem(key, JSON.stringify(items));
+}
+
+function resultSource(result: SearchResult) {
+  return `${result.dynasty}·${result.author}《${result.title}》`;
+}
+
+function buildHistoryItem(query: string, result?: SearchResult): HistoryItem {
+  return {
+    query,
+    href: queryHref(query),
+    quote: result?.quote,
+    source: result ? resultSource(result) : undefined,
+    at: Date.now()
+  };
+}
+
 export default function SearchExperience() {
   const [query, setQuery] = useState("你真好看");
   const [results, setResults] = useState<SearchResult[]>([]);
   const [hotItems, setHotItems] = useState<HotItem[]>([]);
+  const [historyItems, setHistoryItems] = useState<HistoryItem[]>([]);
+  const [favoriteItems, setFavoriteItems] = useState<FavoriteItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -51,16 +116,46 @@ export default function SearchExperience() {
 
   const visibleResults = useMemo(() => (results.length ? results : [PREVIEW]), [results]);
 
+  function refreshLocalPanels() {
+    setHistoryItems(readList<HistoryItem>(HISTORY_KEY).slice(0, 8));
+    setFavoriteItems(readList<FavoriteItem>(FAVORITES_KEY).slice(0, 8));
+  }
+
   useEffect(() => {
     let mounted = true;
-    fetch("/api/hot")
+    fetch("/api/hot?range=today")
       .then((response) => response.ok ? response.json() : null)
       .then((payload: { items?: HotItem[] } | null) => {
         if (mounted && payload?.items) setHotItems(payload.items);
       })
       .catch(() => undefined);
-    return () => { mounted = false; };
+
+    refreshLocalPanels();
+    window.addEventListener("grs:favorites-updated", refreshLocalPanels);
+    return () => {
+      mounted = false;
+      window.removeEventListener("grs:favorites-updated", refreshLocalPanels);
+    };
   }, []);
+
+  function recordHistory(nextQuery: string, result?: SearchResult) {
+    const item = buildHistoryItem(nextQuery, result);
+    const existing = readList<HistoryItem>(HISTORY_KEY).filter((history) => history.query !== nextQuery);
+    const next = [item, ...existing].slice(0, 12);
+    saveList(HISTORY_KEY, next);
+    setHistoryItems(next.slice(0, 8));
+  }
+
+  function clearHistory() {
+    saveList<HistoryItem>(HISTORY_KEY, []);
+    setHistoryItems([]);
+  }
+
+  function clearFavorites() {
+    saveList<FavoriteItem>(FAVORITES_KEY, []);
+    setFavoriteItems([]);
+    window.dispatchEvent(new Event("grs:favorites-updated"));
+  }
 
   async function runSearch(nextQuery = query) {
     const value = nextQuery.trim();
@@ -77,7 +172,9 @@ export default function SearchExperience() {
       });
       if (!response.ok) throw new Error("搜索服务暂时不可用");
       const payload = (await response.json()) as { results: SearchResult[] };
-      setResults(payload.results ?? []);
+      const nextResults = payload.results ?? [];
+      setResults(nextResults);
+      recordHistory(value, nextResults[0]);
       window.setTimeout(() => {
         resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
       }, 80);
@@ -124,16 +221,43 @@ export default function SearchExperience() {
             </div>
           </form>
 
-          {hotItems.length > 0 ? (
-            <section className="hot-strip" aria-label="热门反查">
-              <div className="hot-strip-title">🔥 热门反查</div>
-              <div className="hot-strip-list">
-                {hotItems.slice(0, 10).map((item, index) => (
-                  <a href={item.href} className="hot-chip" key={item.href}><span>{index + 1}</span>{item.query}</a>
+          <section className="return-grid" aria-label="回访入口">
+            <div className="return-panel">
+              <div className="return-panel-head"><strong>今日热门反查</strong><a href="/hot">查看全部</a></div>
+              <div className="return-list">
+                {hotItems.slice(0, 6).map((item, index) => (
+                  <a className="return-item" href={item.href} key={item.href}><span>{index + 1}</span>{item.query}</a>
                 ))}
               </div>
-            </section>
-          ) : null}
+            </div>
+
+            <div className="return-panel">
+              <div className="return-panel-head"><strong>我的查询历史</strong>{historyItems.length > 0 ? <button type="button" onClick={clearHistory}>清空</button> : null}</div>
+              {historyItems.length > 0 ? (
+                <div className="return-list">
+                  {historyItems.map((item) => (
+                    <button className="return-item return-button" key={`${item.query}-${item.at}`} type="button" onClick={() => { setQuery(item.query); void runSearch(item.query); }}>
+                      <span>查</span>{item.query}
+                    </button>
+                  ))}
+                </div>
+              ) : <p className="return-empty">你查过的句子会保存在这里。</p>}
+            </div>
+
+            <div className="return-panel">
+              <div className="return-panel-head"><strong>我的收藏句子</strong>{favoriteItems.length > 0 ? <button type="button" onClick={clearFavorites}>清空</button> : null}</div>
+              {favoriteItems.length > 0 ? (
+                <div className="favorite-list">
+                  {favoriteItems.map((item) => (
+                    <a className="favorite-item" href={item.href} key={`${item.id}-${item.at}`}>
+                      <strong>{item.quote}</strong>
+                      <span>{item.source}</span>
+                    </a>
+                  ))}
+                </div>
+              ) : <p className="return-empty">点结果卡片里的“收藏本句”，下次打开还能看到。</p>}
+            </div>
+          </section>
         </div>
 
         <aside className="preview-stack" aria-label="传播卡片预览">
