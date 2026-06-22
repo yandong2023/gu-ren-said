@@ -224,11 +224,13 @@ export default function SearchExperience() {
           <section className="return-grid" aria-label="回访入口">
             <div className="return-panel">
               <div className="return-panel-head"><strong>今日热门反查</strong><a href="/hot">查看全部</a></div>
-              <div className="return-list">
-                {hotItems.slice(0, 6).map((item, index) => (
-                  <a className="return-item" href={item.href} key={item.href}><span>{index + 1}</span>{item.query}</a>
-                ))}
-              </div>
+              {hotItems.length > 0 ? (
+                <div className="return-list">
+                  {hotItems.slice(0, 6).map((item, index) => (
+                    <a className="return-item" href={item.href} key={item.href}><span>{index + 1}</span>{item.query}</a>
+                  ))}
+                </div>
+              ) : <p className="return-empty">今天还没有足够真实搜索数据。</p>}
             </div>
 
             <div className="return-panel">
