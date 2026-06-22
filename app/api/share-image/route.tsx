@@ -63,7 +63,7 @@ export async function GET(request: Request) {
                 fontWeight: 800
               }}
             >
-              古诗文反查卡
+              古人曰
             </div>
           </div>
 
@@ -90,7 +90,7 @@ export async function GET(request: Request) {
 
           <div style={{ marginTop: 24, display: "flex", alignItems: "center", justifyContent: "space-between", color: "#9b897a", fontSize: 22, letterSpacing: 2 }}>
             <span>GURENSAID.COM · 每句都有出处</span>
-            <span>现代话反查古诗文原句</span>
+            <span>现代话 / 网络热梗 · 古人早就说过</span>
           </div>
         </div>
       </div>
