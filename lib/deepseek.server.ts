@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import type { SearchResult } from "./types";
 
 type DeepSeekRerankItem = {
@@ -35,13 +36,75 @@ type DeepSeekPlanResponse = {
   confidence?: number;
 };
 
+type CacheLookup<T> =
+  | { hit: true; value: T | null }
+  | { hit: false };
+
 const DEFAULT_DEEPSEEK_URL = "https://api.deepseek.com/chat/completions";
 const DEFAULT_MODEL = "deepseek-chat";
+const DEFAULT_PLAN_CACHE_TTL_SECONDS = 60 * 60 * 24 * 30;
+const DEFAULT_RERANK_CACHE_TTL_SECONDS = 60 * 60 * 24 * 7;
 const planCache = new Map<string, DeepSeekQueryPlan | null>();
 const rerankCache = new Map<string, SearchResult[]>();
 
 function isDeepSeekEnabled() {
   return Boolean(process.env.DEEPSEEK_API_KEY) && process.env.DEEPSEEK_ENABLED !== "0";
+}
+
+function cacheTtlSeconds(name: string, fallback: number) {
+  const value = Number(process.env[name] ?? fallback);
+  return Number.isFinite(value) && value > 0 ? value : fallback;
+}
+
+function redisConfig() {
+  const url = process.env.UPSTASH_REDIS_REST_URL;
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+  if (!url || !token) return null;
+  return { url: url.replace(/\/+$/, ""), token };
+}
+
+async function redisCommand<T>(command: Array<string | number>): Promise<T | null> {
+  const config = redisConfig();
+  if (!config) return null;
+
+  try {
+    const response = await fetch(config.url, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${config.token}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(command),
+      cache: "no-store"
+    });
+
+    if (!response.ok) return null;
+    const payload = (await response.json()) as { result?: T };
+    return payload.result ?? null;
+  } catch {
+    return null;
+  }
+}
+
+function makeRedisCacheKey(kind: "plan" | "rerank", rawKey: string) {
+  const hash = createHash("sha256").update(rawKey).digest("hex");
+  return `grs:deepseek:${kind}:v1:${hash}`;
+}
+
+async function readJsonCache<T>(key: string): Promise<CacheLookup<T>> {
+  const raw = await redisCommand<string | null>(["GET", key]);
+  if (raw === null || raw === undefined) return { hit: false };
+
+  try {
+    return { hit: true, value: JSON.parse(String(raw)) as T };
+  } catch {
+    return { hit: false };
+  }
+}
+
+async function writeJsonCache(key: string, value: unknown, ttlSeconds: number) {
+  if (ttlSeconds <= 0) return;
+  await redisCommand<string | null>(["SET", key, JSON.stringify(value), "EX", ttlSeconds]);
 }
 
 function stripJsonFence(value: string): string {
@@ -99,6 +162,13 @@ export async function planQueryWithDeepSeek(query: string): Promise<DeepSeekQuer
     return null;
   }
 
+  const redisCacheKey = makeRedisCacheKey("plan", cacheKey);
+  const cached = await readJsonCache<DeepSeekQueryPlan | null>(redisCacheKey);
+  if (cached.hit) {
+    planCache.set(cacheKey, cached.value);
+    return cached.value;
+  }
+
   try {
     const content = await callDeepSeek([
       {
@@ -121,12 +191,14 @@ export async function planQueryWithDeepSeek(query: string): Promise<DeepSeekQuer
 
     if (!content) {
       planCache.set(cacheKey, null);
+      await writeJsonCache(redisCacheKey, null, cacheTtlSeconds("DEEPSEEK_PLAN_CACHE_TTL_SECONDS", DEFAULT_PLAN_CACHE_TTL_SECONDS));
       return null;
     }
 
     const parsed = parseJsonObject<DeepSeekPlanResponse>(content);
     if (!parsed) {
       planCache.set(cacheKey, null);
+      await writeJsonCache(redisCacheKey, null, cacheTtlSeconds("DEEPSEEK_PLAN_CACHE_TTL_SECONDS", DEFAULT_PLAN_CACHE_TTL_SECONDS));
       return null;
     }
 
@@ -142,6 +214,7 @@ export async function planQueryWithDeepSeek(query: string): Promise<DeepSeekQuer
     };
 
     planCache.set(cacheKey, plan);
+    await writeJsonCache(redisCacheKey, plan, cacheTtlSeconds("DEEPSEEK_PLAN_CACHE_TTL_SECONDS", DEFAULT_PLAN_CACHE_TTL_SECONDS));
     return plan;
   } catch {
     planCache.set(cacheKey, null);
@@ -157,6 +230,13 @@ export async function enhanceWithDeepSeek(query: string, candidates: SearchResul
   const cacheKey = `${query.trim().toLowerCase()}::${candidateSignature}`;
   const cached = rerankCache.get(cacheKey);
   if (cached) return cached;
+
+  const redisCacheKey = makeRedisCacheKey("rerank", cacheKey);
+  const persistentCached = await readJsonCache<SearchResult[]>(redisCacheKey);
+  if (persistentCached.hit && persistentCached.value) {
+    rerankCache.set(cacheKey, persistentCached.value);
+    return persistentCached.value;
+  }
 
   const topCandidates = candidates.slice(0, 20);
   const payload = {
@@ -196,7 +276,11 @@ export async function enhanceWithDeepSeek(query: string, candidates: SearchResul
 
     const parsed = parseJsonObject<DeepSeekRerankResponse>(content);
     const ranked = parsed?.results ?? [];
-    if (ranked.length === 0) return candidates;
+    if (ranked.length === 0) {
+      rerankCache.set(cacheKey, candidates);
+      await writeJsonCache(redisCacheKey, candidates, cacheTtlSeconds("DEEPSEEK_RERANK_CACHE_TTL_SECONDS", DEFAULT_RERANK_CACHE_TTL_SECONDS));
+      return candidates;
+    }
 
     const byId = new Map(candidates.map((item) => [item.id, item]));
     const used = new Set<string>();
@@ -219,6 +303,7 @@ export async function enhanceWithDeepSeek(query: string, candidates: SearchResul
     }
 
     rerankCache.set(cacheKey, enhanced);
+    await writeJsonCache(redisCacheKey, enhanced, cacheTtlSeconds("DEEPSEEK_RERANK_CACHE_TTL_SECONDS", DEFAULT_RERANK_CACHE_TTL_SECONDS));
     return enhanced;
   } catch {
     return candidates;
