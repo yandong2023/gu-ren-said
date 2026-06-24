@@ -57,6 +57,7 @@ export default function QuoteCard({ result, query, compact = false }: Props) {
   const [copied, setCopied] = useState(false);
   const [downloading, setDownloading] = useState(false);
   const [sharing, setSharing] = useState(false);
+  const [linkSharing, setLinkSharing] = useState(false);
   const [feedbacking, setFeedbacking] = useState(false);
   const [favorited, setFavorited] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
@@ -67,6 +68,7 @@ export default function QuoteCard({ result, query, compact = false }: Props) {
   const whyText = result.reason || result.translation;
   const explainText = result.translation || whyText;
   const modernText = query || result.modernMeanings[0] || "我 emo 了";
+  const shareUrl = `${SITE_URL}${queryHref(modernText)}?utm_source=share&utm_medium=link&utm_campaign=quote_card`;
   const shareText = [
     `现代话：${modernText}`,
     "",
@@ -76,7 +78,7 @@ export default function QuoteCard({ result, query, compact = false }: Props) {
     "",
     `一句解释：${explainText}`,
     "",
-    `来自：${SITE_URL}`
+    `来自：${shareUrl}`
   ].join("\n");
 
   useEffect(() => {
@@ -126,6 +128,34 @@ export default function QuoteCard({ result, query, compact = false }: Props) {
     }
     window.setTimeout(() => setCopied(false), 1500);
     return ok;
+  }
+
+  async function shareLink() {
+    setLinkSharing(true);
+    setNotice(null);
+
+    const title = `古人曰｜${modernText}，古文怎么说？`;
+    const text = `${modernText}\n${result.quote}\n${sourceText}`;
+
+    try {
+      if (navigator.share) {
+        await navigator.share({ title, text, url: shareUrl });
+        setNotice("已打开系统分享面板。微信、小红书或其他 App 里可继续转发这个链接。");
+        return;
+      }
+    } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") {
+        setNotice("已取消分享。");
+        return;
+      }
+      // Fall back to copying below.
+    } finally {
+      setLinkSharing(false);
+    }
+
+    const ok = await copyToClipboard(`${text}\n\n${shareUrl}`);
+    setNotice(ok ? "分享链接已复制，可以发给微信好友、朋友圈或小红书。" : "当前浏览器不允许自动复制，可以手动复制页面链接。 ");
+    setLinkSharing(false);
   }
 
   function toggleFavorite() {
@@ -264,6 +294,7 @@ export default function QuoteCard({ result, query, compact = false }: Props) {
 
           <div className="card-actions">
             <button className="secondary-btn" type="button" onClick={prepareShareImage} disabled={sharing}>{sharing ? "生成中…" : "生成分享图"}</button>
+            <button className="ghost-btn" type="button" onClick={shareLink} disabled={linkSharing}>{linkSharing ? "分享中…" : "分享链接"}</button>
             <button className="ghost-btn" type="button" onClick={() => copyText()}>{copied ? "已复制" : "复制分享文案"}</button>
             <button className="ghost-btn" type="button" onClick={toggleFavorite}>{favorited ? "已收藏" : "收藏本句"}</button>
             <button className="ghost-btn" type="button" onClick={downloadCard} disabled={downloading}>{downloading ? "生成中…" : "下载图片"}</button>
@@ -286,7 +317,7 @@ export default function QuoteCard({ result, query, compact = false }: Props) {
           {previewUrl ? (
             <div className="share-preview">
               <img src={previewUrl} alt="可保存的分享卡片" />
-              <span>微信/朋友圈：长按图片保存后转发；小红书：保存图片后上传，文案可直接粘贴。</span>
+              <span>微信/朋友圈：长按图片保存后转发；小红书：保存图片后上传，文案和链接可直接粘贴。</span>
             </div>
           ) : null}
 
