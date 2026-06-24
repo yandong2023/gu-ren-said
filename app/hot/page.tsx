@@ -1,6 +1,7 @@
 import QuoteCard from "@/components/QuoteCard";
 import { runSearch } from "@/lib/search-service.server";
 import { getTrendingQueries, type TrendingQuery } from "@/lib/trends.server";
+import type { SearchResult } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
@@ -11,7 +12,7 @@ export const metadata = {
 
 type RankedPreview = {
   item: TrendingQuery;
-  result?: Awaited<ReturnType<typeof runSearch>>["results"][number];
+  result: SearchResult;
 };
 
 function RankingBlock({ title, description, items, emptyText }: { title: string; description: string; items: TrendingQuery[]; emptyText?: string }) {
@@ -38,7 +39,8 @@ function RankingBlock({ title, description, items, emptyText }: { title: string;
 async function keepRankedItemsWithResults(items: TrendingQuery[], limit: number): Promise<RankedPreview[]> {
   const checked = await Promise.all(items.map(async (item) => {
     const payload = await runSearch(item.query, 1, { enhance: false });
-    return payload.results[0] ? { item, result: payload.results[0] } : null;
+    const result = payload.results[0];
+    return result ? { item, result } : null;
   }));
   return checked.filter((entry): entry is RankedPreview => Boolean(entry)).slice(0, limit);
 }
@@ -82,7 +84,7 @@ export default async function HotPage() {
           <div className="results">
             {todayPreviews.slice(0, 6).map(({ item, result }) => (
               <a className="result-link" href={item.href} key={item.href}>
-                <QuoteCard result={result!} query={item.query} compact />
+                <QuoteCard result={result} query={item.query} compact />
               </a>
             ))}
           </div>
