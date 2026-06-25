@@ -56,7 +56,7 @@ function ChengyuCard({ result, onNotice }: { result: ChengyuResult; onNotice: (v
     <article className="result-card chengyu-card">
       <div className="chengyu-card-main">
         <span className="card-kicker">成语怎么说</span>
-        <div className="chengyu-query-line"><span className="knowledge-label">推荐成语</span><strong>{result.idiom}</strong><em>{result.pinyin}</em></div>
+        <div className="chengyu-query-line"><span className="knowledge-label">推荐成语</span><strong>{result.idiom}</strong>{result.pinyin ? <em>{result.pinyin}</em> : null}</div>
         <p className="chengyu-meaning"><span className="knowledge-label">意思</span>{result.meaning}</p>
         <div className="chengyu-meta">
           <span>{result.tone}</span>
@@ -135,9 +135,9 @@ export default function ChengyuExperience() {
 
       <section className="hero chengyu-hero">
         <div className="hero-copy">
-          <div className="badge">✍️ 口语转成语 · 语气匹配 · 避免误用</div>
+          <div className="badge">✍️ 口语转成语 · 扩展词库 · 避免误用</div>
           <h1>这句话，<span className="title-accent">用成语怎么说？</span></h1>
-          <p className="subtitle">输入一句大白话，找到意思相近、语气合适、能正确使用的成语。第一版先接入高频成语精品库，后续继续扩充。</p>
+          <p className="subtitle">输入一句大白话，找到意思相近、语气合适、能正确使用的成语。已接入扩展成语库，并优先展示语义和场景更贴切的结果。</p>
 
           <form className="search-panel" onSubmit={submit}>
             <textarea value={query} onChange={(event) => setQuery(event.target.value)} placeholder="比如：表面一套背后一套 / 说话前后矛盾 / 很努力但很累" aria-label="输入大白话或想表达的意思" />
