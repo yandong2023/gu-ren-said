@@ -169,9 +169,95 @@
 .feedback-row button:disabled { opacity: 0.6; cursor: not-allowed; }
 .feedback-row span { color: var(--muted); font-size: 12px; font-weight: 800; }
 
+.chengyu-hero {
+  grid-template-columns: minmax(0, 820px);
+  justify-content: center;
+}
+
+.chengyu-results {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.chengyu-card {
+  gap: 14px;
+}
+
+.chengyu-card-main {
+  display: grid;
+  gap: 12px;
+}
+
+.chengyu-query-line strong {
+  display: block;
+  color: #332016;
+  font-family: var(--font-serif);
+  font-size: clamp(40px, 6vw, 68px);
+  line-height: 1.05;
+  letter-spacing: 0.05em;
+}
+
+.chengyu-query-line em {
+  display: block;
+  margin-top: 8px;
+  color: var(--muted);
+  font-style: normal;
+  font-weight: 800;
+}
+
+.chengyu-meaning,
+.chengyu-example,
+.chengyu-note {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 18px;
+  color: #674833;
+  background: rgba(182, 93, 66, 0.07);
+  line-height: 1.72;
+  font-weight: 700;
+}
+
+.chengyu-example {
+  background: rgba(255,255,255,0.62);
+  border: 1px solid rgba(82, 50, 30, 0.08);
+}
+
+.chengyu-note {
+  color: #8b4b33;
+  background: rgba(255, 231, 213, 0.68);
+}
+
+.chengyu-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chengyu-meta span {
+  border-radius: 999px;
+  padding: 7px 10px;
+  color: #9a553f;
+  background: rgba(182, 93, 66, 0.11);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.chengyu-related {
+  display: grid;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.chengyu-related p { margin: 0; }
+.chengyu-related strong { color: #5c3925; }
+
 @media (max-width: 920px) {
   .return-grid { grid-template-columns: 1fr; }
   .return-panel { min-height: auto; }
+  .chengyu-results { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 640px) {
