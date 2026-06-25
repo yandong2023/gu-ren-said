@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { searchChengyu } from "@/lib/chengyu";
+import { CHENGYU_RECORD_COUNT, searchChengyu } from "@/lib/chengyu-large";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -15,8 +15,8 @@ export async function POST(request: NextRequest) {
   const limit = Math.min(Math.max(Number(body.limit ?? 8), 1), 10);
 
   if (!query) {
-    return NextResponse.json({ results: [], message: "请输入一句大白话或想表达的意思。" }, { status: 400 });
+    return NextResponse.json({ results: [], total: CHENGYU_RECORD_COUNT, message: "请输入一句大白话或想表达的意思。" }, { status: 400 });
   }
 
-  return NextResponse.json({ query, results: searchChengyu(query, limit) });
+  return NextResponse.json({ query, total: CHENGYU_RECORD_COUNT, results: searchChengyu(query, limit) });
 }
