@@ -64,7 +64,10 @@ export default async function HotPage() {
     <main className="shell">
       <nav className="nav" aria-label="主导航">
         <a className="brand" href="/"><span className="brand-mark">古</span><span>古人曰</span></a>
-        <a className="nav-pill" href="/">返回首页</a>
+        <div className="nav-actions">
+          <a className="nav-pill" href="/">返回首页</a>
+          <a className="nav-pill" href="/chengyu">成语怎么说</a>
+        </div>
       </nav>
 
       <section className="section-title hot-title">
