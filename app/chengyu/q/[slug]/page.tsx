@@ -1,4 +1,4 @@
-import { chengyuHref, searchChengyu, slugToChengyuQuery } from "@/lib/chengyu";
+import { chengyuHref, searchChengyu, slugToChengyuQuery } from "@/lib/chengyu-large";
 
 export const dynamic = "force-dynamic";
 
@@ -65,7 +65,7 @@ export default async function ChengyuQueryPage({ params }: PageProps) {
               <article className="result-card chengyu-card" key={result.id}>
                 <div className="chengyu-card-main">
                   <span className="card-kicker">成语怎么说</span>
-                  <div className="chengyu-query-line"><span className="knowledge-label">推荐成语</span><strong>{result.idiom}</strong><em>{result.pinyin}</em></div>
+                  <div className="chengyu-query-line"><span className="knowledge-label">推荐成语</span><strong>{result.idiom}</strong>{result.pinyin ? <em>{result.pinyin}</em> : null}</div>
                   <p className="chengyu-meaning"><span className="knowledge-label">意思</span>{result.meaning}</p>
                   <div className="chengyu-meta"><span>{result.tone}</span>{result.scenes.slice(0, 4).map((scene) => <span key={scene}>{scene}</span>)}</div>
                   <div className="match-reason"><strong>为什么匹配</strong><span>{result.reason}</span></div>
