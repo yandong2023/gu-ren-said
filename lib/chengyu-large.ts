@@ -1,4 +1,5 @@
 import { CHENGYU_RECORDS as SEED_CHENGYU_RECORDS, chengyuHref, chengyuToSlug, slugToChengyuQuery, type ChengyuRecord, type ChengyuResult } from "./chengyu";
+import { COMMON_CHENGYU_BANK_RECORDS } from "./chengyu-bank";
 import { EXTRA_CHENGYU_RECORDS } from "./chengyu-expansion";
 import { MORE_CHENGYU_RECORDS } from "./chengyu-more";
 
@@ -28,7 +29,7 @@ function dedupeRecords(records: ChengyuRecord[]) {
   return Array.from(byIdiom.values());
 }
 
-export const CHENGYU_RECORDS = dedupeRecords([...SEED_CHENGYU_RECORDS, ...EXTRA_CHENGYU_RECORDS, ...MORE_CHENGYU_RECORDS]);
+export const CHENGYU_RECORDS = dedupeRecords([...SEED_CHENGYU_RECORDS, ...EXTRA_CHENGYU_RECORDS, ...MORE_CHENGYU_RECORDS, ...COMMON_CHENGYU_BANK_RECORDS]);
 export const CHENGYU_RECORD_COUNT = CHENGYU_RECORDS.length;
 export { chengyuHref, chengyuToSlug, slugToChengyuQuery };
 
