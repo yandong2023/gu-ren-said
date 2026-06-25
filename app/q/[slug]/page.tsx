@@ -59,7 +59,10 @@ export default async function QueryPage({ params }: PageProps) {
     <main className="shell">
       <nav className="nav" aria-label="主导航">
         <a className="brand" href="/"><span className="brand-mark">古</span><span>古人曰</span></a>
-        <a className="nav-pill" href="/hot">热门反查</a>
+        <div className="nav-actions">
+          <a className="nav-pill" href="/chengyu">成语怎么说</a>
+          <a className="nav-pill" href="/hot">热门反查</a>
+        </div>
       </nav>
 
       <section className="query-hero">
