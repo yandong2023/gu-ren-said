@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { CHENGYU_RECORDS, chengyuHref } from "@/lib/chengyu";
+import { CHENGYU_RECORDS, chengyuHref } from "@/lib/chengyu-large";
 import { absoluteQueryUrl, SEO_QUERY_WHITELIST } from "@/lib/trends.server";
 
 const SITE_URL = "https://gurensaid.com";
@@ -34,7 +34,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "weekly" as const,
       priority: 0.7
     })),
-    ...Array.from(chengyuQuerySet).slice(0, 80).map((query) => ({
+    ...Array.from(chengyuQuerySet).slice(0, 120).map((query) => ({
       url: `${SITE_URL}${chengyuHref(query)}`,
       lastModified: now,
       changeFrequency: "weekly" as const,
