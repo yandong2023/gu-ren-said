@@ -5,6 +5,19 @@ import { MORE_CHENGYU_RECORDS } from "./chengyu-more";
 const STOP_WORDS = new Set(["我", "你", "他", "她", "它", "的", "了", "啊", "呀", "吧", "吗", "呢", "很", "太", "真", "真的", "有点", "一个", "这个", "那个"]);
 const LOW_SIGNAL_CHARS = new Set(["好", "说", "想", "人", "事", "不", "有", "没", "真", "太", "这", "那", "很", "更", "多", "少"]);
 
+const QUERY_PREFERENCES: Record<string, string[]> = {
+  表面一套背后一套: ["阳奉阴违", "两面三刀", "表里不一", "口是心非"],
+  说话前后矛盾: ["自相矛盾", "前后矛盾", "前后不一", "言行不一"],
+  很会装: ["装腔作势", "装模作样", "故弄玄虚", "故作高深"],
+  想太多: ["杞人忧天", "庸人自扰", "患得患失"],
+  突然有转机: ["柳暗花明", "峰回路转", "否极泰来", "绝处逢生"],
+  效率很低: ["事倍功半", "徒劳无功", "劳而无功"],
+  很努力但很累: ["孜孜不倦", "废寝忘食", "夜以继日", "任重道远", "全力以赴"],
+  没人知道: ["默默无闻", "鲜为人知", "不为人知", "无人问津"],
+  很有创意: ["别出心裁", "独具匠心", "别具一格", "匠心独运"],
+  太老套了: ["千篇一律", "陈词滥调", "老生常谈", "墨守成规"]
+};
+
 function dedupeRecords(records: ChengyuRecord[]) {
   const byIdiom = new Map<string, ChengyuRecord>();
   for (const record of records) {
@@ -102,7 +115,14 @@ function scoreRecord(record: ChengyuRecord, query: string): ChengyuResult {
     }
   }
 
-  const hasStrongSignal = ["idiom-exact", "modern-exact", "modern-term", "scene", "meaning"].some((type) => matchedBy.has(type));
+  const preferred = QUERY_PREFERENCES[normalizedQuery] ?? [];
+  const preferredIndex = preferred.indexOf(record.idiom);
+  if (preferredIndex >= 0) {
+    score += 160 - preferredIndex * 8;
+    matchedBy.add("fixed-query-preference");
+  }
+
+  const hasStrongSignal = ["idiom-exact", "modern-exact", "modern-term", "scene", "meaning", "fixed-query-preference"].some((type) => matchedBy.has(type));
   if (!hasStrongSignal) score = Math.min(score, 20);
 
   const reason = matchedBy.has("idiom-exact")
