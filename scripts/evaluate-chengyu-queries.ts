@@ -5,6 +5,8 @@ type Case = {
   expectedAny: string[];
 };
 
+const MIN_CHENGYU_RECORD_COUNT = 1500;
+
 const CASES: Case[] = [
   { query: "表面一套背后一套", expectedAny: ["阳奉阴违", "两面三刀", "表里不一", "口是心非"] },
   { query: "说话前后矛盾", expectedAny: ["自相矛盾", "前后矛盾", "前后不一", "言行不一"] },
@@ -21,8 +23,8 @@ const CASES: Case[] = [
 let failed = false;
 console.log(`Chengyu record count: ${CHENGYU_RECORD_COUNT}`);
 
-if (CHENGYU_RECORD_COUNT < 1000) {
-  console.error(`Expected Chengyu record count >= 1000, got ${CHENGYU_RECORD_COUNT}`);
+if (CHENGYU_RECORD_COUNT < MIN_CHENGYU_RECORD_COUNT) {
+  console.error(`Expected Chengyu record count >= ${MIN_CHENGYU_RECORD_COUNT}, got ${CHENGYU_RECORD_COUNT}`);
   failed = true;
 }
 
