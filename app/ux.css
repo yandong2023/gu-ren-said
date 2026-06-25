@@ -261,6 +261,25 @@
 }
 
 @media (max-width: 640px) {
+  .nav {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .nav-actions {
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 2px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .nav-pill {
+    display: inline-flex;
+    flex: 0 0 auto;
+    padding: 8px 11px;
+    font-size: 12px;
+  }
+
   .copy-row button,
   .feedback-row button { flex: 1 1 96px; }
   .feedback-row span { width: 100%; }
