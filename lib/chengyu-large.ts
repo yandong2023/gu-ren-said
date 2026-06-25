@@ -1,5 +1,6 @@
 import { CHENGYU_RECORDS as SEED_CHENGYU_RECORDS, chengyuHref, chengyuToSlug, slugToChengyuQuery, type ChengyuRecord, type ChengyuResult } from "./chengyu";
 import { EXTRA_CHENGYU_RECORDS } from "./chengyu-expansion";
+import { MORE_CHENGYU_RECORDS } from "./chengyu-more";
 
 const STOP_WORDS = new Set(["我", "你", "他", "她", "它", "的", "了", "啊", "呀", "吧", "吗", "呢", "很", "太", "真", "真的", "有点", "一个", "这个", "那个"]);
 const LOW_SIGNAL_CHARS = new Set(["好", "说", "想", "人", "事", "不", "有", "没", "真", "太", "这", "那", "很", "更", "多", "少"]);
@@ -14,7 +15,7 @@ function dedupeRecords(records: ChengyuRecord[]) {
   return Array.from(byIdiom.values());
 }
 
-export const CHENGYU_RECORDS = dedupeRecords([...SEED_CHENGYU_RECORDS, ...EXTRA_CHENGYU_RECORDS]);
+export const CHENGYU_RECORDS = dedupeRecords([...SEED_CHENGYU_RECORDS, ...EXTRA_CHENGYU_RECORDS, ...MORE_CHENGYU_RECORDS]);
 export const CHENGYU_RECORD_COUNT = CHENGYU_RECORDS.length;
 export { chengyuHref, chengyuToSlug, slugToChengyuQuery };
 
