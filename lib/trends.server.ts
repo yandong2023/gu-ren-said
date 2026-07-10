@@ -240,12 +240,9 @@ export async function getQueryCount(query: string): Promise<number> {
   return Number(score ?? 0);
 }
 
-export async function shouldIndexQuery(query: string) {
+export function shouldIndexQuery(query: string) {
   const normalized = normalizeQuery(query);
-  if (!isPublicQueryCandidate(normalized)) return false;
-  if (isSeoQueryWhitelisted(normalized)) return true;
-  const count = await getQueryCount(normalized);
-  return count >= Number(process.env.QUERY_INDEX_MIN_COUNT ?? 10);
+  return isPublicQueryCandidate(normalized) && isSeoQueryWhitelisted(normalized);
 }
 
 export function absoluteQueryUrl(query: string) {

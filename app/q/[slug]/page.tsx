@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+import { cache } from "react";
 import QuoteCard from "@/components/QuoteCard";
 import { runSearch } from "@/lib/search-service.server";
 import { absoluteQueryUrl, queryHref, shouldIndexQuery, slugToQuery } from "@/lib/trends.server";
@@ -7,6 +9,8 @@ type PageProps = {
   params: Promise<{ slug: string }>;
 };
 
+const getQueryPageData = cache((query: string) => runSearch(query, 6, { enhance: false }));
+
 async function getQuery(params: PageProps["params"]) {
   const { slug } = await params;
   return slugToQuery(slug);
@@ -14,8 +18,8 @@ async function getQuery(params: PageProps["params"]) {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const query = await getQuery(params);
-  const shouldIndex = await shouldIndexQuery(query);
-  const payload = await runSearch(query, 1, { enhance: false });
+  const shouldIndex = shouldIndexQuery(query);
+  const payload = await getQueryPageData(query);
   const result = payload.results[0];
   const title = `${query}，古文怎么说？｜古人曰`;
   const description = result
@@ -32,13 +36,15 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       canonical: queryHref(query)
     },
     robots: {
-      index: shouldIndex,
+      index: shouldIndex && Boolean(result),
       follow: true
     },
     openGraph: {
       title,
       description,
+      type: "article",
       url: absoluteQueryUrl(query),
+      siteName: "古人曰",
       images: [image]
     },
     twitter: {
@@ -52,8 +58,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function QueryPage({ params }: PageProps) {
   const query = await getQuery(params);
-  const payload = await runSearch(query, 6, { enhance: true });
+  const payload = await getQueryPageData(query);
   const top = payload.results[0];
+
+  if (!top) notFound();
 
   return (
     <main className="shell">
@@ -70,16 +78,12 @@ export default async function QueryPage({ params }: PageProps) {
         <p>找到意思相近的古诗文原句、作者、出处和原文。</p>
       </section>
 
-      {top ? (
-        <section aria-label="推荐表达">
-          <div className="section-title"><div><h2>推荐表达</h2><p>结果保留原句、出处、解释和原文，方便核对和学习。</p></div></div>
-          <div className="single-result">
-            <QuoteCard result={top} query={query} />
-          </div>
-        </section>
-      ) : (
-        <div className="empty-state">暂时没有找到足够贴切的古文表达。可以回到首页换一种说法再试。</div>
-      )}
+      <section aria-label="推荐表达">
+        <div className="section-title"><div><h2>推荐表达</h2><p>结果保留原句、出处、解释和原文，方便核对和学习。</p></div></div>
+        <div className="single-result">
+          <QuoteCard result={top} query={query} />
+        </div>
+      </section>
 
       {payload.results.length > 1 ? (
         <section aria-label="还能怎么说">

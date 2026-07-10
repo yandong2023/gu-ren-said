@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import QuoteCard from "@/components/QuoteCard";
 import { runSearch } from "@/lib/search-service.server";
 import { getTrendingQueries, type TrendingQuery } from "@/lib/trends.server";
@@ -5,9 +6,26 @@ import type { SearchResult } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "热门反查｜古人曰",
-  description: "查看今日、本周和历史最热门的古诗文反查：我爱你、你真好看、我 emo 了、这事包的等。"
+  description: "查看今日、本周和历史最热门的古诗文反查：我爱你、你真好看、我 emo 了、这事包的等。",
+  alternates: {
+    canonical: "/hot"
+  },
+  openGraph: {
+    title: "热门反查｜古人曰",
+    description: "查看今日、本周和历史最热门的古诗文反查。",
+    type: "website",
+    url: "https://gurensaid.com/hot",
+    siteName: "古人曰",
+    images: ["/og.svg"]
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "热门反查｜古人曰",
+    description: "查看今日、本周和历史最热门的古诗文反查。",
+    images: ["/og.svg"]
+  }
 };
 
 type RankedPreview = {

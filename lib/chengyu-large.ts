@@ -29,12 +29,24 @@ function dedupeRecords(records: ChengyuRecord[]) {
   return Array.from(byIdiom.values());
 }
 
-export const CHENGYU_RECORDS = dedupeRecords([...SEED_CHENGYU_RECORDS, ...EXTRA_CHENGYU_RECORDS, ...MORE_CHENGYU_RECORDS, ...COMMON_CHENGYU_BANK_RECORDS]);
-export const CHENGYU_RECORD_COUNT = CHENGYU_RECORDS.length;
-export { chengyuHref, chengyuToSlug, slugToChengyuQuery };
-
 function normalize(value: string) {
   return value.trim().toLowerCase().replace(/\s+/g, "");
+}
+
+export const CHENGYU_RECORDS = dedupeRecords([...SEED_CHENGYU_RECORDS, ...EXTRA_CHENGYU_RECORDS, ...MORE_CHENGYU_RECORDS, ...COMMON_CHENGYU_BANK_RECORDS]);
+export const CHENGYU_RECORD_COUNT = CHENGYU_RECORDS.length;
+export const PUBLISHED_CHENGYU_QUERIES = Array.from(new Set(
+  CHENGYU_RECORDS
+    .flatMap((record) => [record.idiom, record.modernMeanings[0]])
+    .filter((value): value is string => Boolean(value))
+));
+
+const PUBLISHED_CHENGYU_QUERY_KEYS = new Set(PUBLISHED_CHENGYU_QUERIES.map(normalize));
+
+export { chengyuHref, chengyuToSlug, slugToChengyuQuery };
+
+export function isPublishedChengyuQuery(query: string) {
+  return PUBLISHED_CHENGYU_QUERY_KEYS.has(normalize(query));
 }
 
 function tokenize(input: string) {
