@@ -7,9 +7,6 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://gurensaid.com"),
   title: "古人曰｜现代话 / 网络热梗，古人早就说过",
   description: "输入一句现代话或网络热梗，反查古诗文中真实存在的相似表达、作者、出处和原文，并生成适合手机传播的知识卡片。",
-  alternates: {
-    canonical: "/"
-  },
   icons: {
     icon: "/favicon.svg",
     shortcut: "/favicon.svg",
