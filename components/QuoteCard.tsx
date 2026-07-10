@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { trackEvent } from "@/lib/analytics";
 import { getSharePersona } from "@/lib/share-persona";
 import type { SearchResult } from "@/lib/types";
 
@@ -69,6 +70,10 @@ export default function QuoteCard({ result, query, compact = false }: Props) {
   const explainText = result.translation || whyText;
   const modernText = query || result.modernMeanings[0] || "我 emo 了";
   const shareUrl = `${SITE_URL}${queryHref(modernText)}?utm_source=share&utm_medium=link&utm_campaign=quote_card`;
+  const analyticsContext = {
+    result_id: result.id,
+    query_length: modernText.length
+  };
   const shareText = [
     `现代话：${modernText}`,
     "",
@@ -112,10 +117,11 @@ export default function QuoteCard({ result, query, compact = false }: Props) {
     }
   }
 
-  async function copyFormatted(text: string, successText: string) {
+  async function copyFormatted(text: string, successText: string, copyType: "quote" | "quote_source" | "explanation") {
     const ok = await copyToClipboard(text);
     setCopied(ok);
     setNotice(ok ? successText : "当前浏览器不允许自动复制，可以手动长按卡片保存或复制页面文字。");
+    if (ok) trackEvent("result_copy", { ...analyticsContext, copy_type: copyType });
     window.setTimeout(() => setCopied(false), 1500);
     return ok;
   }
@@ -125,6 +131,7 @@ export default function QuoteCard({ result, query, compact = false }: Props) {
     setCopied(ok);
     if (showNotice) {
       setNotice(ok ? "分享文案已复制，可以直接粘贴到微信、朋友圈或小红书。" : "当前浏览器不允许自动复制，可以手动长按卡片保存或复制页面文字。");
+      if (ok) trackEvent("share_text_copy", analyticsContext);
     }
     window.setTimeout(() => setCopied(false), 1500);
     return ok;
@@ -141,6 +148,7 @@ export default function QuoteCard({ result, query, compact = false }: Props) {
       if (navigator.share) {
         await navigator.share({ title, text, url: shareUrl });
         setNotice("已打开系统分享面板。微信、小红书或其他 App 里可继续转发这个链接。");
+        trackEvent("share_link", { ...analyticsContext, share_method: "web_share" });
         return;
       }
     } catch (error) {
@@ -155,6 +163,7 @@ export default function QuoteCard({ result, query, compact = false }: Props) {
 
     const ok = await copyToClipboard(`${text}\n\n${shareUrl}`);
     setNotice(ok ? "分享链接已复制，可以发给微信好友、朋友圈或小红书。" : "当前浏览器不允许自动复制，可以手动复制页面链接。 ");
+    if (ok) trackEvent("share_link", { ...analyticsContext, share_method: "copy" });
     setLinkSharing(false);
   }
 
@@ -166,6 +175,7 @@ export default function QuoteCard({ result, query, compact = false }: Props) {
       saveFavorites(existing.filter((item) => item.id !== result.id));
       setFavorited(false);
       setNotice("已取消收藏。");
+      trackEvent("favorite_remove", analyticsContext);
       return;
     }
 
@@ -180,6 +190,7 @@ export default function QuoteCard({ result, query, compact = false }: Props) {
     saveFavorites([favorite, ...existing.filter((item) => item.id !== result.id)].slice(0, 30));
     setFavorited(true);
     setNotice("已收藏。下次打开首页可以在“我的收藏句子”里看到。");
+    trackEvent("favorite_add", analyticsContext);
   }
 
   async function sendFeedback(type: "not_accurate" | "wrong_source" | "better_quote") {
@@ -191,7 +202,7 @@ export default function QuoteCard({ result, query, compact = false }: Props) {
 
     setFeedbacking(true);
     try {
-      await fetch("/api/feedback", {
+      const response = await fetch("/api/feedback", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -203,8 +214,10 @@ export default function QuoteCard({ result, query, compact = false }: Props) {
           note
         })
       });
+      if (!response.ok) throw new Error("feedback_failed");
       const text = type === "not_accurate" ? "收到反馈：这条结果不够贴切。" : type === "wrong_source" ? "收到反馈：需要核对出处。" : "收到你的推荐，后续会优先核对。";
       setNotice(text);
+      trackEvent("feedback_submit", { ...analyticsContext, feedback_type: type });
     } catch {
       setNotice("反馈暂时没有提交成功，可以稍后再试。");
     } finally {
@@ -238,12 +251,14 @@ export default function QuoteCard({ result, query, compact = false }: Props) {
         ? "分享图已生成，文案也已复制。微信里请长按下方图片保存，再发给朋友或朋友圈。"
         : "分享图已生成。微信里请长按下方图片保存，再发给朋友或朋友圈。"
       );
+      trackEvent("share_image_generate", { ...analyticsContext, copy_succeeded: copiedOk });
     } catch {
       const copiedOk = await copyText(false);
       setNotice(copiedOk
         ? "生成图片失败，但文案已复制。可以先把文案发到微信或小红书。"
         : "生成图片失败。可以尝试刷新页面，或换 Safari/Chrome 打开后再试。"
       );
+      trackEvent("share_image_error", analyticsContext);
     } finally {
       setSharing(false);
     }
@@ -267,8 +282,10 @@ export default function QuoteCard({ result, query, compact = false }: Props) {
       document.body.removeChild(link);
 
       setNotice("卡片已生成。如果浏览器没有自动保存，可以长按下方图片保存。微信里建议长按保存后再转发。");
+      trackEvent("card_download", analyticsContext);
     } catch {
       setNotice("下载失败。可以先点“生成分享图”，再长按预览图保存。部分微信内置浏览器不支持自动下载。 ");
+      trackEvent("card_download_error", analyticsContext);
     } finally {
       setDownloading(false);
     }
@@ -301,9 +318,9 @@ export default function QuoteCard({ result, query, compact = false }: Props) {
           </div>
 
           <div className="copy-row" aria-label="复制常用格式">
-            <button type="button" onClick={() => copyFormatted(result.quote, "原句已复制。")}>复制原句</button>
-            <button type="button" onClick={() => copyFormatted(`${result.quote}${sourceText}`, "原句和出处已复制。")}>复制原句+出处</button>
-            <button type="button" onClick={() => copyFormatted(explainText, "解释已复制。")}>复制解释</button>
+            <button type="button" onClick={() => copyFormatted(result.quote, "原句已复制。", "quote")}>复制原句</button>
+            <button type="button" onClick={() => copyFormatted(`${result.quote}${sourceText}`, "原句和出处已复制。", "quote_source")}>复制原句+出处</button>
+            <button type="button" onClick={() => copyFormatted(explainText, "解释已复制。", "explanation")}>复制解释</button>
           </div>
 
           <div className="feedback-row" aria-label="结果反馈">
