@@ -3,13 +3,34 @@
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import QuoteCard from "@/components/QuoteCard";
+import { trackEvent, trackVirtualPageView } from "@/lib/analytics";
 import type { SearchResult } from "@/lib/types";
 
 type HotItem = {
   query: string;
   href: string;
   count: number;
+  source?: "search" | "editorial";
 };
+
+type HotPayload = {
+  items?: HotItem[];
+  label?: string;
+  range?: "today" | "week" | "all";
+  fallback?: boolean;
+};
+
+type SearchPayload = {
+  results?: SearchResult[];
+  href?: string;
+  durationMs?: number;
+  message?: string;
+  enhancer?: {
+    deepseek?: boolean;
+  };
+};
+
+type SearchEntry = "form" | "example" | "history";
 
 type HistoryItem = {
   query: string;
@@ -109,6 +130,7 @@ export default function SearchExperience() {
   const [query, setQuery] = useState("你真好看");
   const [results, setResults] = useState<SearchResult[]>([]);
   const [hotItems, setHotItems] = useState<HotItem[]>([]);
+  const [hotLabel, setHotLabel] = useState("今日热门反查");
   const [historyItems, setHistoryItems] = useState<HistoryItem[]>([]);
   const [favoriteItems, setFavoriteItems] = useState<FavoriteItem[]>([]);
   const [loading, setLoading] = useState(false);
@@ -127,8 +149,10 @@ export default function SearchExperience() {
     let mounted = true;
     fetch("/api/hot?range=today")
       .then((response) => response.ok ? response.json() : null)
-      .then((payload: { items?: HotItem[] } | null) => {
-        if (mounted && payload?.items) setHotItems(payload.items);
+      .then((payload: HotPayload | null) => {
+        if (!mounted || !payload) return;
+        if (payload.items) setHotItems(payload.items);
+        if (payload.label) setHotLabel(payload.label);
       })
       .catch(() => undefined);
 
@@ -151,20 +175,33 @@ export default function SearchExperience() {
   function clearHistory() {
     saveList<HistoryItem>(HISTORY_KEY, []);
     setHistoryItems([]);
+    trackEvent("history_clear");
   }
 
   function clearFavorites() {
     saveList<FavoriteItem>(FAVORITES_KEY, []);
     setFavoriteItems([]);
     window.dispatchEvent(new Event("grs:favorites-updated"));
+    trackEvent("favorites_clear");
   }
 
-  async function runSearch(nextQuery = query) {
-    const value = nextQuery.trim();
+  async function runSearch(nextQuery = query, entry: SearchEntry = "form") {
+    const value = nextQuery.trim().replace(/\s+/g, " ");
     if (!value) return;
+
+    if (value.length < 2 || value.length > 60) {
+      const message = value.length < 2 ? "请至少输入两个字，让意思更明确。" : "输入内容请控制在 60 个字以内。";
+      setError(message);
+      trackEvent("search_invalid", { entry, query_length: value.length });
+      return;
+    }
+
+    const startedAt = performance.now();
+    setQuery(value);
     setLoading(true);
     setError(null);
     setSearched(true);
+    trackEvent("search_submit", { entry, query_length: value.length });
 
     try {
       const response = await fetch("/api/search", {
@@ -172,22 +209,44 @@ export default function SearchExperience() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ query: value })
       });
-      if (!response.ok) throw new Error("搜索服务暂时不可用");
-      const payload = (await response.json()) as { results: SearchResult[] };
+      const payload = (await response.json().catch(() => ({}))) as SearchPayload;
+      if (!response.ok) throw new Error(payload.message || "搜索服务暂时不可用");
+
       const nextResults = payload.results ?? [];
+      const href = payload.href || queryHref(value);
+      const durationMs = Math.round(payload.durationMs ?? performance.now() - startedAt);
       setResults(nextResults);
       recordHistory(value, nextResults[0]);
 
       if (nextResults.length > 0) {
-        router.push(queryHref(value));
+        trackEvent("search_success", {
+          entry,
+          result_count: nextResults.length,
+          query_length: value.length,
+          duration_ms: durationMs,
+          ai_enhanced: Boolean(payload.enhancer?.deepseek)
+        });
+        trackVirtualPageView(href);
+        router.push(href);
         return;
       }
 
+      trackEvent("search_empty", {
+        entry,
+        query_length: value.length,
+        duration_ms: durationMs
+      });
       window.setTimeout(() => {
         resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
       }, 80);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "搜索失败");
+      const message = err instanceof Error ? err.message : "搜索失败";
+      setError(message);
+      trackEvent("search_error", {
+        entry,
+        query_length: value.length,
+        duration_ms: Math.round(performance.now() - startedAt)
+      });
     } finally {
       setLoading(false);
     }
@@ -195,12 +254,12 @@ export default function SearchExperience() {
 
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    void runSearch();
+    void runSearch(query, "form");
   }
 
   function pickExample(example: string) {
     setQuery(example);
-    void runSearch(example);
+    void runSearch(example, "example");
   }
 
   return (
@@ -220,7 +279,7 @@ export default function SearchExperience() {
           <p className="subtitle">输入现代话、网络热梗或日常表达，找到意思相近的古诗文原句、作者、出处和原文。不是 AI 编一句古文，而是反查古人早就说过的表达。</p>
 
           <form className="search-panel" onSubmit={submit}>
-            <textarea value={query} onChange={(event) => setQuery(event.target.value)} placeholder="比如：你真好看 / 我爱你 / 我 emo 了 / 太卷了想躺平" aria-label="输入现代话或网络热梗" />
+            <textarea value={query} maxLength={60} onChange={(event) => setQuery(event.target.value)} placeholder="比如：你真好看 / 我爱你 / 我 emo 了 / 太卷了想躺平" aria-label="输入现代话或网络热梗" />
             <div className="search-actions">
               <span className="hint">每句都带作者、篇名和原文，方便核对、学习和分享。</span>
               <button className="primary-btn" type="submit" disabled={loading}>{loading ? "反查中…" : "反查古文"}</button>
@@ -234,14 +293,14 @@ export default function SearchExperience() {
 
           <section className="return-grid" aria-label="回访入口">
             <div className="return-panel">
-              <div className="return-panel-head"><strong>今日热门反查</strong><a href="/hot">查看全部</a></div>
+              <div className="return-panel-head"><strong>{hotLabel}</strong><a href="/hot">查看全部</a></div>
               {hotItems.length > 0 ? (
                 <div className="return-list">
                   {hotItems.slice(0, 6).map((item, index) => (
-                    <a className="return-item" href={item.href} key={item.href}><span>{index + 1}</span>{item.query}</a>
+                    <a className="return-item" href={item.href} key={item.href} onClick={() => trackEvent("hot_click", { hot_source: item.source ?? "search", hot_position: index + 1 })}><span>{index + 1}</span>{item.query}</a>
                   ))}
                 </div>
-              ) : <p className="return-empty">今天还没有足够真实搜索数据。</p>}
+              ) : <p className="return-empty">暂时还没有可展示的热门内容。</p>}
             </div>
 
             <div className="return-panel">
@@ -249,7 +308,7 @@ export default function SearchExperience() {
               {historyItems.length > 0 ? (
                 <div className="return-list">
                   {historyItems.map((item) => (
-                    <button className="return-item return-button" key={`${item.query}-${item.at}`} type="button" onClick={() => { setQuery(item.query); void runSearch(item.query); }}>
+                    <button className="return-item return-button" key={`${item.query}-${item.at}`} type="button" onClick={() => { setQuery(item.query); void runSearch(item.query, "history"); }}>
                       <span>查</span>{item.query}
                     </button>
                   ))}

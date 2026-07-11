@@ -1,11 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { runSearch } from "@/lib/search-service.server";
-import { getTrendingQueries, type TrendingQuery } from "@/lib/trends.server";
+import { getHotFeed, type HotRange } from "@/lib/hot.server";
 
 export const runtime = "nodejs";
-export const dynamic = "force-dynamic";
-
-type HotRange = "today" | "week" | "all";
 
 function readRange(value: string | null): HotRange {
   if (value === "today") return "today";
@@ -13,17 +9,19 @@ function readRange(value: string | null): HotRange {
   return "all";
 }
 
-async function keepItemsWithResults(items: TrendingQuery[], limit: number) {
-  const checked = await Promise.all(items.map(async (item) => {
-    const payload = await runSearch(item.query, 1, { enhance: false });
-    return payload.results.length > 0 ? item : null;
-  }));
-  return checked.filter((item): item is TrendingQuery => Boolean(item)).slice(0, limit);
-}
-
 export async function GET(request: NextRequest) {
-  const range = readRange(request.nextUrl.searchParams.get("range"));
-  const rawItems = await getTrendingQueries(20, range);
-  const items = await keepItemsWithResults(rawItems, 10);
-  return NextResponse.json({ items, range });
+  const requestedRange = readRange(request.nextUrl.searchParams.get("range"));
+  const feed = await getHotFeed(requestedRange);
+
+  return NextResponse.json({
+    items: feed.items,
+    requestedRange: feed.requestedRange,
+    range: feed.range,
+    label: feed.label,
+    fallback: feed.fallback
+  }, {
+    headers: {
+      "Cache-Control": "public, s-maxage=1800, stale-while-revalidate=3600"
+    }
+  });
 }
