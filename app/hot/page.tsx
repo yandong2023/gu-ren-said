@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import QuoteCard from "@/components/QuoteCard";
 import { getHotPageData, type HotItem } from "@/lib/hot.server";
 
-export const revalidate = 60 * 30;
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "热门反查｜古人曰",
