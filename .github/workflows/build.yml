@@ -31,8 +31,14 @@ jobs:
       - name: Seed SQLite database
         run: pnpm db:seed
 
-      - name: Core query relevance tests
-        run: pnpm exec tsx scripts/evaluate-queries.ts && pnpm exec tsx scripts/evaluate-negative-queries.ts && pnpm exec tsx scripts/evaluate-business-competition-query.ts
+      - name: Main query relevance tests
+        run: pnpm exec tsx scripts/evaluate-queries.ts
+
+      - name: Negative query relevance tests
+        run: pnpm exec tsx scripts/evaluate-negative-queries.ts
+
+      - name: Business competition relevance test
+        run: pnpm exec tsx scripts/evaluate-business-competition-query.ts
 
       - name: Classic corpus relevance tests
         run: pnpm exec tsx scripts/evaluate-classic-corpus.ts
