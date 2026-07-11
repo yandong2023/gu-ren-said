@@ -21,3 +21,12 @@ export function trackEvent(name: string, params: AnalyticsParams = {}) {
   if (typeof window === "undefined" || typeof window.gtag !== "function") return;
   window.gtag("event", name, sanitizeParams(params));
 }
+
+export function trackVirtualPageView(path: string) {
+  if (typeof window === "undefined") return;
+  trackEvent("page_view", {
+    page_path: path,
+    page_location: `${window.location.origin}${path}`,
+    page_title: document.title
+  });
+}
