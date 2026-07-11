@@ -1,4 +1,4 @@
-import { expandQuery, mergeResults, searchInMemory } from "../lib/search";
+import { expandQuery, hasUsefulSearchSignal, mergeResults, searchInMemory } from "../lib/search";
 import { searchSqlite } from "../lib/db.server";
 import type { SearchResult } from "../lib/types";
 
@@ -74,7 +74,7 @@ function evaluate(testCase: TestCase) {
   const expanded = expandQuery(testCase.query);
   const sqliteResults = searchSqlite(expanded, 8);
   const memoryResults = searchInMemory(expanded, 8);
-  const results = mergeResults(sqliteResults, memoryResults).slice(0, 8);
+  const results = mergeResults(sqliteResults, memoryResults).filter(hasUsefulSearchSignal).slice(0, 8);
   const top1 = results[0];
   const errors: string[] = [];
 
