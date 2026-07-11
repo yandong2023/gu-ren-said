@@ -1,16 +1,16 @@
 .share-card {
-  padding: 14px;
+  padding: 13px;
 }
 
 .share-card::before {
   inset: -28% auto auto -16%;
-  width: 62%;
-  opacity: 0.35;
+  width: 60%;
+  opacity: 0.24;
   z-index: 0;
 }
 
 .share-card .share-card-inner {
-  padding: 20px 18px 16px;
+  padding: 18px 16px 14px;
 }
 
 .share-card .share-card-inner::before,
@@ -19,10 +19,10 @@
 }
 
 .share-card .share-card-inner::after {
-  right: -10px;
+  right: -12px;
   bottom: -24px;
-  font-size: 104px;
-  color: rgba(139, 74, 49, 0.03);
+  font-size: 96px;
+  color: rgba(139, 74, 49, 0.024);
 }
 
 .share-card .share-card-inner > * {
@@ -32,11 +32,18 @@
 
 .share-card .card-kicker {
   max-width: 100%;
-  min-height: 28px;
-  padding: 6px 11px 6px 10px;
-  line-height: 1.25;
+  min-height: 26px;
+  padding: 5px 10px 5px 9px;
+  line-height: 1.2;
   flex-wrap: wrap;
-  font-size: 11px;
+  font-size: 10.5px;
+}
+
+.share-card .card-kicker::before {
+  width: 16px;
+  height: 16px;
+  margin-right: 6px;
+  font-size: 10px;
 }
 
 .share-card .card-kicker::after {
@@ -46,9 +53,9 @@
 
 .share-card .knowledge-label {
   display: block;
-  margin-bottom: 6px;
-  color: rgba(112, 72, 51, 0.64);
-  font-size: 11px;
+  margin-bottom: 5px;
+  color: rgba(112, 72, 51, 0.62);
+  font-size: 10.5px;
   font-weight: 800;
   line-height: 1.2;
 }
@@ -62,31 +69,32 @@
 }
 
 .share-card .modern-line {
-  margin-top: 16px;
-  padding: 10px 13px 11px;
+  margin-top: 13px;
+  padding: 9px 12px 10px;
   border-left: 3px solid #b65d42;
-  border-radius: 4px 14px 14px 4px;
+  border-radius: 3px 13px 13px 3px;
   color: #704833;
-  background: rgba(182, 93, 66, 0.06);
-  font-size: 13px;
-  line-height: 1.5;
+  background: rgba(182, 93, 66, 0.055);
+  font-size: 12px;
+  line-height: 1.45;
   font-weight: 700;
 }
 
 .share-card .hook-line {
-  margin-top: 12px;
+  margin-top: 9px;
   color: #80553e;
-  font-size: 12px;
-  line-height: 1.65;
+  font-size: 11px;
+  line-height: 1.5;
   font-weight: 700;
 }
 
 .share-card .quote-block {
-  margin-top: 14px;
-  padding: 14px 14px 12px;
-  border-radius: 18px;
-  background: rgba(255, 252, 247, 0.72);
+  margin-top: 10px;
+  padding: 12px 13px 10px;
+  border-radius: 16px 16px 0 0;
+  background: rgba(255, 252, 247, 0.7);
   border: 1px solid rgba(82, 50, 30, 0.08);
+  border-bottom: 0;
 }
 
 .share-card .quote-line {
@@ -94,14 +102,14 @@
   padding: 0;
   color: #2f2018;
   font-family: "Songti SC", "STSong", "Noto Serif SC", serif;
-  font-size: clamp(20px, 4.6vw, 29px);
+  font-size: clamp(19px, 4.2vw, 25px);
   font-weight: 700;
-  line-height: 1.52;
-  letter-spacing: 0.01em;
+  line-height: 1.46;
+  letter-spacing: 0.008em;
   word-break: break-word;
   text-wrap: pretty;
   overflow: hidden;
-  max-height: calc(1.52em * 4);
+  max-height: calc(1.46em * 4);
 }
 
 .share-card .quote-line::before {
@@ -109,57 +117,77 @@
 }
 
 .share-card .source-line {
-  margin-top: 12px;
+  margin-top: 0;
+  padding: 8px 13px 10px;
+  border-radius: 0 0 16px 16px;
   color: #6c4b35;
+  background: rgba(255, 252, 247, 0.7);
+  border: 1px solid rgba(82, 50, 30, 0.08);
+  border-top: 1px solid rgba(82, 50, 30, 0.06);
   font-weight: 700;
-  font-size: 12px;
-  line-height: 1.55;
+  font-size: 11px;
+  line-height: 1.45;
+  text-align: right;
 }
 
-.share-card .card-spacer {
-  flex: 1;
-  min-height: 14px;
+.share-card .source-line .knowledge-label {
+  display: inline;
+  margin: 0 7px 0 0;
+  color: rgba(112, 72, 51, 0.56);
 }
 
 .share-card .explain-line {
-  padding: 11px 13px 12px;
-  border-radius: 16px;
+  order: 6;
+  margin-top: 10px;
+  padding: 10px 12px 11px;
+  border-radius: 14px;
   color: #735848;
-  background: rgba(255, 255, 255, 0.58);
-  border: 1px solid rgba(82, 50, 30, 0.08);
-  font-size: 12px;
-  line-height: 1.62;
+  background: rgba(255, 255, 255, 0.54);
+  border: 1px solid rgba(82, 50, 30, 0.075);
+  font-size: 11px;
+  line-height: 1.55;
   overflow: hidden;
-  max-height: calc(1.62em * 4 + 28px);
+  max-height: calc(1.55em * 3 + 27px);
+}
+
+.share-card .card-spacer {
+  order: 7;
+  flex: 1;
+  min-height: 8px;
 }
 
 .share-card .watermark {
+  order: 8;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  margin-top: 10px;
-  padding-top: 8px;
-  border-top: 1px solid rgba(82, 50, 30, 0.09);
+  margin-top: 7px;
+  padding-top: 7px;
+  border-top: 1px solid rgba(82, 50, 30, 0.085);
   color: rgba(44, 27, 18, 0.58);
-  font-size: 9.5px;
-  line-height: 1.45;
+  font-size: 9px;
+  line-height: 1.35;
   font-weight: 800;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.015em;
   flex-wrap: wrap;
 }
 
+.share-card .watermark::after {
+  content: none;
+}
+
 .share-card .watermark span:last-child {
-  color: rgba(88, 107, 70, 0.86);
+  color: rgba(88, 107, 70, 0.88);
 }
 
 @media (max-width: 640px) {
   .share-card {
-    padding: 12px;
+    padding: 11px;
   }
 
   .share-card .share-card-inner {
-    padding: 18px 16px 15px;
+    padding: 16px 14px 13px;
   }
 
   .share-card .card-kicker::after {
@@ -167,21 +195,21 @@
   }
 
   .share-card .quote-line {
-    font-size: 24px;
-    line-height: 1.5;
-    max-height: calc(1.5em * 4);
+    font-size: 21px;
+    line-height: 1.44;
+    max-height: calc(1.44em * 4);
   }
 }
 
 @media (max-width: 430px) {
   .share-card .quote-line {
-    font-size: 22px;
+    font-size: 20px;
   }
 
   .share-card .hook-line,
   .share-card .modern-line,
   .share-card .explain-line,
   .share-card .source-line {
-    font-size: 11.5px;
+    font-size: 10.5px;
   }
 }

@@ -31,8 +31,44 @@ jobs:
       - name: Seed SQLite database
         run: pnpm db:seed
 
-      - name: Query relevance tests
-        run: pnpm test:queries
+      - name: Main query relevance tests
+        run: pnpm exec tsx scripts/evaluate-queries.ts
+
+      - name: Negative — 你真丑
+        run: NEGATIVE_QUERY="你真丑" pnpm exec tsx scripts/evaluate-negative-queries.ts
+
+      - name: Negative — 不好看
+        run: NEGATIVE_QUERY="不好看" pnpm exec tsx scripts/evaluate-negative-queries.ts
+
+      - name: Negative — 不漂亮
+        run: NEGATIVE_QUERY="不漂亮" pnpm exec tsx scripts/evaluate-negative-queries.ts
+
+      - name: Negative — 我不开心
+        run: NEGATIVE_QUERY="我不开心" pnpm exec tsx scripts/evaluate-negative-queries.ts
+
+      - name: Negative — 我不喜欢你
+        run: NEGATIVE_QUERY="我不喜欢你" pnpm exec tsx scripts/evaluate-negative-queries.ts
+
+      - name: Negative — 我没信心
+        run: NEGATIVE_QUERY="我没信心" pnpm exec tsx scripts/evaluate-negative-queries.ts
+
+      - name: Negative — 我不想努力了
+        run: NEGATIVE_QUERY="我不想努力了" pnpm exec tsx scripts/evaluate-negative-queries.ts
+
+      - name: Negative — 今天吃什么
+        run: NEGATIVE_QUERY="今天吃什么" pnpm exec tsx scripts/evaluate-negative-queries.ts
+
+      - name: Business competition relevance test
+        run: pnpm exec tsx scripts/evaluate-business-competition-query.ts
+
+      - name: Classic corpus relevance tests
+        run: pnpm exec tsx scripts/evaluate-classic-corpus.ts
+
+      - name: Corpus coverage audit
+        run: pnpm exec tsx scripts/audit-corpus.ts
+
+      - name: Chengyu relevance tests
+        run: pnpm exec tsx scripts/evaluate-chengyu-queries.ts
 
       - name: Build
         run: pnpm build
