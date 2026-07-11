@@ -3,14 +3,14 @@
 }
 
 .share-card::before {
-  inset: -30% auto auto -18%;
-  width: 68%;
-  opacity: 0.5;
+  inset: -28% auto auto -16%;
+  width: 62%;
+  opacity: 0.35;
   z-index: 0;
 }
 
 .share-card .share-card-inner {
-  padding: 22px 20px 18px;
+  padding: 20px 18px 16px;
 }
 
 .share-card .share-card-inner::before,
@@ -19,10 +19,10 @@
 }
 
 .share-card .share-card-inner::after {
-  right: -8px;
-  bottom: -28px;
-  font-size: 120px;
-  color: rgba(139, 74, 49, 0.035);
+  right: -10px;
+  bottom: -24px;
+  font-size: 104px;
+  color: rgba(139, 74, 49, 0.03);
 }
 
 .share-card .share-card-inner > * {
@@ -32,8 +32,11 @@
 
 .share-card .card-kicker {
   max-width: 100%;
-  line-height: 1.3;
+  min-height: 28px;
+  padding: 6px 11px 6px 10px;
+  line-height: 1.25;
   flex-wrap: wrap;
+  font-size: 11px;
 }
 
 .share-card .card-kicker::after {
@@ -44,92 +47,110 @@
 .share-card .knowledge-label {
   display: block;
   margin-bottom: 6px;
-  color: rgba(112, 72, 51, 0.62);
-  font-size: 12px;
+  color: rgba(112, 72, 51, 0.64);
+  font-size: 11px;
   font-weight: 800;
   line-height: 1.2;
 }
 
+.share-card .modern-line,
+.share-card .hook-line,
+.share-card .quote-block,
+.share-card .source-line,
+.share-card .explain-line {
+  width: 100%;
+}
+
 .share-card .modern-line {
-  margin-top: 18px;
-  padding: 11px 14px 12px;
+  margin-top: 16px;
+  padding: 10px 13px 11px;
   border-left: 3px solid #b65d42;
-  border-radius: 4px 16px 16px 4px;
+  border-radius: 4px 14px 14px 4px;
   color: #704833;
-  background: rgba(182, 93, 66, 0.075);
-  font-size: 14px;
-  line-height: 1.55;
-  font-weight: 800;
-  display: block;
-  overflow: hidden;
+  background: rgba(182, 93, 66, 0.06);
+  font-size: 13px;
+  line-height: 1.5;
+  font-weight: 700;
+}
+
+.share-card .hook-line {
+  margin-top: 12px;
+  color: #80553e;
+  font-size: 12px;
+  line-height: 1.65;
+  font-weight: 700;
+}
+
+.share-card .quote-block {
+  margin-top: 14px;
+  padding: 14px 14px 12px;
+  border-radius: 18px;
+  background: rgba(255, 252, 247, 0.72);
+  border: 1px solid rgba(82, 50, 30, 0.08);
 }
 
 .share-card .quote-line {
-  margin: 24px 0 12px;
-  padding: 0 2px 0 4px;
+  margin: 0;
+  padding: 0;
   color: #2f2018;
-  font-size: clamp(24px, 5.6vw, 35px);
-  line-height: 1.42;
-  letter-spacing: 0.02em;
-  text-wrap: pretty;
+  font-family: "Songti SC", "STSong", "Noto Serif SC", serif;
+  font-size: clamp(20px, 4.6vw, 29px);
+  font-weight: 700;
+  line-height: 1.52;
+  letter-spacing: 0.01em;
   word-break: break-word;
+  text-wrap: pretty;
   overflow: hidden;
-  max-height: calc(1.42em * 4);
-  display: block;
-  -webkit-line-clamp: unset;
-  -webkit-box-orient: initial;
+  max-height: calc(1.52em * 4);
 }
 
 .share-card .quote-line::before {
-  left: -8px;
-  top: -24px;
-  color: rgba(182, 93, 66, 0.12);
-  font-size: 68px;
+  content: none;
 }
 
 .share-card .source-line {
-  max-width: 100%;
-  margin-top: 8px;
+  margin-top: 12px;
   color: #6c4b35;
-  font-weight: 800;
-  font-size: 13px;
-  text-align: right;
+  font-weight: 700;
+  font-size: 12px;
   line-height: 1.55;
 }
 
-.share-card .source-line .knowledge-label {
-  margin-bottom: 4px;
-  text-align: right;
-}
-
 .share-card .card-spacer {
-  min-height: 16px;
+  flex: 1;
+  min-height: 14px;
 }
 
 .share-card .explain-line {
-  padding: 11px 14px 12px;
+  padding: 11px 13px 12px;
   border-radius: 16px;
   color: #735848;
-  background: rgba(255, 255, 255, 0.55);
+  background: rgba(255, 255, 255, 0.58);
   border: 1px solid rgba(82, 50, 30, 0.08);
   font-size: 12px;
-  line-height: 1.6;
-  display: block;
+  line-height: 1.62;
   overflow: hidden;
-  max-height: calc(1.6em * 4 + 32px);
-}
-
-.share-card .tags {
-  row-gap: 8px;
-  margin-top: 10px;
+  max-height: calc(1.62em * 4 + 28px);
 }
 
 .share-card .watermark {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
   margin-top: 10px;
   padding-top: 8px;
+  border-top: 1px solid rgba(82, 50, 30, 0.09);
+  color: rgba(44, 27, 18, 0.58);
   font-size: 9.5px;
   line-height: 1.45;
+  font-weight: 800;
+  letter-spacing: 0.02em;
   flex-wrap: wrap;
+}
+
+.share-card .watermark span:last-child {
+  color: rgba(88, 107, 70, 0.86);
 }
 
 @media (max-width: 640px) {
@@ -138,35 +159,29 @@
   }
 
   .share-card .share-card-inner {
-    padding: 20px 18px 16px;
-  }
-
-  .share-card .card-kicker {
-    font-size: 11px;
+    padding: 18px 16px 15px;
   }
 
   .share-card .card-kicker::after {
     content: " · 现代话 × 古诗文";
   }
 
-  .share-card .modern-line {
-    margin-top: 16px;
-  }
-
   .share-card .quote-line {
-    margin-top: 22px;
-    font-size: 27px;
-    line-height: 1.4;
-    max-height: calc(1.4em * 4);
+    font-size: 24px;
+    line-height: 1.5;
+    max-height: calc(1.5em * 4);
   }
 }
 
 @media (max-width: 430px) {
   .share-card .quote-line {
-    font-size: 25px;
+    font-size: 22px;
   }
 
-  .share-card .watermark {
-    gap: 6px;
+  .share-card .hook-line,
+  .share-card .modern-line,
+  .share-card .explain-line,
+  .share-card .source-line {
+    font-size: 11.5px;
   }
 }
