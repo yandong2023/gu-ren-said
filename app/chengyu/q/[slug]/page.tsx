@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import ChengyuCard from "@/components/ChengyuCard";
 import { chengyuHref, isPublishedChengyuQuery, searchChengyu, slugToChengyuQuery } from "@/lib/chengyu-large";
 
 type PageProps = {
@@ -85,24 +86,7 @@ export default async function ChengyuQueryPage({ params }: PageProps) {
       <section aria-label="推荐成语">
         <div className="section-title"><div><h2>推荐成语</h2><p>结果会说明为什么匹配，以及适合什么语气和场景。</p></div></div>
         <div className="chengyu-results">
-          {results.map((result) => (
-            <article className="result-card chengyu-card" key={result.id}>
-              <div className="chengyu-card-main">
-                <span className="card-kicker">成语怎么说</span>
-                <div className="chengyu-query-line"><span className="knowledge-label">推荐成语</span><strong>{result.idiom}</strong>{result.pinyin ? <em>{result.pinyin}</em> : null}</div>
-                <p className="chengyu-meaning"><span className="knowledge-label">意思</span>{result.meaning}</p>
-                <div className="chengyu-meta"><span>{result.tone}</span>{result.scenes.slice(0, 4).map((scene) => <span key={scene}>{scene}</span>)}</div>
-                <div className="match-reason"><strong>为什么匹配</strong><span>{result.reason}</span></div>
-                <div className="chengyu-example"><span className="knowledge-label">例句</span>{result.example}</div>
-                {result.source ? <div className="source-line"><span className="knowledge-label">出处</span>{result.source}</div> : null}
-                <div className="chengyu-related">
-                  {result.synonyms.length > 0 ? <p><strong>近义：</strong>{result.synonyms.join(" / ")}</p> : null}
-                  {result.antonyms.length > 0 ? <p><strong>反义：</strong>{result.antonyms.join(" / ")}</p> : null}
-                </div>
-                {result.note ? <div className="chengyu-note">注意：{result.note}</div> : null}
-              </div>
-            </article>
-          ))}
+          {results.map((result) => <ChengyuCard key={result.id} result={result} />)}
         </div>
       </section>
 
