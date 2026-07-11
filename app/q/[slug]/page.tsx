@@ -10,7 +10,8 @@ type PageProps = {
   params: Promise<{ slug: string }>;
 };
 
-const getQueryPageData = cache((query: string) => runSearch(query, 6, { enhance: false }));
+const getStableQueryPageData = cache((query: string) => runSearch(query, 6, { enhance: false }));
+const getEnhancedQueryPageData = cache((query: string) => runSearch(query, 6, { enhance: true }));
 
 async function getQuery(params: PageProps["params"]) {
   const { slug } = await params;
@@ -20,7 +21,7 @@ async function getQuery(params: PageProps["params"]) {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const query = await getQuery(params);
   const shouldIndex = shouldIndexQuery(query);
-  const payload = await getQueryPageData(query);
+  const payload = await getStableQueryPageData(query);
   const result = payload.results[0];
   const title = `${query}，古文怎么说？｜古人曰`;
   const description = result
@@ -59,7 +60,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function QueryPage({ params }: PageProps) {
   const query = await getQuery(params);
-  const payload = await getQueryPageData(query);
+  const shouldIndex = shouldIndexQuery(query);
+  const payload = shouldIndex
+    ? await getStableQueryPageData(query)
+    : await getEnhancedQueryPageData(query);
   const top = payload.results[0];
 
   if (!top) notFound();

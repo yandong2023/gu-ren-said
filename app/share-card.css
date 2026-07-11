@@ -1,0 +1,31 @@
+.share-card .modern-line {
+  margin-top: 20px;
+  padding: 12px 14px;
+  border-left: 3px solid #b65d42;
+  border-radius: 4px 16px 16px 4px;
+  color: #704833;
+  background: rgba(182, 93, 66, 0.075);
+  font-size: 14px;
+  line-height: 1.55;
+  font-weight: 800;
+}
+
+.share-card .modern-line .knowledge-label,
+.share-card .explain-line .knowledge-label {
+  margin-bottom: 5px;
+  color: rgba(112, 72, 51, 0.62);
+}
+
+.share-card .explain-line {
+  padding: 12px 14px;
+  border-radius: 16px;
+  color: #735848;
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(82, 50, 30, 0.08);
+  font-size: 12px;
+  line-height: 1.65;
+}
+
+@media (max-width: 640px) {
+  .share-card .modern-line { margin-top: 16px; }
+}

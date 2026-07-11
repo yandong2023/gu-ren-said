@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { checkRateLimit } from "@/lib/request-guard.server";
 import { runSearch } from "@/lib/search-service.server";
-import { queryHref } from "@/lib/trends.server";
+import { queryHref, shouldIndexQuery } from "@/lib/trends.server";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -64,9 +64,10 @@ export async function POST(request: NextRequest) {
   }
 
   const startedAt = Date.now();
+  const enhance = !shouldIndexQuery(query);
 
   try {
-    const payload = await runSearch(query, limit, { record: true });
+    const payload = await runSearch(query, limit, { record: true, enhance });
     const durationMs = Date.now() - startedAt;
 
     return jsonResponse({
@@ -80,6 +81,7 @@ export async function POST(request: NextRequest) {
         emotion: payload.plan.emotion,
         keywords: payload.plan.keywords,
         classicalHintPhrases: payload.plan.classicalHintPhrases,
+        avoidThemes: payload.plan.avoidThemes,
         confidence: payload.plan.confidence
       } : null,
       db: payload.db,

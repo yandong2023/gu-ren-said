@@ -34,6 +34,8 @@ export type ExpandedQuery = {
   normalized: string;
   terms: string[];
   themes: string[];
+  avoidThemes?: string[];
   emotion?: string;
+  confidence?: number;
   intentExplanation?: string;
 };
