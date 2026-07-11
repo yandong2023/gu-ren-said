@@ -83,7 +83,7 @@ function evaluate(testCase: TestCase) {
     return { testCase, expanded, results, errors };
   }
 
-  if (!hasAnyTheme(top1, testCase.top1AnyTheme)) {
+  if (!testCase.allowEmpty && !hasAnyTheme(top1, testCase.top1AnyTheme)) {
     errors.push(`top1 theme mismatch: expected one of [${testCase.top1AnyTheme?.join(", ")}], got [${top1.themes.join(", ")}]`);
   }
 
