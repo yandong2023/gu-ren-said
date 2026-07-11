@@ -137,6 +137,8 @@ export default function SearchExperience() {
   const [searched, setSearched] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const resultsRef = useRef<HTMLElement | null>(null);
+  const searchAbortRef = useRef<AbortController | null>(null);
+  const searchRequestIdRef = useRef(0);
 
   const hasResults = results.length > 0;
   const visibleResults = useMemo(() => (hasResults ? results : [PREVIEW]), [hasResults, results]);
@@ -162,6 +164,7 @@ export default function SearchExperience() {
     window.addEventListener("grs:favorites-updated", refreshLocalPanels);
     return () => {
       mounted = false;
+      searchAbortRef.current?.abort();
       window.removeEventListener("grs:favorites-updated", refreshLocalPanels);
     };
   }, []);
@@ -198,6 +201,12 @@ export default function SearchExperience() {
       return;
     }
 
+    searchAbortRef.current?.abort();
+    const controller = new AbortController();
+    searchAbortRef.current = controller;
+    const requestId = searchRequestIdRef.current + 1;
+    searchRequestIdRef.current = requestId;
+
     const startedAt = performance.now();
     setQuery(value);
     setLoading(true);
@@ -209,10 +218,12 @@ export default function SearchExperience() {
       const response = await fetch("/api/search", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query: value })
+        body: JSON.stringify({ query: value }),
+        signal: controller.signal
       });
       const payload = (await response.json().catch(() => ({}))) as SearchPayload;
       if (!response.ok) throw new Error(payload.message || "搜索服务暂时不可用");
+      if (requestId !== searchRequestIdRef.current) return;
 
       const nextResults = payload.results ?? [];
       const href = payload.href || queryHref(value);
@@ -239,9 +250,11 @@ export default function SearchExperience() {
         duration_ms: durationMs
       });
       window.setTimeout(() => {
-        resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+        if (requestId === searchRequestIdRef.current) resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
       }, 80);
     } catch (err) {
+      if (err instanceof DOMException && err.name === "AbortError") return;
+      if (requestId !== searchRequestIdRef.current) return;
       const message = err instanceof Error ? err.message : "搜索失败";
       setError(message);
       trackEvent("search_error", {
@@ -250,7 +263,7 @@ export default function SearchExperience() {
         duration_ms: Math.round(performance.now() - startedAt)
       });
     } finally {
-      setLoading(false);
+      if (requestId === searchRequestIdRef.current) setLoading(false);
     }
   }
 
@@ -288,7 +301,7 @@ export default function SearchExperience() {
             </div>
             <div className="examples" aria-label="示例">
               {EXAMPLES.map((example) => (
-                <button className="example-chip" key={example} type="button" onClick={() => pickExample(example)}>{example}</button>
+                <button className="example-chip" key={example} type="button" disabled={loading} onClick={() => pickExample(example)}>{example}</button>
               ))}
             </div>
           </form>
@@ -310,7 +323,7 @@ export default function SearchExperience() {
               {historyItems.length > 0 ? (
                 <div className="return-list">
                   {historyItems.map((item) => (
-                    <button className="return-item return-button" key={`${item.query}-${item.at}`} type="button" onClick={() => { setQuery(item.query); void runSearch(item.query, "history"); }}>
+                    <button className="return-item return-button" key={`${item.query}-${item.at}`} type="button" disabled={loading} onClick={() => { setQuery(item.query); void runSearch(item.query, "history"); }}>
                       <span>查</span>{item.query}
                     </button>
                   ))}
