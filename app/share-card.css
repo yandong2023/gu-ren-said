@@ -81,10 +81,10 @@
 }
 
 .share-card .hook-line {
-  margin-top: 9px;
+  margin-top: 8px;
   color: #80553e;
-  font-size: 11px;
-  line-height: 1.5;
+  font-size: 10.8px;
+  line-height: 1.48;
   font-weight: 700;
 }
 
@@ -92,7 +92,7 @@
   margin-top: 10px;
   padding: 12px 13px 10px;
   border-radius: 16px 16px 0 0;
-  background: rgba(255, 252, 247, 0.7);
+  background: rgba(255, 252, 247, 0.76);
   border: 1px solid rgba(82, 50, 30, 0.08);
   border-bottom: 0;
 }
@@ -102,14 +102,16 @@
   padding: 0;
   color: #2f2018;
   font-family: "Songti SC", "STSong", "Noto Serif SC", serif;
-  font-size: clamp(19px, 4.2vw, 25px);
+  font-size: clamp(18px, 4vw, 24px);
   font-weight: 700;
-  line-height: 1.46;
+  line-height: 1.48;
   letter-spacing: 0.008em;
   word-break: break-word;
   text-wrap: pretty;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
   overflow: hidden;
-  max-height: calc(1.46em * 4);
 }
 
 .share-card .quote-line::before {
@@ -117,23 +119,29 @@
 }
 
 .share-card .source-line {
-  margin-top: 0;
+  margin-top: -1px;
   padding: 8px 13px 10px;
   border-radius: 0 0 16px 16px;
   color: #6c4b35;
-  background: rgba(255, 252, 247, 0.7);
+  background: rgba(255, 252, 247, 0.76);
   border: 1px solid rgba(82, 50, 30, 0.08);
   border-top: 1px solid rgba(82, 50, 30, 0.06);
   font-weight: 700;
   font-size: 11px;
   line-height: 1.45;
   text-align: right;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
 }
 
 .share-card .source-line .knowledge-label {
-  display: inline;
-  margin: 0 7px 0 0;
+  display: inline-flex;
+  margin: 0;
   color: rgba(112, 72, 51, 0.56);
+  flex: 0 0 auto;
 }
 
 .share-card .explain-line {
@@ -144,8 +152,9 @@
   color: #735848;
   background: rgba(255, 255, 255, 0.54);
   border: 1px solid rgba(82, 50, 30, 0.075);
-  font-size: 11px;
+  font-size: 10.8px;
   line-height: 1.55;
+  word-break: break-word;
   overflow: hidden;
   max-height: calc(1.55em * 3 + 27px);
 }
@@ -153,7 +162,7 @@
 .share-card .card-spacer {
   order: 7;
   flex: 1;
-  min-height: 8px;
+  min-height: 10px;
 }
 
 .share-card .watermark {
@@ -195,15 +204,14 @@
   }
 
   .share-card .quote-line {
-    font-size: 21px;
-    line-height: 1.44;
-    max-height: calc(1.44em * 4);
+    font-size: 20px;
+    line-height: 1.46;
   }
 }
 
 @media (max-width: 430px) {
   .share-card .quote-line {
-    font-size: 20px;
+    font-size: 19px;
   }
 
   .share-card .hook-line,
