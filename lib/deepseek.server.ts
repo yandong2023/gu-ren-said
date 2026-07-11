@@ -5,6 +5,7 @@ type DeepSeekRerankItem = {
   id: string;
   reason?: string;
   fitScore?: number;
+  accepted?: boolean;
 };
 
 type DeepSeekRerankResponse = {
@@ -44,6 +45,7 @@ const DEFAULT_DEEPSEEK_URL = "https://api.deepseek.com/chat/completions";
 const DEFAULT_MODEL = "deepseek-chat";
 const DEFAULT_PLAN_CACHE_TTL_SECONDS = 60 * 60 * 24 * 30;
 const DEFAULT_RERANK_CACHE_TTL_SECONDS = 60 * 60 * 24 * 7;
+const MIN_ACCEPTED_FIT_SCORE = 58;
 const planCache = new Map<string, DeepSeekQueryPlan | null>();
 const rerankCache = new Map<string, SearchResult[]>();
 
@@ -88,7 +90,7 @@ async function redisCommand<T>(command: Array<string | number>): Promise<T | nul
 
 function makeRedisCacheKey(kind: "plan" | "rerank", rawKey: string) {
   const hash = createHash("sha256").update(rawKey).digest("hex");
-  return `grs:deepseek:${kind}:v1:${hash}`;
+  return `grs:deepseek:${kind}:v2:${hash}`;
 }
 
 async function readJsonCache<T>(key: string): Promise<CacheLookup<T>> {
@@ -130,23 +132,31 @@ async function callDeepSeek(messages: Array<{ role: "system" | "user"; content: 
   const apiKey = process.env.DEEPSEEK_API_KEY;
   if (!apiKey || process.env.DEEPSEEK_ENABLED === "0") return null;
 
-  const response = await fetch(process.env.DEEPSEEK_BASE_URL ?? DEFAULT_DEEPSEEK_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`
-    },
-    body: JSON.stringify({
-      model: process.env.DEEPSEEK_MODEL ?? DEFAULT_MODEL,
-      temperature,
-      response_format: { type: "json_object" },
-      messages
-    })
-  });
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), Number(process.env.DEEPSEEK_TIMEOUT_MS ?? 10000));
 
-  if (!response.ok) return null;
-  const data = (await response.json()) as { choices?: Array<{ message?: { content?: string } }> };
-  return data.choices?.[0]?.message?.content ?? null;
+  try {
+    const response = await fetch(process.env.DEEPSEEK_BASE_URL ?? DEFAULT_DEEPSEEK_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: process.env.DEEPSEEK_MODEL ?? DEFAULT_MODEL,
+        temperature,
+        response_format: { type: "json_object" },
+        messages
+      }),
+      signal: controller.signal
+    });
+
+    if (!response.ok) return null;
+    const data = (await response.json()) as { choices?: Array<{ message?: { content?: string } }> };
+    return data.choices?.[0]?.message?.content ?? null;
+  } finally {
+    clearTimeout(timeout);
+  }
 }
 
 function normalizeStringArray(value: unknown): string[] {
@@ -176,11 +186,12 @@ export async function planQueryWithDeepSeek(query: string): Promise<DeepSeekQuer
         content: [
           "你是一个中文古诗文检索规划器，不负责输出最终答案。",
           "用户会输入现代话、网络热梗、口头禅或日常表达。",
-          "你的任务是理解语义，生成用于检索真实古诗文数据库的线索。",
+          "你的任务是先判断肯定/否定、情绪方向和真实意图，再生成用于检索真实古诗文数据库的线索。",
+          "特别注意‘不开心’‘不喜欢’‘没信心’这类否定表达，不能按其中的正向词理解。",
           "可以给出可能相关的经典短语作为检索提示，但这些短语不能直接展示，必须由数据库验证后才能使用。",
           "返回 JSON，字段包括 intent, emotion, themes, keywords, modern_paraphrases, classical_hint_phrases, avoid_themes, confidence。",
-          "themes/keywords/classical_hint_phrases 要简短，优先给能在古诗文中出现的词。",
-          "例如‘我爱你’应生成 表白/爱情/相守/相思，以及 山有木兮、愿得一心人、执子之手、只愿君心似我心 等检索线索。"
+          "avoid_themes 必须列出与用户意图相反、应该排除的主题。",
+          "themes/keywords/classical_hint_phrases 要简短，优先给能在古诗文中出现的词。"
         ].join("\n")
       },
       {
@@ -222,6 +233,10 @@ export async function planQueryWithDeepSeek(query: string): Promise<DeepSeekQuer
   }
 }
 
+function hasStrongBaseSignal(candidate: SearchResult) {
+  return candidate.score >= 60 && candidate.matchedBy.some((signal) => ["modern-exact", "exact", "modern-meaning", "semantic-theme", "emotion"].includes(signal));
+}
+
 export async function enhanceWithDeepSeek(query: string, candidates: SearchResult[], plan?: DeepSeekQueryPlan | null): Promise<SearchResult[]> {
   const enabled = isDeepSeekEnabled();
   if (!enabled || candidates.length <= 1) return candidates;
@@ -242,7 +257,7 @@ export async function enhanceWithDeepSeek(query: string, candidates: SearchResul
   const payload = {
     query,
     plan,
-    instruction: "只能从 candidates 里选择和排序，不能创造新古文，不能改作者、篇名、朝代、出处。返回 JSON。",
+    instruction: "只能从 candidates 里选择和排序，不能创造新古文，不能改作者、篇名、朝代、出处。若候选只是字面碰巧相似、情绪方向相反或没有真正表达用户意图，必须拒绝。允许全部拒绝。",
     candidates: topCandidates.map((item) => ({
       id: item.id,
       quote: item.quote,
@@ -250,7 +265,9 @@ export async function enhanceWithDeepSeek(query: string, candidates: SearchResul
       themes: item.themes,
       modernMeanings: item.modernMeanings,
       explanation: item.reason || item.translation,
-      context: item.context?.slice(0, 520)
+      context: item.context?.slice(0, 520),
+      baseScore: item.score,
+      matchedBy: item.matchedBy
     }))
   };
 
@@ -259,11 +276,13 @@ export async function enhanceWithDeepSeek(query: string, candidates: SearchResul
       {
         role: "system",
         content: [
-          "你是一个中文古诗文匹配评审。",
-          "用户会输入现代话、网络热梗或日常表达。",
-          "你的任务是从候选古诗文中选出语义最贴切、最适合分享和学习的结果。",
-          "必须遵守：不能编造古文，不能编造出处，不能修改候选原句、作者、篇名。",
-          "只返回 JSON：{\"results\":[{\"id\":\"候选id\",\"fitScore\":0-100,\"reason\":\"一句中文解释\"}]}。"
+          "你是一个严格的中文古诗文匹配评审。",
+          "先判断用户的肯定/否定、情绪、对象和表达目的，再判断候选是否真的贴切。",
+          "关键词相同不代表语义相同；否定表达、反讽和相反情绪必须重点排除。",
+          "只有 fitScore >= 58 才可以 accepted=true；勉强牵强的候选必须 rejected。",
+          "允许没有任何合格候选，宁可少给或不给，也不要硬凑。",
+          "不能编造古文，不能编造出处，不能修改候选原句、作者、篇名。",
+          "只返回 JSON：{\"results\":[{\"id\":\"候选id\",\"accepted\":true,\"fitScore\":0-100,\"reason\":\"一句中文解释\"}]}。"
         ].join("\n")
       },
       {
@@ -277,9 +296,10 @@ export async function enhanceWithDeepSeek(query: string, candidates: SearchResul
     const parsed = parseJsonObject<DeepSeekRerankResponse>(content);
     const ranked = parsed?.results ?? [];
     if (ranked.length === 0) {
-      rerankCache.set(cacheKey, candidates);
-      await writeJsonCache(redisCacheKey, candidates, cacheTtlSeconds("DEEPSEEK_RERANK_CACHE_TTL_SECONDS", DEFAULT_RERANK_CACHE_TTL_SECONDS));
-      return candidates;
+      const fallback = candidates.filter(hasStrongBaseSignal);
+      rerankCache.set(cacheKey, fallback);
+      await writeJsonCache(redisCacheKey, fallback, cacheTtlSeconds("DEEPSEEK_RERANK_CACHE_TTL_SECONDS", DEFAULT_RERANK_CACHE_TTL_SECONDS));
+      return fallback;
     }
 
     const byId = new Map(candidates.map((item) => [item.id, item]));
@@ -288,18 +308,19 @@ export async function enhanceWithDeepSeek(query: string, candidates: SearchResul
 
     for (const item of ranked) {
       const candidate = byId.get(item.id);
-      if (!candidate || used.has(item.id)) continue;
+      const fitScore = Math.max(0, Math.min(100, Number(item.fitScore ?? 0)));
+      if (!candidate || used.has(item.id) || item.accepted === false || fitScore < MIN_ACCEPTED_FIT_SCORE) continue;
       used.add(item.id);
       enhanced.push({
         ...candidate,
-        score: candidate.score + Math.max(0, Math.min(100, Number(item.fitScore ?? 0))) / 2,
+        score: candidate.score + fitScore / 2,
         reason: item.reason?.trim() || candidate.reason,
-        matchedBy: Array.from(new Set([...candidate.matchedBy, "deepseek-rerank"]))
+        matchedBy: Array.from(new Set([...candidate.matchedBy, "deepseek-rerank", "deepseek-fit"]))
       });
     }
 
     for (const candidate of candidates) {
-      if (!used.has(candidate.id)) enhanced.push(candidate);
+      if (!used.has(candidate.id) && hasStrongBaseSignal(candidate)) enhanced.push(candidate);
     }
 
     rerankCache.set(cacheKey, enhanced);
