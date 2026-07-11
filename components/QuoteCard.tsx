@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { trackEvent } from "@/lib/analytics";
+import { getPrimaryShareHook } from "@/lib/share-hook";
 import type { SearchResult } from "@/lib/types";
 
 const SITE_URL = "https://gurensaid.com";
@@ -67,7 +68,7 @@ export default function QuoteCard({ result, query, compact = false }: Props) {
   const whyText = result.reason || result.translation;
   const explainText = result.translation || whyText;
   const modernText = query || result.modernMeanings[0] || "我 emo 了";
-  const hookText = `原来“${modernText}”，古人早就说过。`;
+  const hookText = getPrimaryShareHook(modernText, result);
   const shareUrl = `${SITE_URL}${queryHref(modernText)}?utm_source=share&utm_medium=link&utm_campaign=quote_card`;
   const analyticsContext = {
     result_id: result.id,
