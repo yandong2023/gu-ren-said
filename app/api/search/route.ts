@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { recordSearchQuality } from "@/lib/quality.server";
 import { checkRateLimit } from "@/lib/request-guard.server";
 import { runSearch } from "@/lib/search-service.server";
 import { queryHref, shouldIndexQuery } from "@/lib/trends.server";
@@ -70,6 +71,15 @@ export async function POST(request: NextRequest) {
     const payload = await runSearch(query, limit, { record: true, enhance });
     const durationMs = Date.now() - startedAt;
 
+    await recordSearchQuality({
+      query,
+      status: payload.results.length > 0 ? "success" : "empty",
+      results: payload.results,
+      durationMs,
+      aiEnhanced: payload.enhancer.deepseek,
+      planConfidence: payload.plan?.confidence
+    });
+
     return jsonResponse({
       query: payload.query,
       href: queryHref(query),
@@ -91,6 +101,8 @@ export async function POST(request: NextRequest) {
       "X-RateLimit-Remaining": String(rateLimit.remaining)
     });
   } catch {
+    const durationMs = Date.now() - startedAt;
+    await recordSearchQuality({ query, status: "error", durationMs, aiEnhanced: enhance });
     return jsonResponse({ results: [], message: "搜索服务暂时不可用，请稍后再试。" }, 500);
   }
 }
