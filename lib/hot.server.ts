@@ -1,4 +1,3 @@
-import { unstable_cache } from "next/cache";
 import { runSearch } from "./search-service.server";
 import { FALLBACK_TRENDING_QUERIES, getTrendingQueries, type TrendingQuery } from "./trends.server";
 import type { SearchResult } from "./types";
@@ -24,6 +23,14 @@ export type HotFeed = {
   previews: RankedPreview[];
 };
 
+type CacheEntry = {
+  expiresAt: number;
+  value: Promise<RankedPreview[]>;
+};
+
+const CACHE_TTL_MS = 30 * 60 * 1000;
+const rangeCache = new Map<HotRange, CacheEntry>();
+
 function isEditorialFallback(range: HotRange, items: TrendingQuery[]) {
   if (range !== "all" || items.length === 0) return false;
   return items.every((item, index) => item.query === FALLBACK_TRENDING_QUERIES[index]);
@@ -45,14 +52,21 @@ async function loadRange(range: HotRange): Promise<RankedPreview[]> {
     return result ? { item: { ...item, source }, result } : null;
   }));
 
-  return checked.filter((entry): entry is RankedPreview => Boolean(entry)).slice(0, 10);
+  return checked.filter((entry): entry is RankedPreview => entry !== null).slice(0, 10);
 }
 
-const getCachedRange = unstable_cache(
-  async (range: HotRange) => loadRange(range),
-  ["grs-hot-range-v2"],
-  { revalidate: 60 * 30 }
-);
+async function getCachedRange(range: HotRange) {
+  const now = Date.now();
+  const cached = rangeCache.get(range);
+  if (cached && cached.expiresAt > now) return cached.value;
+
+  const value = loadRange(range).catch((error) => {
+    rangeCache.delete(range);
+    throw error;
+  });
+  rangeCache.set(range, { expiresAt: now + CACHE_TTL_MS, value });
+  return value;
+}
 
 function fallbackOrder(range: HotRange): HotRange[] {
   if (range === "today") return ["today", "week", "all"];
@@ -93,8 +107,9 @@ export async function getHotPageData() {
   ]);
 
   const previewGroup = today.length > 0 ? today : week.length > 0 ? week : all;
+  const previewRange: HotRange = previewGroup === today ? "today" : previewGroup === week ? "week" : "all";
   const previewLabel = previewGroup.length > 0
-    ? labelFor(previewGroup === today ? "today" : previewGroup === week ? "week" : "all", previewGroup[0].item.source)
+    ? labelFor(previewRange, previewGroup[0].item.source)
     : "热门知识卡片";
 
   return { today, week, all, previewGroup, previewLabel };
