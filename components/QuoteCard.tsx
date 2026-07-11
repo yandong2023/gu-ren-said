@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import { trackEvent } from "@/lib/analytics";
-import { getSharePersona } from "@/lib/share-persona";
 import type { SearchResult } from "@/lib/types";
 
 const SITE_URL = "https://gurensaid.com";
@@ -65,25 +64,26 @@ export default function QuoteCard({ result, query, compact = false }: Props) {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const sourceText = `——${result.dynasty}·${result.author}《${result.title}》`;
   const fullSourceText = `${result.dynasty}·${result.author}《${result.title}》`;
-  const shareCopy = getSharePersona(result);
   const whyText = result.reason || result.translation;
   const explainText = result.translation || whyText;
   const modernText = query || result.modernMeanings[0] || "我 emo 了";
+  const hookText = `原来“${modernText}”，古人早就说过。`;
   const shareUrl = `${SITE_URL}${queryHref(modernText)}?utm_source=share&utm_medium=link&utm_campaign=quote_card`;
   const analyticsContext = {
     result_id: result.id,
     query_length: modernText.length
   };
   const shareText = [
-    `现代话：${modernText}`,
+    hookText,
     "",
-    "古诗文表达：",
     result.quote,
-    `出处：${fullSourceText}`,
+    fullSourceText,
     "",
     `一句解释：${explainText}`,
     "",
-    `来自：${shareUrl}`
+    "gurensaid.com",
+    "每一句都有真实出处",
+    shareUrl
   ].join("\n");
 
   useEffect(() => {
@@ -142,7 +142,7 @@ export default function QuoteCard({ result, query, compact = false }: Props) {
     setNotice(null);
 
     const title = `古人曰｜${modernText}，古文怎么说？`;
-    const text = `${modernText}\n${result.quote}\n${sourceText}`;
+    const text = `${hookText}\n${result.quote}\n${sourceText}`;
 
     try {
       if (navigator.share) {
@@ -297,12 +297,15 @@ export default function QuoteCard({ result, query, compact = false }: Props) {
         <div className="share-card-inner">
           <span className="card-kicker">古人曰</span>
           <div className="modern-line"><span className="knowledge-label">现代话</span>{modernText}</div>
-          <h3 className="quote-line">{result.quote}</h3>
+          <div className="hook-line">{hookText}</div>
+          <div className="quote-block">
+            <span className="knowledge-label">古诗文表达</span>
+            <h3 className="quote-line">{result.quote}</h3>
+          </div>
           <div className="source-line"><span className="knowledge-label">出处</span>{sourceText}</div>
           <div className="card-spacer" />
           <div className="explain-line"><span className="knowledge-label">一句解释</span>{explainText}</div>
-          <div className="tags"><span className="tag">#{shareCopy.tag}</span>{result.themes.slice(0, 3).map((tag) => <span className="tag" key={tag}>#{tag}</span>)}</div>
-          <div className="watermark">gurensaid.com · 每句都有出处</div>
+          <div className="watermark"><span>gurensaid.com</span><span>每一句都有真实出处</span></div>
         </div>
       </div>
       {!compact ? (
