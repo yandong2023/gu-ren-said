@@ -11,6 +11,10 @@ async function getQuery(params: PageProps["params"]) {
   return slugToChengyuQuery(slug);
 }
 
+function normalizeRelatedQuery(value: string) {
+  return value.trim().toLowerCase().replace(/\s+/g, "");
+}
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const query = await getQuery(params);
   const result = searchChengyu(query, 1)[0];
@@ -51,6 +55,17 @@ export default async function ChengyuQueryPage({ params }: PageProps) {
 
   if (!top) notFound();
 
+  const currentKey = normalizeRelatedQuery(query);
+  const relatedQueries = Array.from(new Set([
+    top.idiom,
+    ...results.slice(1).map((result) => result.idiom),
+    ...top.synonyms,
+    ...top.antonyms,
+    ...top.modernMeanings
+  ]))
+    .filter((item) => normalizeRelatedQuery(item) !== currentKey && isPublishedChengyuQuery(item))
+    .slice(0, 8);
+
   return (
     <main className="shell">
       <nav className="nav" aria-label="主导航">
@@ -90,6 +105,17 @@ export default async function ChengyuQueryPage({ params }: PageProps) {
           ))}
         </div>
       </section>
+
+      {relatedQueries.length > 0 ? (
+        <section className="related-searches" aria-label="相关成语和说法">
+          <div className="section-title"><div><h2>相关成语和说法</h2><p>继续查看近义、反义和相似使用场景。</p></div></div>
+          <div className="hot-strip-list">
+            {relatedQueries.map((item, index) => (
+              <a href={chengyuHref(item)} className="hot-chip" key={item}><span>{index + 1}</span>{item}</a>
+            ))}
+          </div>
+        </section>
+      ) : null}
     </main>
   );
 }
