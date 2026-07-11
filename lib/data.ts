@@ -1,8 +1,10 @@
 import type { QuoteRecord, SlangMapping } from "@/lib/types";
+import { BLESSING_QUOTES, BLESSING_SLANG_MAPPINGS } from "./blessing-corpus";
 import { CLASSIC_QUOTES, CLASSIC_SLANG_MAPPINGS } from "./classic-corpus";
 
 export const QUOTES: QuoteRecord[] = [
   ...CLASSIC_QUOTES,
+  ...BLESSING_QUOTES,
   { id: "li-bai-xuanzhou-emo", quote: "抽刀断水水更流，举杯消愁愁更愁。", title: "宣州谢朓楼饯别校书叔云", author: "李白", dynasty: "唐", source: "全唐诗", context: "弃我去者，昨日之日不可留；乱我心者，今日之日多烦忧。", translation: "想借酒消愁，反而愁绪更深。", themes: ["忧愁", "失意", "烦闷"], modernMeanings: ["我 emo 了", "破防了", "心态崩了"], emotion: "sad", scene: ["情绪", "夜晚", "低落"], weight: 98 },
   { id: "li-bai-xinglunan-stable", quote: "长风破浪会有时，直挂云帆济沧海。", title: "行路难·其一", author: "李白", dynasty: "唐", source: "全唐诗", context: "行路难，行路难，多歧路，今安在？", translation: "相信终有一天能冲破阻碍，实现理想。", themes: ["希望", "信心", "成功", "逆境"], modernMeanings: ["这事包的", "稳了", "未来可期", "一定能成"], emotion: "positive", scene: ["考试", "创业", "鼓励"], weight: 100 },
   { id: "tao-yuanming-yinju-tangping", quote: "采菊东篱下，悠然见南山。", title: "饮酒·其五", author: "陶渊明", dynasty: "东晋", source: "陶渊明集", context: "结庐在人境，而无车马喧。", translation: "远离喧嚣，在平淡生活里获得松弛和自在。", themes: ["松弛", "归隐", "自由", "不争"], modernMeanings: ["躺平", "不想卷", "想退休", "佛系"], emotion: "calm", scene: ["工作", "生活", "田园"], weight: 96 },
@@ -26,6 +28,7 @@ export const QUOTES: QuoteRecord[] = [
 
 export const SLANG_MAPPINGS: SlangMapping[] = [
   ...CLASSIC_SLANG_MAPPINGS,
+  ...BLESSING_SLANG_MAPPINGS,
   { id: "emo", patterns: ["emo", "破防", "心态崩", "崩了", "难受", "低落", "丧"], keywords: ["忧愁", "失意", "烦忧", "愁", "伤心", "惆怅", "心碎", "孤独"], themes: ["忧愁", "失意", "孤独"], emotion: "sad", explanation: "表达低落、烦乱、情绪失控或心里难受。" },
   { id: "awesome", patterns: ["牛", "太强", "厉害", "666", "绝绝子", "封神", "天花板", "顶级"], keywords: ["惊", "绝", "壮", "奇", "豪", "才华", "惊艳", "卓绝"], themes: ["赞美", "才华", "震撼"], emotion: "admire", explanation: "表达强烈赞叹、佩服和“太厉害了”。" },
   { id: "beauty", patterns: ["好看", "真好看", "你好看", "你真好看", "漂亮", "真漂亮", "好美", "真美", "太美", "颜值", "美貌", "美女", "帅", "好帅"], keywords: ["美貌", "赞美", "容貌", "惊艳", "佳人", "美目", "花想容", "回眸", "百媚", "漂亮"], themes: ["美貌", "赞美", "惊艳"], emotion: "beauty", explanation: "表达对外貌、气质、笑容或颜值的赞美，比如“你好看”“太漂亮了”。" },
