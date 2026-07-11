@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import ChengyuCard from "@/components/ChengyuCard";
 import type { ChengyuResult } from "@/lib/chengyu";
 
 const EXAMPLES = [
@@ -31,54 +32,6 @@ const PREVIEW: ChengyuResult = {
   matchedBy: ["preview"],
   reason: "“阳奉阴违”可以表达“表面一套背后一套 / 当面答应背后不做”这类意思，语气为贬义。"
 };
-
-function copyToClipboard(text: string) {
-  if (navigator.clipboard?.writeText && window.isSecureContext) return navigator.clipboard.writeText(text).then(() => true).catch(() => false);
-  const textarea = document.createElement("textarea");
-  textarea.value = text;
-  textarea.setAttribute("readonly", "readonly");
-  textarea.style.position = "fixed";
-  textarea.style.left = "-9999px";
-  document.body.appendChild(textarea);
-  textarea.select();
-  const ok = document.execCommand("copy");
-  document.body.removeChild(textarea);
-  return Promise.resolve(ok);
-}
-
-function ChengyuCard({ result, onNotice }: { result: ChengyuResult; onNotice: (value: string) => void }) {
-  async function copy(text: string, notice: string) {
-    const ok = await copyToClipboard(text);
-    onNotice(ok ? notice : "当前浏览器不允许自动复制，可以手动复制页面文字。");
-  }
-
-  return (
-    <article className="result-card chengyu-card">
-      <div className="chengyu-card-main">
-        <span className="card-kicker">成语怎么说</span>
-        <div className="chengyu-query-line"><span className="knowledge-label">推荐成语</span><strong>{result.idiom}</strong>{result.pinyin ? <em>{result.pinyin}</em> : null}</div>
-        <p className="chengyu-meaning"><span className="knowledge-label">意思</span>{result.meaning}</p>
-        <div className="chengyu-meta">
-          <span>{result.tone}</span>
-          {result.scenes.slice(0, 4).map((scene) => <span key={scene}>{scene}</span>)}
-        </div>
-        <div className="match-reason"><strong>为什么匹配</strong><span>{result.reason}</span></div>
-        <div className="chengyu-example"><span className="knowledge-label">例句</span>{result.example}</div>
-        {result.source ? <div className="source-line"><span className="knowledge-label">出处</span>{result.source}</div> : null}
-        <div className="chengyu-related">
-          {result.synonyms.length > 0 ? <p><strong>近义：</strong>{result.synonyms.join(" / ")}</p> : null}
-          {result.antonyms.length > 0 ? <p><strong>反义：</strong>{result.antonyms.join(" / ")}</p> : null}
-        </div>
-        {result.note ? <div className="chengyu-note">注意：{result.note}</div> : null}
-      </div>
-      <div className="copy-row" aria-label="复制成语常用格式">
-        <button type="button" onClick={() => copy(result.idiom, "成语已复制。")}>复制成语</button>
-        <button type="button" onClick={() => copy(`${result.idiom}：${result.meaning}`, "成语和释义已复制。")}>复制成语+释义</button>
-        <button type="button" onClick={() => copy(result.example, "例句已复制。")}>复制例句</button>
-      </div>
-    </article>
-  );
-}
 
 export default function ChengyuExperience() {
   const [query, setQuery] = useState("表面一套背后一套");
@@ -181,7 +134,7 @@ export default function ChengyuExperience() {
           <div className="empty-state">暂时没有找到特别贴切的成语。可以换一种更明确的说法，比如“表面一套背后一套”“说话前后矛盾”“事情突然变坏”。</div>
         ) : (
           <div className="chengyu-results">
-            {visibleResults.map((result) => <ChengyuCard key={result.id} result={result} onNotice={setNotice} />)}
+            {visibleResults.map((result) => <ChengyuCard key={result.id} result={result} showActions onNotice={setNotice} />)}
           </div>
         )}
       </section>
