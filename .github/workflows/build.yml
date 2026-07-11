@@ -64,6 +64,9 @@ jobs:
       - name: Classic corpus relevance tests
         run: pnpm exec tsx scripts/evaluate-classic-corpus.ts
 
+      - name: Blessing relevance tests
+        run: pnpm exec tsx scripts/evaluate-blessing-queries.ts
+
       - name: Corpus coverage audit
         run: pnpm exec tsx scripts/audit-corpus.ts
 
