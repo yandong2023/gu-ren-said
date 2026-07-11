@@ -20,7 +20,7 @@
     "lint": "next lint",
     "db:seed": "tsx scripts/seed.ts",
     "audit:corpus": "tsx scripts/audit-corpus.ts",
-    "test:queries": "tsx scripts/evaluate-queries.ts && tsx scripts/evaluate-negative-queries.ts && tsx scripts/evaluate-business-competition-query.ts && tsx scripts/evaluate-classic-corpus.ts && tsx scripts/audit-corpus.ts && tsx scripts/evaluate-chengyu-queries.ts"
+    "test:queries": "tsx scripts/evaluate-queries.ts && tsx scripts/evaluate-negative-queries.ts && tsx scripts/evaluate-business-competition-query.ts && tsx scripts/evaluate-classic-corpus.ts && tsx scripts/evaluate-blessing-queries.ts && tsx scripts/audit-corpus.ts && tsx scripts/evaluate-chengyu-queries.ts"
   },
   "dependencies": {
     "@vercel/analytics": "latest",
