@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import type { ChengyuResult } from "@/lib/chengyu";
 
 const EXAMPLES = [
@@ -87,11 +87,27 @@ export default function ChengyuExperience() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const searchAbortRef = useRef<AbortController | null>(null);
+  const searchRequestIdRef = useRef(0);
   const visibleResults = useMemo(() => (searched ? results : [PREVIEW]), [results, searched]);
 
+  useEffect(() => () => searchAbortRef.current?.abort(), []);
+
   async function runSearch(nextQuery = query) {
-    const value = nextQuery.trim();
+    const value = nextQuery.trim().replace(/\s+/g, " ");
     if (!value) return;
+    if (value.length > 60) {
+      setError("输入内容请控制在 60 个字以内。");
+      return;
+    }
+
+    searchAbortRef.current?.abort();
+    const controller = new AbortController();
+    searchAbortRef.current = controller;
+    const requestId = searchRequestIdRef.current + 1;
+    searchRequestIdRef.current = requestId;
+
+    setQuery(value);
     setLoading(true);
     setError(null);
     setNotice(null);
@@ -101,15 +117,19 @@ export default function ChengyuExperience() {
       const response = await fetch("/api/chengyu/search", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query: value, limit: 8 })
+        body: JSON.stringify({ query: value, limit: 8 }),
+        signal: controller.signal
       });
-      if (!response.ok) throw new Error("成语搜索暂时不可用");
-      const payload = (await response.json()) as { results: ChengyuResult[] };
+      const payload = (await response.json().catch(() => ({}))) as { results?: ChengyuResult[]; message?: string };
+      if (!response.ok) throw new Error(payload.message || "成语搜索暂时不可用");
+      if (requestId !== searchRequestIdRef.current) return;
       setResults(payload.results ?? []);
     } catch (err) {
+      if (err instanceof DOMException && err.name === "AbortError") return;
+      if (requestId !== searchRequestIdRef.current) return;
       setError(err instanceof Error ? err.message : "搜索失败");
     } finally {
-      setLoading(false);
+      if (requestId === searchRequestIdRef.current) setLoading(false);
     }
   }
 
@@ -140,13 +160,13 @@ export default function ChengyuExperience() {
           <p className="subtitle">输入一句大白话，找到意思相近、语气合适、能正确使用的成语。已接入扩展成语库，并优先展示语义和场景更贴切的结果。</p>
 
           <form className="search-panel" onSubmit={submit}>
-            <textarea value={query} onChange={(event) => setQuery(event.target.value)} placeholder="比如：表面一套背后一套 / 说话前后矛盾 / 很努力但很累" aria-label="输入大白话或想表达的意思" />
+            <textarea value={query} maxLength={60} onChange={(event) => setQuery(event.target.value)} placeholder="比如：表面一套背后一套 / 说话前后矛盾 / 很努力但很累" aria-label="输入大白话或想表达的意思" />
             <div className="search-actions">
               <span className="hint">结果会显示成语、释义、语气、近义反义和例句，方便写作和表达。</span>
               <button className="primary-btn" type="submit" disabled={loading}>{loading ? "查找中…" : "查成语"}</button>
             </div>
             <div className="examples" aria-label="示例">
-              {EXAMPLES.map((example) => <button className="example-chip" key={example} type="button" onClick={() => pickExample(example)}>{example}</button>)}
+              {EXAMPLES.map((example) => <button className="example-chip" key={example} type="button" disabled={loading} onClick={() => pickExample(example)}>{example}</button>)}
             </div>
           </form>
         </div>
