@@ -46,16 +46,25 @@ jobs:
           tail -n 30 query-tests.log
 
       - name: Build
+        id: build
+        continue-on-error: true
+        run: pnpm build > build.log 2>&1
+
+      - name: Upload build log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-log
+          path: build.log
+          if-no-files-found: error
+          retention-days: 3
+
+      - name: Report build failure
+        if: steps.build.outcome == 'failure'
         shell: bash
         run: |
-          set +e
-          pnpm build > build.log 2>&1
-          status=$?
-          if [ $status -ne 0 ]; then
-            echo "=== BUILD ERROR SUMMARY ==="
-            grep -n -E "Type error|Failed to compile|Error:|error TS|Module not found|Cannot find|is not assignable" build.log || true
-            echo "=== BUILD LOG TAIL ==="
-            tail -n 120 build.log
-            exit $status
-          fi
-          tail -n 40 build.log
+          echo "=== BUILD ERROR SUMMARY ==="
+          grep -n -E "Type error|Failed to compile|Error:|error TS|Module not found|Cannot find|is not assignable" build.log || true
+          echo "=== BUILD LOG TAIL ==="
+          tail -n 120 build.log
+          exit 1
