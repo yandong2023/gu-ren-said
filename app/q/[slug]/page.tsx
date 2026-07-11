@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { cache } from "react";
 import QuoteCard from "@/components/QuoteCard";
+import { getRelatedQueries } from "@/lib/related-queries";
 import { runSearch } from "@/lib/search-service.server";
 import { absoluteQueryUrl, queryHref, shouldIndexQuery, slugToQuery } from "@/lib/trends.server";
 
@@ -63,6 +64,8 @@ export default async function QueryPage({ params }: PageProps) {
 
   if (!top) notFound();
 
+  const relatedQueries = getRelatedQueries(query, payload.results, 8);
+
   return (
     <main className="shell">
       <nav className="nav" aria-label="主导航">
@@ -94,14 +97,16 @@ export default async function QueryPage({ params }: PageProps) {
         </section>
       ) : null}
 
-      <section className="related-searches" aria-label="相似搜索">
-        <div className="section-title"><div><h2>相似搜索</h2><p>继续看看这些现代话，古人会怎么说。</p></div></div>
-        <div className="hot-strip-list">
-          {["我爱你", "你真好看", "我 emo 了", "这事包的", "太卷了想躺平", "不要放弃", "想家了", "我真的会谢"].filter((item) => item !== query).slice(0, 8).map((item, index) => (
-            <a href={queryHref(item)} className="hot-chip" key={item}><span>{index + 1}</span>{item}</a>
-          ))}
-        </div>
-      </section>
+      {relatedQueries.length > 0 ? (
+        <section className="related-searches" aria-label="语义相关搜索">
+          <div className="section-title"><div><h2>你可能还想查</h2><p>根据当前结果的主题、情绪和使用场景推荐。</p></div></div>
+          <div className="hot-strip-list">
+            {relatedQueries.map((item, index) => (
+              <a href={item.href} className="hot-chip" key={item.href}><span>{index + 1}</span>{item.query}</a>
+            ))}
+          </div>
+        </section>
+      ) : null}
     </main>
   );
 }
