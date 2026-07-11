@@ -98,9 +98,17 @@ function evaluate(testCase: TestCase) {
   return { testCase, expanded, results, errors };
 }
 
+const requestedQuery = process.env.NEGATIVE_QUERY?.trim();
+const selectedCases = requestedQuery ? TEST_CASES.filter((item) => item.query === requestedQuery) : TEST_CASES;
+
+if (requestedQuery && selectedCases.length === 0) {
+  console.error(`Unknown NEGATIVE_QUERY: ${requestedQuery}`);
+  process.exit(1);
+}
+
 let failed = 0;
 
-for (const testCase of TEST_CASES) {
+for (const testCase of selectedCases) {
   const result = evaluate(testCase);
   const top = result.results.slice(0, 3).map((item) => `${item.id}: ${item.quote} [${item.themes.join("/")}] score=${item.score}`).join(" | ");
 
@@ -118,8 +126,8 @@ for (const testCase of TEST_CASES) {
 }
 
 if (failed > 0) {
-  console.error(`\n${failed}/${TEST_CASES.length} negative query tests failed.`);
+  console.error(`\n${failed}/${selectedCases.length} negative query tests failed.`);
   process.exit(1);
 }
 
-console.log(`\nAll ${TEST_CASES.length} negative query tests passed.`);
+console.log(`\nAll ${selectedCases.length} selected negative query tests passed.`);
