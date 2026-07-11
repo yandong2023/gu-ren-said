@@ -92,6 +92,36 @@ export const EXTRA_QUOTES: QuoteRecord[] = [
     weight: 112
   },
   {
+    id: "lunyu-liren-proper-way",
+    quote: "富与贵，是人之所欲也；不以其道得之，不处也。",
+    title: "里仁",
+    author: "孔子",
+    dynasty: "先秦",
+    source: "论语",
+    context: "子曰：富与贵，是人之所欲也；不以其道得之，不处也。贫与贱，是人之所恶也；不以其道得之，不去也。",
+    translation: "利益和成功人人都想要，但不能用不正当的手段获取；适合提醒商业竞争要守规则、走正道，不要耍小动作。",
+    themes: ["正当竞争", "诚信", "规则", "义利", "正道"],
+    modernMeanings: ["正常商业竞争", "不要总是做些小动作", "不要耍手段", "竞争要守规矩", "赚钱也要走正道", "不要背后使坏", "正当竞争"],
+    emotion: "principled",
+    scene: ["商业", "竞争", "合作", "职场"],
+    weight: 126
+  },
+  {
+    id: "lunyu-yanyuan-help-good",
+    quote: "君子成人之美，不成人之恶。小人反是。",
+    title: "颜渊",
+    author: "孔子",
+    dynasty: "先秦",
+    source: "论语",
+    context: "子曰：君子成人之美，不成人之恶。小人反是。",
+    translation: "君子成全别人的好事，不助长坏事；也可用来提醒竞争不要损人、使绊子或背后搞小动作。",
+    themes: ["正当竞争", "诚信", "合作", "成人之美"],
+    modernMeanings: ["不要给别人使绊子", "不要背后使坏", "不要做小动作", "良性竞争", "不要损人利己"],
+    emotion: "principled",
+    scene: ["竞争", "合作", "职场", "做人"],
+    weight: 121
+  },
+  {
     id: "shiji-zixu-appearance-judgement",
     quote: "以貌取人，失之子羽。",
     title: "仲尼弟子列传",
@@ -131,6 +161,14 @@ export const EXTRA_SLANG_MAPPINGS: SlangMapping[] = [
     themes: ["爱情", "告白", "相思", "相守", "承诺"],
     emotion: "love",
     explanation: "表达喜欢、表白、想念、相守或长期承诺。"
+  },
+  {
+    id: "fair-competition",
+    patterns: ["商业竞争", "正常竞争", "正当竞争", "良性竞争", "小动作", "耍手段", "使绊子", "背后使坏", "不正当手段", "守规矩", "公平竞争"],
+    keywords: ["不以其道得之", "君子", "小人", "正道", "义", "诚信", "规矩", "竞争", "成人之美", "不成人之恶"],
+    themes: ["正当竞争", "诚信", "规则", "义利", "正道"],
+    emotion: "principled",
+    explanation: "表达竞争应当光明正大、遵守规则，不靠小动作、使绊子或不正当手段获利。"
   },
   {
     id: "appearance-negative",
