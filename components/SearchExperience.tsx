@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import QuoteCard from "@/components/QuoteCard";
 import type { SearchResult } from "@/lib/types";
 
@@ -104,6 +105,7 @@ function buildHistoryItem(query: string, result?: SearchResult): HistoryItem {
 }
 
 export default function SearchExperience() {
+  const router = useRouter();
   const [query, setQuery] = useState("你真好看");
   const [results, setResults] = useState<SearchResult[]>([]);
   const [hotItems, setHotItems] = useState<HotItem[]>([]);
@@ -175,6 +177,12 @@ export default function SearchExperience() {
       const nextResults = payload.results ?? [];
       setResults(nextResults);
       recordHistory(value, nextResults[0]);
+
+      if (nextResults.length > 0) {
+        router.push(queryHref(value));
+        return;
+      }
+
       window.setTimeout(() => {
         resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
       }, 80);
@@ -260,7 +268,7 @@ export default function SearchExperience() {
                     </a>
                   ))}
                 </div>
-              ) : <p className="return-empty">点结果卡片里的“收藏本句”，下次打开还能看到。</p>}
+              ) : <p className="return-empty">点结果卡片里的“收藏本句”，下次打开首页可以在这里看到。</p>}
             </div>
           </section>
         </div>
