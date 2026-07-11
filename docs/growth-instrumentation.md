@@ -9,3 +9,5 @@ This release adds:
 - explicit editorial labels instead of presenting fallback content as real search counts
 
 No raw search text is sent to GA4. Search terms continue to be recorded only by the existing server-side trending pipeline when they pass the public-query safety filter.
+
+Validation covers database seeding, query relevance regression tests, and the production Next.js build.
