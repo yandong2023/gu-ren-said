@@ -138,7 +138,9 @@ export default function SearchExperience() {
   const [error, setError] = useState<string | null>(null);
   const resultsRef = useRef<HTMLElement | null>(null);
 
-  const visibleResults = useMemo(() => (results.length ? results : [PREVIEW]), [results]);
+  const hasResults = results.length > 0;
+  const visibleResults = useMemo(() => (hasResults ? results : [PREVIEW]), [hasResults, results]);
+  const visibleQuery = hasResults ? query : (PREVIEW.modernMeanings[0] ?? "你真好看");
 
   function refreshLocalPanels() {
     setHistoryItems(readList<HistoryItem>(HISTORY_KEY).slice(0, 8));
@@ -333,7 +335,7 @@ export default function SearchExperience() {
         </div>
 
         <aside className="preview-stack" aria-label="传播卡片预览">
-          <div className="phone-frame"><div className="phone-screen"><QuoteCard result={visibleResults[0]} query={query} compact /></div></div>
+          <div className="phone-frame"><div className="phone-screen"><QuoteCard result={visibleResults[0]} query={visibleQuery} compact /></div></div>
         </aside>
       </section>
 
@@ -344,7 +346,7 @@ export default function SearchExperience() {
         {searched && !loading && results.length === 0 ? (
           <div className="empty-state">暂时没有特别贴切的结果。可以把现代话写得更具体，比如“我失恋了很难过”“考试稳了”“想远离内卷”。</div>
         ) : (
-          <div className="results">{visibleResults.slice(0, 6).map((result) => <QuoteCard key={result.id} result={result} query={query} />)}</div>
+          <div className="results">{visibleResults.slice(0, 6).map((result) => <QuoteCard key={result.id} result={result} query={visibleQuery} />)}</div>
         )}
       </section>
 

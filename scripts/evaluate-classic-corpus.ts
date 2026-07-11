@@ -12,7 +12,8 @@ const cases: Array<{ query: string; expectedIds: string[]; label: string }> = [
   { query: "真正有实力不需要自吹自擂", expectedIds: ["shiji-lijiangjun-peach-plum"], label: "口碑与实力" },
   { query: "实践出真知 不要只会纸上谈兵", expectedIds: ["luyou-zidong-practice"], label: "实践" },
   { query: "事情突然有了转机", expectedIds: ["luyou-youshanxi-turnaround"], label: "柳暗花明" },
-  { query: "好人才需要被看见 也需要好平台", expectedIds: ["hanyu-mashuo-talent-recognition"], label: "伯乐与千里马" }
+  { query: "好人才需要被看见 也需要好平台", expectedIds: ["hanyu-mashuo-talent-recognition"], label: "伯乐与千里马" },
+  { query: "生日快乐", expectedIds: ["shijing-tianbao-birthday"], label: "生日祝福" }
 ];
 
 let failed = 0;
