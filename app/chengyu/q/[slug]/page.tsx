@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import ChengyuCard from "@/components/ChengyuCard";
-import { chengyuHref, isPublishedChengyuQuery, searchChengyu, slugToChengyuQuery } from "@/lib/chengyu-large";
+import { chengyuHref, getPreferredChengyuQuery, isChengyuIdiomQuery, isPublishedChengyuQuery, searchChengyu, slugToChengyuQuery } from "@/lib/chengyu-large";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -18,25 +18,33 @@ function normalizeRelatedQuery(value: string) {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const query = await getQuery(params);
-  const result = searchChengyu(query, 1)[0];
-  const title = `${query}，成语怎么说？｜古人曰`;
-  const description = result
-    ? `“${query}”可以用成语“${result.idiom}”表达：${result.meaning}`
-    : `输入“${query}”，查找意思相近、语气合适、能正确使用的成语。`;
+  const idiomQuery = isChengyuIdiomQuery(query);
+  const preferredQuery = getPreferredChengyuQuery(query);
+  const canonicalQuery = preferredQuery ?? query;
+  const canonicalPath = preferredQuery ? chengyuHref(preferredQuery) : idiomQuery ? "/chengyu" : chengyuHref(query);
+  const result = searchChengyu(canonicalQuery, 1)[0];
+  const title = idiomQuery && !preferredQuery
+    ? "成语怎么说｜口语转成语｜古人曰"
+    : `${canonicalQuery}，成语怎么说？｜古人曰`;
+  const description = idiomQuery && !preferredQuery
+    ? "输入一句大白话，找到意思相近、语气合适、能正确使用的成语。"
+    : result
+      ? `“${canonicalQuery}”可以用成语“${result.idiom}”表达：${result.meaning}`
+      : `输入“${canonicalQuery}”，查找意思相近、语气合适、能正确使用的成语。`;
 
   return {
     title,
     description,
-    alternates: { canonical: chengyuHref(query) },
+    alternates: { canonical: canonicalPath },
     robots: {
-      index: Boolean(result) && isPublishedChengyuQuery(query),
+      index: !idiomQuery && Boolean(result) && isPublishedChengyuQuery(query),
       follow: true
     },
     openGraph: {
       title,
       description,
       type: "article",
-      url: `https://gurensaid.com${chengyuHref(query)}`,
+      url: `https://gurensaid.com${canonicalPath}`,
       siteName: "古人曰",
       images: ["/og.svg"]
     },
@@ -51,6 +59,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function ChengyuQueryPage({ params }: PageProps) {
   const query = await getQuery(params);
+  const idiomQuery = isChengyuIdiomQuery(query);
+  const preferredQuery = getPreferredChengyuQuery(query);
+
+  if (idiomQuery) permanentRedirect(preferredQuery ? chengyuHref(preferredQuery) : "/chengyu");
+
   const results = searchChengyu(query, 8);
   const top = results[0];
 
