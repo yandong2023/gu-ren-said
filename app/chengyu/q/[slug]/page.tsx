@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import ChengyuCard from "@/components/ChengyuCard";
-import { chengyuHref, isPublishedChengyuQuery, searchChengyu, slugToChengyuQuery } from "@/lib/chengyu-large";
+import { chengyuHref, getPreferredChengyuQuery, isPublishedChengyuQuery, searchChengyu, slugToChengyuQuery } from "@/lib/chengyu-large";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -18,25 +18,27 @@ function normalizeRelatedQuery(value: string) {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const query = await getQuery(params);
-  const result = searchChengyu(query, 1)[0];
-  const title = `${query}，成语怎么说？｜古人曰`;
+  const preferredQuery = getPreferredChengyuQuery(query);
+  const canonicalQuery = preferredQuery ?? query;
+  const result = searchChengyu(canonicalQuery, 1)[0];
+  const title = `${canonicalQuery}，成语怎么说？｜古人曰`;
   const description = result
-    ? `“${query}”可以用成语“${result.idiom}”表达：${result.meaning}`
-    : `输入“${query}”，查找意思相近、语气合适、能正确使用的成语。`;
+    ? `“${canonicalQuery}”可以用成语“${result.idiom}”表达：${result.meaning}`
+    : `输入“${canonicalQuery}”，查找意思相近、语气合适、能正确使用的成语。`;
 
   return {
     title,
     description,
-    alternates: { canonical: chengyuHref(query) },
+    alternates: { canonical: chengyuHref(canonicalQuery) },
     robots: {
-      index: Boolean(result) && isPublishedChengyuQuery(query),
+      index: !preferredQuery && Boolean(result) && isPublishedChengyuQuery(query),
       follow: true
     },
     openGraph: {
       title,
       description,
       type: "article",
-      url: `https://gurensaid.com${chengyuHref(query)}`,
+      url: `https://gurensaid.com${chengyuHref(canonicalQuery)}`,
       siteName: "古人曰",
       images: ["/og.svg"]
     },
@@ -51,6 +53,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function ChengyuQueryPage({ params }: PageProps) {
   const query = await getQuery(params);
+  const preferredQuery = getPreferredChengyuQuery(query);
+
+  if (preferredQuery) permanentRedirect(chengyuHref(preferredQuery));
+
   const results = searchChengyu(query, 8);
   const top = results[0];
 
