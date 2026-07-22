@@ -5,6 +5,7 @@ import { MORE_CHENGYU_RECORDS } from "./chengyu-more";
 
 const STOP_WORDS = new Set(["我", "你", "他", "她", "它", "的", "了", "啊", "呀", "吧", "吗", "呢", "很", "太", "真", "真的", "有点", "一个", "这个", "那个"]);
 const LOW_SIGNAL_CHARS = new Set(["好", "说", "想", "人", "事", "不", "有", "没", "真", "太", "这", "那", "很", "更", "多", "少"]);
+const GENERIC_LANDING_QUERIES = new Set(["常用成语", "成语表达", "更有文化的表达"]);
 
 const QUERY_PREFERENCES: Record<string, string[]> = {
   表面一套背后一套: ["阳奉阴违", "两面三刀", "表里不一", "口是心非"],
@@ -17,6 +18,20 @@ const QUERY_PREFERENCES: Record<string, string[]> = {
   没人知道: ["默默无闻", "鲜为人知", "不为人知", "无人问津"],
   很有创意: ["别出心裁", "独具匠心", "别具一格", "匠心独运"],
   太老套了: ["千篇一律", "陈词滥调", "老生常谈", "墨守成规"]
+};
+
+const CHENGYU_RECORD_OVERRIDES: Record<string, Partial<Omit<ChengyuRecord, "id" | "idiom">>> = {
+  众所周知: {
+    pinyin: "zhòng suǒ zhōu zhī",
+    meaning: "大家普遍都知道。",
+    tone: "中性",
+    modernMeanings: ["大家都知道", "所有人都知道", "大家都清楚", "这是人人皆知的事"],
+    scenes: ["常识", "说明", "强调", "写作"],
+    synonyms: ["家喻户晓", "妇孺皆知", "尽人皆知"],
+    antonyms: ["鲜为人知", "不为人知"],
+    example: "这个道理众所周知，不必再反复说明。",
+    note: "用于说明某件事已经被普遍知晓。"
+  }
 };
 
 function dedupeRecords(records: ChengyuRecord[]) {
@@ -33,15 +48,21 @@ function normalize(value: string) {
   return value.trim().toLowerCase().replace(/\s+/g, "");
 }
 
-export const CHENGYU_RECORDS = dedupeRecords([...SEED_CHENGYU_RECORDS, ...EXTRA_CHENGYU_RECORDS, ...MORE_CHENGYU_RECORDS, ...COMMON_CHENGYU_BANK_RECORDS]);
+function applyRecordOverride(record: ChengyuRecord): ChengyuRecord {
+  const override = CHENGYU_RECORD_OVERRIDES[record.idiom];
+  return override ? { ...record, ...override, id: record.id, idiom: record.idiom } : record;
+}
+
+export const CHENGYU_RECORDS = dedupeRecords([...SEED_CHENGYU_RECORDS, ...EXTRA_CHENGYU_RECORDS, ...MORE_CHENGYU_RECORDS, ...COMMON_CHENGYU_BANK_RECORDS]).map(applyRecordOverride);
 export const CHENGYU_RECORD_COUNT = CHENGYU_RECORDS.length;
 
 const CHENGYU_IDIOM_QUERY_KEYS = new Set(CHENGYU_RECORDS.map((record) => normalize(record.idiom)));
+const GENERIC_LANDING_QUERY_KEYS = new Set(Array.from(GENERIC_LANDING_QUERIES).map(normalize));
 
 function getRecordLandingQuery(record: ChengyuRecord) {
   return record.modernMeanings.find((value) => {
     const key = normalize(value);
-    return Boolean(key) && !CHENGYU_IDIOM_QUERY_KEYS.has(key);
+    return Boolean(key) && !CHENGYU_IDIOM_QUERY_KEYS.has(key) && !GENERIC_LANDING_QUERY_KEYS.has(key);
   });
 }
 
@@ -59,9 +80,13 @@ export function isPublishedChengyuQuery(query: string) {
   return PUBLISHED_CHENGYU_QUERY_KEYS.has(normalize(query));
 }
 
+export function isChengyuIdiomQuery(query: string) {
+  return CHENGYU_IDIOM_QUERY_KEYS.has(normalize(query));
+}
+
 export function getPreferredChengyuQuery(query: string) {
   const key = normalize(query);
-  if (!key || !CHENGYU_IDIOM_QUERY_KEYS.has(key)) return null;
+  if (!key || !isChengyuIdiomQuery(query)) return null;
   const record = CHENGYU_RECORDS.find((item) => normalize(item.idiom) === key);
   return record ? getRecordLandingQuery(record) ?? null : null;
 }
