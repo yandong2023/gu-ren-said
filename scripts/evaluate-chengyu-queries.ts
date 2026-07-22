@@ -1,4 +1,10 @@
-import { CHENGYU_RECORD_COUNT, searchChengyu } from "../lib/chengyu-large";
+import {
+  CHENGYU_RECORDS,
+  CHENGYU_RECORD_COUNT,
+  PUBLISHED_CHENGYU_QUERIES,
+  getPreferredChengyuQuery,
+  searchChengyu
+} from "../lib/chengyu-large";
 
 type Case = {
   query: string;
@@ -20,6 +26,10 @@ const CASES: Case[] = [
   { query: "太老套了", expectedAny: ["千篇一律", "陈词滥调", "老生常谈", "墨守成规"] }
 ];
 
+function normalize(value: string) {
+  return value.trim().toLowerCase().replace(/\s+/g, "");
+}
+
 let failed = false;
 console.log(`Chengyu record count: ${CHENGYU_RECORD_COUNT}`);
 
@@ -35,6 +45,36 @@ for (const item of CASES) {
   const passed = Boolean(top) && item.expectedAny.includes(top.idiom);
   console.log(`${passed ? "PASS" : "FAIL"} ${item.query} => ${top?.idiom ?? "无结果"} | top5: ${candidates.join("、")}`);
   if (!passed) failed = true;
+}
+
+const idiomKeys = new Set(CHENGYU_RECORDS.map((record) => normalize(record.idiom)));
+const publishedIdiomQueries = PUBLISHED_CHENGYU_QUERIES.filter((query) => idiomKeys.has(normalize(query)));
+
+if (publishedIdiomQueries.length > 0) {
+  console.error(`Published Chengyu queries must be natural-language descriptions, found idioms: ${publishedIdiomQueries.slice(0, 10).join("、")}`);
+  failed = true;
+} else {
+  console.log(`PASS published landing queries exclude all ${idiomKeys.size} idioms`);
+}
+
+const recordsWithNaturalQuery = CHENGYU_RECORDS.filter((record) =>
+  record.modernMeanings.some((meaning) => !idiomKeys.has(normalize(meaning)))
+);
+const missingRedirectTargets = recordsWithNaturalQuery.filter((record) => !getPreferredChengyuQuery(record.idiom));
+
+if (missingRedirectTargets.length > 0) {
+  console.error(`Missing natural-language redirect targets: ${missingRedirectTargets.slice(0, 10).map((record) => record.idiom).join("、")}`);
+  failed = true;
+} else {
+  console.log(`PASS ${recordsWithNaturalQuery.length} idiom URLs have natural-language redirect targets`);
+}
+
+const exampleRedirect = getPreferredChengyuQuery("众所周知");
+if (!exampleRedirect || normalize(exampleRedirect) === normalize("众所周知")) {
+  console.error("Expected 众所周知 to redirect to a natural-language description query");
+  failed = true;
+} else {
+  console.log(`PASS 众所周知 => ${exampleRedirect}`);
 }
 
 if (failed) {
