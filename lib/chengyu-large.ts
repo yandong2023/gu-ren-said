@@ -35,9 +35,19 @@ function normalize(value: string) {
 
 export const CHENGYU_RECORDS = dedupeRecords([...SEED_CHENGYU_RECORDS, ...EXTRA_CHENGYU_RECORDS, ...MORE_CHENGYU_RECORDS, ...COMMON_CHENGYU_BANK_RECORDS]);
 export const CHENGYU_RECORD_COUNT = CHENGYU_RECORDS.length;
+
+const CHENGYU_IDIOM_QUERY_KEYS = new Set(CHENGYU_RECORDS.map((record) => normalize(record.idiom)));
+
+function getRecordLandingQuery(record: ChengyuRecord) {
+  return record.modernMeanings.find((value) => {
+    const key = normalize(value);
+    return Boolean(key) && !CHENGYU_IDIOM_QUERY_KEYS.has(key);
+  });
+}
+
 export const PUBLISHED_CHENGYU_QUERIES = Array.from(new Set(
   CHENGYU_RECORDS
-    .flatMap((record) => [record.idiom, record.modernMeanings[0]])
+    .map(getRecordLandingQuery)
     .filter((value): value is string => Boolean(value))
 ));
 
@@ -47,6 +57,13 @@ export { chengyuHref, chengyuToSlug, slugToChengyuQuery };
 
 export function isPublishedChengyuQuery(query: string) {
   return PUBLISHED_CHENGYU_QUERY_KEYS.has(normalize(query));
+}
+
+export function getPreferredChengyuQuery(query: string) {
+  const key = normalize(query);
+  if (!key || !CHENGYU_IDIOM_QUERY_KEYS.has(key)) return null;
+  const record = CHENGYU_RECORDS.find((item) => normalize(item.idiom) === key);
+  return record ? getRecordLandingQuery(record) ?? null : null;
 }
 
 function tokenize(input: string) {
