@@ -24,8 +24,10 @@ const QUERY_PREFERENCES: Record<string, string[]> = {
   这是人人皆知的事: ["众所周知", "尽人皆知", "妇孺皆知"]
 };
 
-const CHENGYU_RECORD_OVERRIDES: Record<string, Partial<Omit<ChengyuRecord, "id" | "idiom">>> = {
-  众所周知: {
+const CURATED_CHENGYU_RECORDS: ChengyuRecord[] = [
+  {
+    id: "zhong-suo-zhou-zhi",
+    idiom: "众所周知",
     pinyin: "zhòng suǒ zhōu zhī",
     meaning: "大家普遍都知道。",
     tone: "中性",
@@ -36,7 +38,7 @@ const CHENGYU_RECORD_OVERRIDES: Record<string, Partial<Omit<ChengyuRecord, "id" 
     example: "这个道理众所周知，不必再反复说明。",
     note: "用于说明某件事已经被普遍知晓。"
   }
-};
+];
 
 function dedupeRecords(records: ChengyuRecord[]) {
   const byIdiom = new Map<string, ChengyuRecord>();
@@ -52,12 +54,13 @@ function normalize(value: string) {
   return value.trim().toLowerCase().replace(/\s+/g, "");
 }
 
-function applyRecordOverride(record: ChengyuRecord): ChengyuRecord {
-  const override = CHENGYU_RECORD_OVERRIDES[record.idiom];
-  return override ? { ...record, ...override, id: record.id, idiom: record.idiom } : record;
-}
-
-export const CHENGYU_RECORDS = dedupeRecords([...SEED_CHENGYU_RECORDS, ...EXTRA_CHENGYU_RECORDS, ...MORE_CHENGYU_RECORDS, ...COMMON_CHENGYU_BANK_RECORDS]).map(applyRecordOverride);
+export const CHENGYU_RECORDS = dedupeRecords([
+  ...CURATED_CHENGYU_RECORDS,
+  ...SEED_CHENGYU_RECORDS,
+  ...EXTRA_CHENGYU_RECORDS,
+  ...MORE_CHENGYU_RECORDS,
+  ...COMMON_CHENGYU_BANK_RECORDS
+]);
 export const CHENGYU_RECORD_COUNT = CHENGYU_RECORDS.length;
 
 const CHENGYU_IDIOM_QUERY_KEYS = new Set(CHENGYU_RECORDS.map((record) => normalize(record.idiom)));
