@@ -3,6 +3,7 @@ import {
   CHENGYU_RECORD_COUNT,
   PUBLISHED_CHENGYU_QUERIES,
   getPreferredChengyuQuery,
+  isChengyuIdiomQuery,
   searchChengyu
 } from "../lib/chengyu-large";
 
@@ -12,6 +13,7 @@ type Case = {
 };
 
 const MIN_CHENGYU_RECORD_COUNT = 1500;
+const GENERIC_LANDING_QUERIES = new Set(["常用成语", "成语表达", "更有文化的表达"]);
 
 const CASES: Case[] = [
   { query: "表面一套背后一套", expectedAny: ["阳奉阴违", "两面三刀", "表里不一", "口是心非"] },
@@ -48,17 +50,24 @@ for (const item of CASES) {
 }
 
 const idiomKeys = new Set(CHENGYU_RECORDS.map((record) => normalize(record.idiom)));
-const publishedIdiomQueries = PUBLISHED_CHENGYU_QUERIES.filter((query) => idiomKeys.has(normalize(query)));
+const genericKeys = new Set(Array.from(GENERIC_LANDING_QUERIES).map(normalize));
+const invalidPublishedQueries = PUBLISHED_CHENGYU_QUERIES.filter((query) => {
+  const key = normalize(query);
+  return idiomKeys.has(key) || genericKeys.has(key);
+});
 
-if (publishedIdiomQueries.length > 0) {
-  console.error(`Published Chengyu queries must be natural-language descriptions, found idioms: ${publishedIdiomQueries.slice(0, 10).join("、")}`);
+if (invalidPublishedQueries.length > 0) {
+  console.error(`Published Chengyu queries must be natural-language descriptions, found invalid queries: ${invalidPublishedQueries.slice(0, 10).join("、")}`);
   failed = true;
 } else {
-  console.log(`PASS published landing queries exclude all ${idiomKeys.size} idioms`);
+  console.log(`PASS published landing queries exclude all ${idiomKeys.size} idioms and generic placeholders`);
 }
 
 const recordsWithNaturalQuery = CHENGYU_RECORDS.filter((record) =>
-  record.modernMeanings.some((meaning) => !idiomKeys.has(normalize(meaning)))
+  record.modernMeanings.some((meaning) => {
+    const key = normalize(meaning);
+    return !idiomKeys.has(key) && !genericKeys.has(key);
+  })
 );
 const missingRedirectTargets = recordsWithNaturalQuery.filter((record) => !getPreferredChengyuQuery(record.idiom));
 
@@ -70,11 +79,25 @@ if (missingRedirectTargets.length > 0) {
 }
 
 const exampleRedirect = getPreferredChengyuQuery("众所周知");
-if (!exampleRedirect || normalize(exampleRedirect) === normalize("众所周知")) {
-  console.error("Expected 众所周知 to redirect to a natural-language description query");
+const exampleTop = searchChengyu("大家都知道", 1)[0];
+
+if (!isChengyuIdiomQuery("众所周知")) {
+  console.error("Expected 众所周知 to be recognized as an exact idiom query");
+  failed = true;
+}
+
+if (exampleRedirect !== "大家都知道") {
+  console.error(`Expected 众所周知 to redirect to 大家都知道, got ${exampleRedirect ?? "null"}`);
   failed = true;
 } else {
-  console.log(`PASS 众所周知 => ${exampleRedirect}`);
+  console.log("PASS 众所周知 => 大家都知道");
+}
+
+if (exampleTop?.idiom !== "众所周知") {
+  console.error(`Expected 大家都知道 to return 众所周知, got ${exampleTop?.idiom ?? "无结果"}`);
+  failed = true;
+} else {
+  console.log("PASS 大家都知道 => 众所周知");
 }
 
 if (failed) {
