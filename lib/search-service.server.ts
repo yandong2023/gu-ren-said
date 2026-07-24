@@ -126,6 +126,7 @@ export async function runSearch(query: string, limit = 6, options: { record?: bo
     query,
     expanded,
     plan,
+    message: null,
     db: getDbStatus(),
     enhancer: {
       deepseek: shouldEnhance && Boolean(process.env.DEEPSEEK_API_KEY) && process.env.DEEPSEEK_ENABLED !== "0"
