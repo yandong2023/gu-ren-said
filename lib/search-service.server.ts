@@ -1,6 +1,7 @@
 import { expandQuery, hasUsefulSearchSignal, mergeResults, searchInMemory } from "./search";
 import { getDbStatus, searchSqlite } from "./db.server";
 import { enhanceWithDeepSeek, planQueryWithDeepSeek } from "./deepseek.server";
+import { getQueryClarificationMessage } from "./query-guard";
 import { recordSearchQuery } from "./trends.server";
 import type { ExpandedQuery, SearchResult } from "./types";
 
@@ -89,6 +90,20 @@ export async function runSearch(query: string, limit = 6, options: { record?: bo
   const safeLimit = Math.min(Math.max(Number(limit ?? 6), 1), 10);
   const shouldEnhance = options.enhance !== false;
   const baseExpanded = expandQuery(query);
+  const clarificationMessage = getQueryClarificationMessage(query);
+
+  if (clarificationMessage) {
+    return {
+      query,
+      expanded: baseExpanded,
+      plan: null,
+      message: clarificationMessage,
+      db: getDbStatus(),
+      enhancer: { deepseek: false },
+      results: [] as SearchResult[]
+    };
+  }
+
   const plan = shouldEnhance ? await planQueryWithDeepSeek(query) : null;
   const expanded = applyPlanToExpanded(baseExpanded, plan);
 
