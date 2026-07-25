@@ -1,3 +1,4 @@
+import { getQueryClarificationMessage } from "../lib/query-guard";
 import { expandQuery, hasUsefulSearchSignal, mergeResults, searchInMemory } from "../lib/search";
 import { searchSqlite } from "../lib/db.server";
 import type { SearchResult } from "../lib/types";
@@ -9,6 +10,7 @@ type TestCase = {
   forbiddenTop1Themes: string[];
   forbiddenTop1Ids?: string[];
   allowEmpty?: boolean;
+  expectClarification?: boolean;
 };
 
 const TEST_CASES: TestCase[] = [
@@ -61,6 +63,13 @@ const TEST_CASES: TestCase[] = [
     description: "与古诗文表达意图无关的泛问题不应该硬凑结果",
     forbiddenTop1Themes: [],
     allowEmpty: true
+  },
+  {
+    query: "脑子有问题",
+    description: "歧义辱骂或健康描述不能进入古文召回，必须提示用户把含义说具体",
+    forbiddenTop1Themes: [],
+    allowEmpty: true,
+    expectClarification: true
   }
 ];
 
@@ -71,16 +80,25 @@ function hasAnyTheme(result: SearchResult | undefined, themes: string[] | undefi
 }
 
 function evaluate(testCase: TestCase) {
+  const clarificationMessage = getQueryClarificationMessage(testCase.query);
   const expanded = expandQuery(testCase.query);
-  const sqliteResults = searchSqlite(expanded, 8);
-  const memoryResults = searchInMemory(expanded, 8);
+  const sqliteResults = clarificationMessage ? [] : searchSqlite(expanded, 8);
+  const memoryResults = clarificationMessage ? [] : searchInMemory(expanded, 8);
   const results = mergeResults(sqliteResults, memoryResults).filter(hasUsefulSearchSignal).slice(0, 8);
   const top1 = results[0];
   const errors: string[] = [];
 
+  if (testCase.expectClarification && !clarificationMessage) {
+    errors.push("expected a clarification guard, but the query was allowed into search");
+  }
+
+  if (!testCase.expectClarification && clarificationMessage) {
+    errors.push(`unexpected clarification guard: ${clarificationMessage}`);
+  }
+
   if (!top1) {
-    if (!testCase.allowEmpty) errors.push("no results returned");
-    return { testCase, expanded, results, errors };
+    if (!testCase.allowEmpty && !testCase.expectClarification) errors.push("no results returned");
+    return { testCase, expanded, results, errors, clarificationMessage };
   }
 
   if (!testCase.allowEmpty && !hasAnyTheme(top1, testCase.top1AnyTheme)) {
@@ -95,7 +113,7 @@ function evaluate(testCase: TestCase) {
     errors.push(`forbidden top1 id: ${top1.id}`);
   }
 
-  return { testCase, expanded, results, errors };
+  return { testCase, expanded, results, errors, clarificationMessage };
 }
 
 const requestedQuery = process.env.NEGATIVE_QUERY?.trim();
@@ -118,10 +136,12 @@ for (const testCase of selectedCases) {
     console.error(`   ${testCase.description}`);
     console.error(`   Expanded terms: ${result.expanded.terms.join(", ")}`);
     console.error(`   Avoid themes: ${(result.expanded.avoidThemes ?? []).join(", ")}`);
+    console.error(`   Clarification: ${result.clarificationMessage ?? "无"}`);
     console.error(`   Top3: ${top}`);
     for (const error of result.errors) console.error(`   - ${error}`);
   } else {
-    console.log(`✅ ${testCase.query} → ${result.results[0]?.quote ?? "无结果（符合预期）"}`);
+    const output = result.clarificationMessage ? `需要澄清：${result.clarificationMessage}` : result.results[0]?.quote ?? "无结果（符合预期）";
+    console.log(`✅ ${testCase.query} → ${output}`);
   }
 }
 

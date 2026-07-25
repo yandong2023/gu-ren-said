@@ -31,7 +31,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const title = `${query}，古文怎么说？｜古人曰`;
   const description = result
     ? `${query}的古诗文表达：${result.quote} ——${result.dynasty}·${result.author}《${result.title}》。`
-    : `暂时没有找到与“${query}”足够贴切的古诗文表达。可以换一种更明确的说法继续反查。`;
+    : payload.message ?? `暂时没有找到与“${query}”足够贴切的古诗文表达。可以换一种更明确的说法继续反查。`;
   const image = result
     ? `/api/share-image?q=${encodeURIComponent(query)}&quote=${encodeURIComponent(result.quote)}&author=${encodeURIComponent(result.author)}&dynasty=${encodeURIComponent(result.dynasty)}&title=${encodeURIComponent(result.title)}&explain=${encodeURIComponent(result.translation || result.reason)}`
     : "/og.svg";
@@ -72,6 +72,7 @@ export default async function QueryPage({ params }: PageProps) {
     ? await getStableQueryPageData(query)
     : await getEnhancedQueryPageData(query);
   const top = payload.results[0];
+  const emptyMessage = payload.message ?? "这句话暂时没有找到足够贴切、可以放心展示的古诗文表达。";
   const relatedQueries = getRelatedQueries(query, payload.results, 8);
   const fallbackQueries = fallbackTrending(8);
   const suggestions = relatedQueries.length > 0
@@ -90,7 +91,7 @@ export default async function QueryPage({ params }: PageProps) {
 
       <section className="query-hero">
         <h1>“{query}”，古文怎么说？</h1>
-        <p>{top ? "找到意思相近的古诗文原句、作者、出处和原文。" : "这句话暂时没有找到足够贴切、可以放心展示的古诗文表达。"}</p>
+        <p>{top ? "找到意思相近的古诗文原句、作者、出处和原文。" : emptyMessage}</p>
       </section>
 
       {top ? (
@@ -115,8 +116,13 @@ export default async function QueryPage({ params }: PageProps) {
         <section aria-label="暂无贴切结果">
           <div className="section-title"><div><h2>暂时没有贴切结果</h2><p>宁可少给，也不硬凑一句看似有文化、实际不相关的古文。</p></div></div>
           <div className="empty-state">
-            <strong>可以把表达改得更聚焦一些：</strong>
-            <p>例如把“正常商业竞争，不要总是做些小动作”拆成“做事要光明磊落”“不要背后使小手段”“竞争也要守规矩”，通常更容易找到准确对应。</p>
+            <strong>{payload.message ? "这句话需要说得更具体：" : "可以把表达改得更聚焦一些："}</strong>
+            <p>{emptyMessage}</p>
+            {payload.message ? (
+              <p>例如可以改成“这个人的想法不合逻辑”“这个人见识有限”或“这种行为很荒唐”。如果是在描述健康问题，请直接使用明确、尊重的表述。</p>
+            ) : (
+              <p>例如把“正常商业竞争，不要总是做些小动作”拆成“做事要光明磊落”“不要背后使小手段”“竞争也要守规矩”，通常更容易找到准确对应。</p>
+            )}
             <p><a className="nav-pill" href="/">返回首页重新描述</a></p>
           </div>
         </section>
