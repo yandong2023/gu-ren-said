@@ -41,8 +41,12 @@ type CacheLookup<T> =
   | { hit: true; value: T | null }
   | { hit: false };
 
+type DeepSeekThinkingMode = "enabled" | "disabled";
+type DeepSeekReasoningEffort = "high" | "max";
+
 const DEFAULT_DEEPSEEK_URL = "https://api.deepseek.com/chat/completions";
-const DEFAULT_MODEL = "deepseek-chat";
+const DEFAULT_MODEL = "deepseek-v4-flash";
+const DEFAULT_THINKING_MODE: DeepSeekThinkingMode = "disabled";
 const DEFAULT_PLAN_CACHE_TTL_SECONDS = 60 * 60 * 24 * 30;
 const DEFAULT_RERANK_CACHE_TTL_SECONDS = 60 * 60 * 24 * 7;
 const MIN_ACCEPTED_FIT_SCORE = 58;
@@ -51,6 +55,14 @@ const rerankCache = new Map<string, SearchResult[]>();
 
 function isDeepSeekEnabled() {
   return Boolean(process.env.DEEPSEEK_API_KEY) && process.env.DEEPSEEK_ENABLED !== "0";
+}
+
+function deepSeekThinkingMode(): DeepSeekThinkingMode {
+  return process.env.DEEPSEEK_THINKING === "enabled" ? "enabled" : DEFAULT_THINKING_MODE;
+}
+
+function deepSeekReasoningEffort(): DeepSeekReasoningEffort {
+  return process.env.DEEPSEEK_REASONING_EFFORT === "max" ? "max" : "high";
 }
 
 function cacheTtlSeconds(name: string, fallback: number) {
@@ -90,7 +102,7 @@ async function redisCommand<T>(command: Array<string | number>): Promise<T | nul
 
 function makeRedisCacheKey(kind: "plan" | "rerank", rawKey: string) {
   const hash = createHash("sha256").update(rawKey).digest("hex");
-  return `grs:deepseek:${kind}:v2:${hash}`;
+  return `grs:deepseek:${kind}:v3:${hash}`;
 }
 
 async function readJsonCache<T>(key: string): Promise<CacheLookup<T>> {
@@ -134,6 +146,16 @@ async function callDeepSeek(messages: Array<{ role: "system" | "user"; content: 
 
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), Number(process.env.DEEPSEEK_TIMEOUT_MS ?? 10000));
+  const thinkingMode = deepSeekThinkingMode();
+  const requestBody = {
+    model: process.env.DEEPSEEK_MODEL ?? DEFAULT_MODEL,
+    thinking: { type: thinkingMode },
+    ...(thinkingMode === "enabled"
+      ? { reasoning_effort: deepSeekReasoningEffort() }
+      : { temperature }),
+    response_format: { type: "json_object" },
+    messages
+  };
 
   try {
     const response = await fetch(process.env.DEEPSEEK_BASE_URL ?? DEFAULT_DEEPSEEK_URL, {
@@ -142,12 +164,7 @@ async function callDeepSeek(messages: Array<{ role: "system" | "user"; content: 
         "Content-Type": "application/json",
         Authorization: `Bearer ${apiKey}`
       },
-      body: JSON.stringify({
-        model: process.env.DEEPSEEK_MODEL ?? DEFAULT_MODEL,
-        temperature,
-        response_format: { type: "json_object" },
-        messages
-      }),
+      body: JSON.stringify(requestBody),
       signal: controller.signal
     });
 
