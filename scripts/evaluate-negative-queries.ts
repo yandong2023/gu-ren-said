@@ -1,6 +1,4 @@
-import { getQueryClarificationMessage } from "../lib/query-guard";
-import { expandQuery, hasUsefulSearchSignal, mergeResults, searchInMemory } from "../lib/search";
-import { searchSqlite } from "../lib/db.server";
+import { runSearch } from "../lib/search-service.server";
 import type { SearchResult } from "../lib/types";
 
 type TestCase = {
@@ -10,6 +8,7 @@ type TestCase = {
   forbiddenTop1Themes: string[];
   forbiddenTop1Ids?: string[];
   allowEmpty?: boolean;
+  expectEmpty?: boolean;
   expectClarification?: boolean;
 };
 
@@ -62,14 +61,124 @@ const TEST_CASES: TestCase[] = [
     query: "今天吃什么",
     description: "与古诗文表达意图无关的泛问题不应该硬凑结果",
     forbiddenTop1Themes: [],
-    allowEmpty: true
+    expectEmpty: true
   },
   {
     query: "脑子有问题",
     description: "歧义辱骂或健康描述不能进入古文召回，必须提示用户把含义说具体",
     forbiddenTop1Themes: [],
-    allowEmpty: true,
+    expectEmpty: true,
     expectClarification: true
+  },
+  {
+    query: "这人有病",
+    description: "可能是辱骂也可能是健康描述，不能硬配古文",
+    forbiddenTop1Themes: [],
+    expectEmpty: true,
+    expectClarification: true
+  },
+  {
+    query: "精神有问题",
+    description: "精神健康描述具有医学和辱骂歧义，必须先澄清",
+    forbiddenTop1Themes: [],
+    expectEmpty: true,
+    expectClarification: true
+  },
+  {
+    query: "神经病",
+    description: "攻击性健康词不能直接映射成古文",
+    forbiddenTop1Themes: [],
+    expectEmpty: true,
+    expectClarification: true
+  },
+  {
+    query: "脑残",
+    description: "攻击性智力评价不能通过关键词硬配古文",
+    forbiddenTop1Themes: [],
+    expectEmpty: true,
+    expectClarification: true
+  },
+  {
+    query: "我不想躺平",
+    description: "不想躺平不能返回归隐和松弛类结果",
+    forbiddenTop1Themes: ["松弛", "归隐", "自由", "不争"],
+    allowEmpty: true
+  },
+  {
+    query: "我还没释怀",
+    description: "尚未释怀不能返回已经放下、豁达通透的结果",
+    forbiddenTop1Themes: ["释怀", "豁达", "通透", "放下"],
+    allowEmpty: true
+  },
+  {
+    query: "我不想发财",
+    description: "否定发财意愿不能触发财运祝福",
+    forbiddenTop1Themes: ["祝福", "财富", "富足", "生意"],
+    forbiddenTop1Ids: ["shiji-guanyan-prosperity"],
+    allowEmpty: true
+  },
+  {
+    query: "我不想结婚",
+    description: "不想结婚不能触发新婚祝福",
+    forbiddenTop1Themes: ["祝福", "新婚", "爱情", "家庭"],
+    forbiddenTop1Ids: ["shijing-taoyao-wedding"],
+    allowEmpty: true
+  },
+  {
+    query: "我不想回家",
+    description: "不想回家不能被理解成想家",
+    forbiddenTop1Themes: ["思乡", "归家", "亲情"],
+    allowEmpty: true
+  },
+  {
+    query: "我不想上岸",
+    description: "不想上岸不能触发考试成功或金榜题名祝福",
+    forbiddenTop1Themes: ["祝福", "考试", "成功", "金榜题名"],
+    forbiddenTop1Ids: ["mengjiao-dengke-success"],
+    allowEmpty: true
+  },
+  {
+    query: "不开心是不可能的",
+    description: "双重否定表达不能按“不开心”处理成悲伤",
+    forbiddenTop1Themes: ["忧愁", "失意", "烦闷", "孤独"],
+    allowEmpty: true
+  },
+  {
+    query: "我不是不喜欢你",
+    description: "双重否定的感情表达不能直接按拒绝处理",
+    forbiddenTop1Themes: [],
+    expectEmpty: true,
+    expectClarification: true
+  },
+  {
+    query: "我饿了",
+    description: "生理状态不是古文表达意图，不能硬凑",
+    forbiddenTop1Themes: [],
+    expectEmpty: true
+  },
+  {
+    query: "失眠怎么办",
+    description: "健康求助问题不能被包装成古文答案",
+    forbiddenTop1Themes: [],
+    expectEmpty: true
+  },
+  {
+    query: "怎么减肥",
+    description: "行动建议问题不属于古文反查",
+    forbiddenTop1Themes: [],
+    expectEmpty: true
+  },
+  {
+    query: "感冒了怎么办",
+    description: "医疗求助问题不能硬配古文",
+    forbiddenTop1Themes: [],
+    expectEmpty: true
+  },
+  {
+    query: "今天天气怎么样",
+    description: "事实查询不是古文表达意图",
+    forbiddenTop1Themes: [],
+    expectEmpty: true
   }
 ];
 
@@ -79,12 +188,10 @@ function hasAnyTheme(result: SearchResult | undefined, themes: string[] | undefi
   return result.themes.some((theme) => themes.includes(theme));
 }
 
-function evaluate(testCase: TestCase) {
-  const clarificationMessage = getQueryClarificationMessage(testCase.query);
-  const expanded = expandQuery(testCase.query);
-  const sqliteResults = clarificationMessage ? [] : searchSqlite(expanded, 8);
-  const memoryResults = clarificationMessage ? [] : searchInMemory(expanded, 8);
-  const results = mergeResults(sqliteResults, memoryResults).filter(hasUsefulSearchSignal).slice(0, 8);
+async function evaluate(testCase: TestCase) {
+  const payload = await runSearch(testCase.query, 8, { enhance: false });
+  const clarificationMessage = payload.message;
+  const results = payload.results;
   const top1 = results[0];
   const errors: string[] = [];
 
@@ -96,12 +203,16 @@ function evaluate(testCase: TestCase) {
     errors.push(`unexpected clarification guard: ${clarificationMessage}`);
   }
 
-  if (!top1) {
-    if (!testCase.allowEmpty && !testCase.expectClarification) errors.push("no results returned");
-    return { testCase, expanded, results, errors, clarificationMessage };
+  if (testCase.expectEmpty && top1) {
+    errors.push(`expected no results, got ${top1.id}: ${top1.quote}`);
   }
 
-  if (!testCase.allowEmpty && !hasAnyTheme(top1, testCase.top1AnyTheme)) {
+  if (!top1) {
+    if (!testCase.allowEmpty && !testCase.expectEmpty && !testCase.expectClarification) errors.push("no results returned");
+    return { testCase, payload, results, errors, clarificationMessage };
+  }
+
+  if (!testCase.allowEmpty && !testCase.expectEmpty && !hasAnyTheme(top1, testCase.top1AnyTheme)) {
     errors.push(`top1 theme mismatch: expected one of [${testCase.top1AnyTheme?.join(", ")}], got [${top1.themes.join(", ")}]`);
   }
 
@@ -113,7 +224,7 @@ function evaluate(testCase: TestCase) {
     errors.push(`forbidden top1 id: ${top1.id}`);
   }
 
-  return { testCase, expanded, results, errors, clarificationMessage };
+  return { testCase, payload, results, errors, clarificationMessage };
 }
 
 const requestedQuery = process.env.NEGATIVE_QUERY?.trim();
@@ -127,15 +238,15 @@ if (requestedQuery && selectedCases.length === 0) {
 let failed = 0;
 
 for (const testCase of selectedCases) {
-  const result = evaluate(testCase);
+  const result = await evaluate(testCase);
   const top = result.results.slice(0, 3).map((item) => `${item.id}: ${item.quote} [${item.themes.join("/")}] score=${item.score}`).join(" | ");
 
   if (result.errors.length > 0) {
     failed += 1;
     console.error(`\n❌ ${testCase.query}`);
     console.error(`   ${testCase.description}`);
-    console.error(`   Expanded terms: ${result.expanded.terms.join(", ")}`);
-    console.error(`   Avoid themes: ${(result.expanded.avoidThemes ?? []).join(", ")}`);
+    console.error(`   Expanded terms: ${result.payload.expanded.terms.join(", ")}`);
+    console.error(`   Avoid themes: ${(result.payload.expanded.avoidThemes ?? []).join(", ")}`);
     console.error(`   Clarification: ${result.clarificationMessage ?? "无"}`);
     console.error(`   Top3: ${top}`);
     for (const error of result.errors) console.error(`   - ${error}`);
@@ -146,8 +257,8 @@ for (const testCase of selectedCases) {
 }
 
 if (failed > 0) {
-  console.error(`\n${failed}/${selectedCases.length} negative query tests failed.`);
+  console.error(`\n${failed}/${selectedCases.length} risky query tests failed.`);
   process.exit(1);
 }
 
-console.log(`\nAll ${selectedCases.length} selected negative query tests passed.`);
+console.log(`\nAll ${selectedCases.length} selected risky query tests passed.`);
