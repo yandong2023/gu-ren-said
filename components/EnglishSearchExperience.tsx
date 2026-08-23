@@ -7,7 +7,7 @@ import LanguageSwitcher from "@/components/LanguageSwitcher";
 import styles from "@/app/en/english.module.css";
 import { trackEvent } from "@/lib/analytics";
 import { englishQueryHref } from "@/lib/english-url";
-import type { EnglishClassic, EnglishTopic } from "@/lib/english-classics";
+import type { EnglishClassic, EnglishTopic } from "@/lib/english-classics-expanded";
 
 type TopicPreview = Pick<EnglishTopic, "slug" | "shortTitle" | "description">;
 
@@ -17,12 +17,12 @@ type Props = {
 };
 
 const EXAMPLES = [
-  "I miss you",
-  "You are beautiful",
-  "Do not give up",
-  "Let go of the past",
-  "I miss my hometown",
-  "Be yourself despite criticism"
+  "I love you but you do not know",
+  "True love survives distance",
+  "When one road closes another opens",
+  "Know yourself",
+  "Practice is better than theory",
+  "May we share the same moon"
 ];
 
 export default function EnglishSearchExperience({ featured, topics }: Props) {
@@ -140,7 +140,7 @@ export default function EnglishSearchExperience({ featured, topics }: Props) {
             <a className={styles.textLink} href="/en/topics">See all themes →</a>
           </div>
           <div className={styles.topicGrid}>
-            {topics.slice(0, 12).map((topic) => (
+            {topics.slice(0, 16).map((topic) => (
               <a className={styles.topicCard} href={`/en/topics/${topic.slug}`} key={topic.slug}>
                 <strong>{topic.shortTitle}</strong>
                 <span>{topic.description}</span>
