@@ -8,7 +8,7 @@ import {
   ENGLISH_TOPICS,
   searchEnglishClassics,
   shouldIndexEnglishQuery
-} from "@/lib/english-classics-expanded";
+} from "@/lib/english-classics-wave2";
 import { englishQueryHref, englishSlugToQuery, normalizeEnglishQuery } from "@/lib/english-url";
 
 type PageProps = {
