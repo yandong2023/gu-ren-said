@@ -14,9 +14,14 @@ original Chinese + pinyin + English reading + source + context
 
 ## Source rule
 
-The final Chinese line and attribution must come from the verified Chinese corpus. The English layer references records by ID from `QUOTES` and `EXTRA_QUOTES`, and fails fast when an ID is missing. It must not create a line that merely sounds classical.
+The final Chinese line and attribution must come from a verified Chinese source record. The English layer references stable records by ID and fails fast when an ID is missing. It must not create a line that merely sounds classical.
 
-The first English MVP remains in `lib/english-classics.ts`. The larger production catalog is assembled in `lib/english-classics-expanded.ts`, which combines the base corpus with additional source-linked records, topics, SEO queries, and the shared ranking logic.
+The catalog is assembled in layers:
+
+- `lib/english-classics.ts`: the original English MVP;
+- `lib/english-classics-expanded.ts`: the first major expansion;
+- `lib/english-wave2-corpus.ts`: human-reviewed Chinese source records for the second wave;
+- `lib/english-classics-wave2.ts`: the current production catalog, topics, curated queries, and shared ranking logic.
 
 ## Translation rule
 
@@ -32,23 +37,21 @@ The English text is an original reading aid for Gu Ren Said. Do not copy a moder
 
 ## Current coverage
 
-The expanded layer covers more than 75 source-linked classics across more than 20 themes. In addition to the original love, longing, beauty, friendship, homesickness, sadness, letting go, perseverance, inner peace, life, wisdom, learning, and courage pages, it now includes:
+The production layer now covers more than 110 source-linked classics across more than 30 themes. In addition to love, longing, beauty, friendship, homesickness, sadness, letting go, perseverance, inner peace, life, wisdom, learning, courage, commitment, farewell, family, ambition, work, renewal, perspective, fairness, time, and celebrations, the second wave adds:
 
-- commitment and marriage;
-- farewell and distance;
-- family and reunion;
-- ambition and success;
-- work and leadership;
-- mistakes and renewal;
-- perspective and self-knowledge;
-- fairness and integrity;
-- time and impermanence;
-- celebrations and new beginnings.
+- moon and night;
+- seasons and nature;
+- solitude and reflection;
+- travel and journey;
+- parents and filial love;
+- teaching and mentorship;
+- critical thinking and empathy;
+- aging and resilience.
 
 ## Adding a Chinese classic
 
-1. Verify or add the Chinese source record in `QUOTES` or `EXTRA_QUOTES`.
-2. Add an English metadata entry in `lib/english-classics-expanded.ts`, referencing the Chinese record ID.
+1. Verify or add a stable Chinese source record in an approved corpus file.
+2. Add an English metadata entry in the latest production catalog, referencing that record ID.
 3. Assign one or more existing topic slugs.
 4. Add at least four natural English search expressions.
 5. Add a ranking regression case when the line should be the best answer to an important query.
