@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 import { PUBLISHED_CHENGYU_QUERIES, chengyuHref } from "@/lib/chengyu-large";
-import { ENGLISH_SEO_QUERIES, ENGLISH_TOPICS } from "@/lib/english-classics-expanded";
+import { ENGLISH_SEO_QUERIES, ENGLISH_TOPICS } from "@/lib/english-classics-wave2";
 import { englishQueryHref } from "@/lib/english-url";
 import { absoluteQueryUrl, SEO_QUERY_WHITELIST } from "@/lib/trends.server";
 
