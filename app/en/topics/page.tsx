@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import styles from "@/app/en/english.module.css";
-import { ENGLISH_SEO_QUERIES, ENGLISH_TOPICS } from "@/lib/english-classics-expanded";
+import { ENGLISH_SEO_QUERIES, ENGLISH_TOPICS } from "@/lib/english-classics-wave2";
 import { englishQueryHref } from "@/lib/english-url";
 
 export const metadata: Metadata = {
   title: "Chinese Poetry and Quote Themes | Gu Ren Said",
-  description: "Browse source-verified classical Chinese poems and sayings by love, longing, friendship, homesickness, perseverance, inner peace, wisdom, learning, ambition, family, work, renewal, and more.",
+  description: "Browse source-verified classical Chinese poems and sayings by love, longing, moonlight, seasons, solitude, family, teaching, perseverance, wisdom, work, renewal, and more.",
   alternates: { canonical: "/en/topics", languages: { en: "/en/topics", "x-default": "/en/topics" } },
   openGraph: {
     title: "Browse Classical Chinese Poetry and Quotes by Theme",
