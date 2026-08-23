@@ -4,7 +4,7 @@ import {
   ENGLISH_TOPICS,
   getEnglishClassicsForTopic,
   searchEnglishClassics
-} from "../lib/english-classics";
+} from "../lib/english-classics-expanded";
 
 const SEARCH_CASES: Array<{ query: string; expectedId: string }> = [
   { query: "I miss you", expectedId: "shijing-love" },
@@ -20,11 +20,31 @@ const SEARCH_CASES: Array<{ query: string; expectedId: string }> = [
   { query: "Slow down and do not rush", expectedId: "lunyu-zilu-haste-small-profit" },
   { query: "Prepare before you begin", expectedId: "zhongyong-plan-preparation" },
   { query: "Learn from everyone", expectedId: "lunyu-shuer-three-teachers" },
-  { query: "Small steps still matter", expectedId: "xunzi-work-hard" }
+  { query: "Small steps still matter", expectedId: "xunzi-work-hard" },
+  { query: "I love you but you do not know", expectedId: "yue-ren-ge-love" },
+  { query: "I want to grow old with you", expectedId: "zhuo-wenjun-baitou-love" },
+  { query: "True love survives distance", expectedId: "qin-guan-queshen-love" },
+  { query: "May we share the same moon", expectedId: "sushi-shuidiaogetou-reunion" },
+  { query: "Goodbye and good luck", expectedId: "gaoshi-biedongda-farewell" },
+  { query: "Know yourself", expectedId: "laozi-33-self-knowledge" },
+  { query: "Everyone makes mistakes", expectedId: "zuozhuan-xuangong-correct-error" },
+  { query: "It is not too late to fix it", expectedId: "zhanguoce-chu-mend-fold" },
+  { query: "Let your work speak for itself", expectedId: "shiji-lijiangjun-peach-plum" },
+  { query: "Practice is better than theory", expectedId: "luyou-zidong-practice" },
+  { query: "Step back to see the whole picture", expectedId: "sushi-xilin-blind-spot" },
+  { query: "When one road closes another opens", expectedId: "luyou-youshanxi-turnaround" },
+  { query: "Human life is brief", expectedId: "sushi-chibi-small-in-world" },
+  { query: "Success must be earned the right way", expectedId: "lunyu-liren-proper-way" },
+  { query: "Renew yourself every day", expectedId: "daxue-daily-renewal-opening" },
+  { query: "Dream big", expectedId: "libai-shangliyong-career" },
+  { query: "A blessing for a new home", expectedId: "shijing-sigan-housewarming" }
 ];
 
 const failures: string[] = [];
 const ids = new Set<string>();
+
+if (ENGLISH_CLASSICS.length < 75) failures.push(`Expected at least 75 English classics, received ${ENGLISH_CLASSICS.length}.`);
+if (ENGLISH_TOPICS.length < 23) failures.push(`Expected at least 23 English topics, received ${ENGLISH_TOPICS.length}.`);
 
 for (const classic of ENGLISH_CLASSICS) {
   if (ids.has(classic.id)) failures.push(`Duplicate English classic id: ${classic.id}`);
