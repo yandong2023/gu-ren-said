@@ -4,7 +4,7 @@ import {
   ENGLISH_TOPICS,
   getEnglishClassicsForTopic,
   searchEnglishClassics
-} from "../lib/english-classics-expanded";
+} from "../lib/english-classics-wave2";
 
 const SEARCH_CASES: Array<{ query: string; expectedId: string }> = [
   { query: "I miss you", expectedId: "shijing-love" },
@@ -37,14 +37,30 @@ const SEARCH_CASES: Array<{ query: string; expectedId: string }> = [
   { query: "Success must be earned the right way", expectedId: "lunyu-liren-proper-way" },
   { query: "Renew yourself every day", expectedId: "daxue-daily-renewal-opening" },
   { query: "Dream big", expectedId: "libai-shangliyong-career" },
-  { query: "A blessing for a new home", expectedId: "shijing-sigan-housewarming" }
+  { query: "A blessing for a new home", expectedId: "shijing-sigan-housewarming" },
+  { query: "We are under the same moon", expectedId: "zhangjiuling-wangyue-shared-moon" },
+  { query: "Looking at the moon makes me miss home", expectedId: "li-bai-jingyesi-moon-home" },
+  { query: "Life cannot be perfect", expectedId: "sushi-shuidiao-imperfection" },
+  { query: "Spring is beginning quietly", expectedId: "hanyu-early-spring" },
+  { query: "Autumn can still be hopeful", expectedId: "liuyuxi-autumn-crane" },
+  { query: "A lonely boat in the snow", expectedId: "liuzongyuan-jiangxue-solitude" },
+  { query: "May your journey have fair wind", expectedId: "wangwan-beigushan-sail" },
+  { query: "I watched my friend sail away", expectedId: "libai-yellow-crane-farewell" },
+  { query: "I miss my mother", expectedId: "mengjiao-youziyin-mother" },
+  { query: "Students can surpass teachers", expectedId: "hanyu-shishuo-student-teacher" },
+  { query: "Review the old to learn the new", expectedId: "lunyu-weizheng-review-new" },
+  { query: "Teachers and students grow together", expectedId: "liji-xueji-teaching-learning" },
+  { query: "Do not believe every book blindly", expectedId: "mengzi-jinxin-books-critical" },
+  { query: "Treat others as you wish to be treated", expectedId: "lunyu-weilinggong-golden-rule" },
+  { query: "Stay ambitious as you grow older", expectedId: "caocao-guisu-old-steed" },
+  { query: "Hardship should not break your ambition", expectedId: "wangbo-old-stronger" }
 ];
 
 const failures: string[] = [];
 const ids = new Set<string>();
 
-if (ENGLISH_CLASSICS.length < 75) failures.push(`Expected at least 75 English classics, received ${ENGLISH_CLASSICS.length}.`);
-if (ENGLISH_TOPICS.length < 23) failures.push(`Expected at least 23 English topics, received ${ENGLISH_TOPICS.length}.`);
+if (ENGLISH_CLASSICS.length < 110) failures.push(`Expected at least 110 English classics, received ${ENGLISH_CLASSICS.length}.`);
+if (ENGLISH_TOPICS.length < 31) failures.push(`Expected at least 31 English topics, received ${ENGLISH_TOPICS.length}.`);
 
 for (const classic of ENGLISH_CLASSICS) {
   if (ids.has(classic.id)) failures.push(`Duplicate English classic id: ${classic.id}`);
