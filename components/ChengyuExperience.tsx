@@ -2,6 +2,7 @@
 
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import ChengyuCard from "@/components/ChengyuCard";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 import type { ChengyuResult } from "@/lib/chengyu";
 
 const EXAMPLES = [
@@ -101,6 +102,7 @@ export default function ChengyuExperience() {
       <nav className="nav" aria-label="主导航">
         <a className="brand" href="/"><span className="brand-mark">古</span><span>古人曰</span></a>
         <div className="nav-actions">
+          <LanguageSwitcher />
           <a className="nav-pill" href="/">古文怎么说</a>
           <a className="nav-pill" href="/hot">热门反查</a>
         </div>
