@@ -39,6 +39,25 @@ export const metadata: Metadata = {
   }
 };
 
+const HOME_TOPIC_ORDER = [
+  "love",
+  "missing-someone",
+  "commitment-and-marriage",
+  "farewell-and-distance",
+  "family-and-reunion",
+  "beauty",
+  "friendship",
+  "ambition-and-success",
+  "perseverance",
+  "letting-go",
+  "inner-peace",
+  "sadness-and-loneliness",
+  "work-and-leadership",
+  "mistakes-and-renewal",
+  "perspective-and-self-knowledge",
+  "life"
+];
+
 type PageProps = {
   searchParams: Promise<{ q?: string | string[] }>;
 };
@@ -54,7 +73,11 @@ export default async function EnglishHomePage({ searchParams }: PageProps) {
     "sushi-shuidiaogetou-reunion",
     "luyou-youshanxi-turnaround"
   ]);
-  const topics = ENGLISH_TOPICS.map(({ slug, shortTitle, description }) => ({ slug, shortTitle, description }));
+  const topicBySlug = new Map(ENGLISH_TOPICS.map((topic) => [topic.slug, topic]));
+  const topics = HOME_TOPIC_ORDER
+    .map((slug) => topicBySlug.get(slug))
+    .filter((topic): topic is NonNullable<typeof topic> => Boolean(topic))
+    .map(({ slug, shortTitle, description }) => ({ slug, shortTitle, description }));
 
   return <EnglishSearchExperience featured={featured} topics={topics} />;
 }
