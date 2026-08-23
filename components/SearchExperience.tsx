@@ -2,6 +2,7 @@
 
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 import QuoteCard from "@/components/QuoteCard";
 import { trackEvent, trackVirtualPageView } from "@/lib/analytics";
 import type { SearchResult } from "@/lib/types";
@@ -282,6 +283,7 @@ export default function SearchExperience() {
       <nav className="nav" aria-label="主导航">
         <div className="brand"><span className="brand-mark">古</span><span>古人曰</span></div>
         <div className="nav-actions">
+          <LanguageSwitcher />
           <a className="nav-pill" href="/chengyu">成语怎么说</a>
           <a className="nav-pill" href="/hot">热门反查</a>
         </div>
