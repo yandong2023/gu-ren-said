@@ -5,61 +5,102 @@
   bottom: 18px;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  min-height: 42px;
-  padding: 0 13px 0 8px;
-  border: 1px solid rgba(55, 42, 31, 0.2);
+  justify-content: center;
+  gap: 7px;
+  height: 38px;
+  padding: 0 11px 0 10px;
+  border: 1px solid rgba(82, 50, 30, 0.12);
   border-radius: 999px;
-  color: #352a23;
-  background: rgba(255, 251, 244, 0.96);
-  box-shadow: 0 10px 30px rgba(58, 42, 29, 0.16);
-  backdrop-filter: blur(12px);
+  color: rgba(44, 27, 18, 0.72);
+  background: rgba(255, 255, 255, 0.48);
+  box-shadow:
+    0 1px 2px rgba(58, 42, 29, 0.035),
+    inset 0 1px 0 rgba(255, 255, 255, 0.72);
+  backdrop-filter: saturate(135%) blur(12px);
+  -webkit-backdrop-filter: saturate(135%) blur(12px);
   text-decoration: none;
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  font-size: 12px;
-  transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
+  font-size: 13px;
+  line-height: 1;
+  transition:
+    color 150ms ease,
+    background 150ms ease,
+    border-color 150ms ease,
+    box-shadow 150ms ease;
 }
 
 .switcher:hover {
-  transform: translateY(-2px);
-  background: #fffdf8;
-  box-shadow: 0 14px 34px rgba(58, 42, 29, 0.2);
+  color: #2c1b12;
+  background: rgba(255, 255, 255, 0.76);
+  border-color: rgba(82, 50, 30, 0.18);
+  box-shadow:
+    0 4px 14px rgba(58, 42, 29, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
 .switcher:focus-visible {
-  outline: 3px solid rgba(182, 93, 66, 0.28);
+  outline: 3px solid rgba(182, 93, 66, 0.22);
   outline-offset: 3px;
 }
 
-.switcher span {
-  display: grid;
-  place-items: center;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  color: #fff8ee;
-  background: #9f2f2f;
-  font-weight: 800;
-  font-size: 11px;
+.globe {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  stroke: currentColor;
+  stroke-width: 1.55;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.82;
 }
 
-.switcher strong {
-  font-weight: 750;
+.label {
+  font-weight: 620;
+  letter-spacing: -0.012em;
 }
 
-/* On desktop, place the switch beside the existing Chinese navigation pills,
-   so it is visible immediately without covering “成语怎么说 / 热门反查”. */
+.chevron {
+  width: 13px;
+  height: 13px;
+  flex: 0 0 auto;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.42;
+  transition: transform 150ms ease, opacity 150ms ease;
+}
+
+.switcher:hover .chevron {
+  transform: translateX(1px);
+  opacity: 0.68;
+}
+
+/* Desktop: align it with the existing utility navigation instead of making it
+   feel like a floating promotional button. */
 @media (min-width: 1150px) {
   .switcher {
-    top: 26px;
+    top: 27px;
     right: max(235px, calc((100vw - 1120px) / 2 + 220px));
     bottom: auto;
   }
 }
 
+/* Mobile keeps an unobtrusive, reachable utility pill away from the content. */
 @media (max-width: 700px) {
   .switcher {
     right: 12px;
     bottom: 12px;
+    height: 40px;
+    padding-inline: 11px;
+    background: rgba(255, 251, 244, 0.92);
+    box-shadow: 0 6px 22px rgba(58, 42, 29, 0.12);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .switcher,
+  .chevron {
+    transition: none;
   }
 }
