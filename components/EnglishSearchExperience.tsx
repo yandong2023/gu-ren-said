@@ -3,6 +3,7 @@
 import { ChangeEvent, FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import EnglishQuoteCard from "@/components/EnglishQuoteCard";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 import styles from "@/app/en/english.module.css";
 import { trackEvent } from "@/lib/analytics";
 import { englishQueryHref } from "@/lib/english-url";
@@ -64,7 +65,7 @@ export default function EnglishSearchExperience({ featured, topics }: Props) {
           </a>
           <div className={styles.navLinks}>
             <a className={styles.navLink} href="/en/topics">Browse themes</a>
-            <a className={styles.navLink} href="/">中文</a>
+            <LanguageSwitcher />
             <a className={styles.navPrimary} href="#search">Find a line</a>
           </div>
         </nav>
