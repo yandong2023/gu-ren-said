@@ -1,24 +1,19 @@
 .switcher {
-  position: fixed;
-  z-index: 80;
-  right: 18px;
-  bottom: 18px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 7px;
-  height: 38px;
-  padding: 0 11px 0 10px;
-  border: 1px solid rgba(82, 50, 30, 0.12);
+  height: 36px;
+  padding: 0 10px;
+  border: 1px solid rgba(82, 50, 30, 0.1);
   border-radius: 999px;
-  color: rgba(44, 27, 18, 0.72);
-  background: rgba(255, 255, 255, 0.48);
-  box-shadow:
-    0 1px 2px rgba(58, 42, 29, 0.035),
-    inset 0 1px 0 rgba(255, 255, 255, 0.72);
-  backdrop-filter: saturate(135%) blur(12px);
-  -webkit-backdrop-filter: saturate(135%) blur(12px);
+  color: rgba(44, 27, 18, 0.68);
+  background: rgba(255, 255, 255, 0.42);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.58);
+  backdrop-filter: saturate(130%) blur(10px);
+  -webkit-backdrop-filter: saturate(130%) blur(10px);
   text-decoration: none;
+  white-space: nowrap;
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   font-size: 13px;
   line-height: 1;
@@ -32,10 +27,10 @@
 .switcher:hover {
   color: #2c1b12;
   background: rgba(255, 255, 255, 0.76);
-  border-color: rgba(82, 50, 30, 0.18);
+  border-color: rgba(82, 50, 30, 0.16);
   box-shadow:
-    0 4px 14px rgba(58, 42, 29, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    0 4px 14px rgba(58, 42, 29, 0.065),
+    inset 0 1px 0 rgba(255, 255, 255, 0.86);
 }
 
 .switcher:focus-visible {
@@ -44,14 +39,14 @@
 }
 
 .globe {
-  width: 16px;
-  height: 16px;
+  width: 15px;
+  height: 15px;
   flex: 0 0 auto;
   stroke: currentColor;
   stroke-width: 1.55;
   stroke-linecap: round;
   stroke-linejoin: round;
-  opacity: 0.82;
+  opacity: 0.8;
 }
 
 .label {
@@ -60,41 +55,40 @@
 }
 
 .chevron {
-  width: 13px;
-  height: 13px;
+  width: 12px;
+  height: 12px;
   flex: 0 0 auto;
   stroke: currentColor;
   stroke-width: 1.7;
   stroke-linecap: round;
   stroke-linejoin: round;
-  opacity: 0.42;
+  opacity: 0.36;
   transition: transform 150ms ease, opacity 150ms ease;
 }
 
 .switcher:hover .chevron {
   transform: translateX(1px);
-  opacity: 0.68;
+  opacity: 0.62;
 }
 
-/* Desktop: align it with the existing utility navigation instead of making it
-   feel like a floating promotional button. */
-@media (min-width: 1150px) {
+/* At phone widths the other utility links are hidden. Keep one calm,
+   recognizable globe control in the same top navigation position. */
+@media (max-width: 640px) {
   .switcher {
-    top: 27px;
-    right: max(235px, calc((100vw - 1120px) / 2 + 220px));
-    bottom: auto;
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    background: rgba(255, 255, 255, 0.52);
   }
-}
 
-/* Mobile keeps an unobtrusive, reachable utility pill away from the content. */
-@media (max-width: 700px) {
-  .switcher {
-    right: 12px;
-    bottom: 12px;
-    height: 40px;
-    padding-inline: 11px;
-    background: rgba(255, 251, 244, 0.92);
-    box-shadow: 0 6px 22px rgba(58, 42, 29, 0.12);
+  .globe {
+    width: 17px;
+    height: 17px;
+  }
+
+  .label,
+  .chevron {
+    display: none;
   }
 }
 
