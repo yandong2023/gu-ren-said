@@ -1,0 +1,100 @@
+/* Shared language control for every English header.
+   The English pages currently render the locale link as a normal anchor.
+   This turns it into the same calm globe control used by mature global products. */
+nav[aria-label="English navigation"] a[href="/"] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 36px;
+  padding: 0 10px;
+  border: 1px solid rgba(59, 43, 31, 0.11);
+  border-radius: 999px;
+  color: rgba(33, 27, 23, 0.7);
+  background: rgba(255, 255, 255, 0.38);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.64);
+  backdrop-filter: saturate(130%) blur(10px);
+  -webkit-backdrop-filter: saturate(130%) blur(10px);
+  text-decoration: none;
+  white-space: nowrap;
+  font-size: 13px;
+  font-weight: 650;
+  line-height: 1;
+  transition:
+    color 150ms ease,
+    background 150ms ease,
+    border-color 150ms ease,
+    box-shadow 150ms ease;
+}
+
+nav[aria-label="English navigation"] a[href="/"]::before {
+  content: "";
+  width: 15px;
+  height: 15px;
+  flex: 0 0 auto;
+  background: currentColor;
+  opacity: 0.82;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.55' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='8.5'/%3E%3Cpath d='M3.8 12h16.4M12 3.5c2.15 2.25 3.25 5.08 3.25 8.5S14.15 18.25 12 20.5M12 3.5C9.85 5.75 8.75 8.58 8.75 12s1.1 6.25 3.25 8.5'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.55' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='8.5'/%3E%3Cpath d='M3.8 12h16.4M12 3.5c2.15 2.25 3.25 5.08 3.25 8.5S14.15 18.25 12 20.5M12 3.5C9.85 5.75 8.75 8.58 8.75 12s1.1 6.25 3.25 8.5'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+nav[aria-label="English navigation"] a[href="/"]::after {
+  content: "";
+  width: 6px;
+  height: 6px;
+  margin-left: 1px;
+  border-top: 1.5px solid currentColor;
+  border-right: 1.5px solid currentColor;
+  opacity: 0.38;
+  transform: rotate(45deg);
+  transition: transform 150ms ease, opacity 150ms ease;
+}
+
+nav[aria-label="English navigation"] a[href="/"]:hover {
+  color: #211b17;
+  border-color: rgba(59, 43, 31, 0.18);
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow:
+    0 4px 14px rgba(62, 43, 28, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.88);
+}
+
+nav[aria-label="English navigation"] a[href="/"]:hover::after {
+  opacity: 0.62;
+  transform: translateX(1px) rotate(45deg);
+}
+
+nav[aria-label="English navigation"] a[href="/"]:focus-visible {
+  outline: 3px solid rgba(159, 47, 47, 0.2);
+  outline-offset: 3px;
+}
+
+@media (max-width: 700px) {
+  nav[aria-label="English navigation"] a[href="/"] {
+    width: 38px;
+    min-width: 38px;
+    height: 38px;
+    min-height: 38px;
+    padding: 0;
+    overflow: hidden;
+    color: rgba(33, 27, 23, 0.72);
+    font-size: 0;
+    background: rgba(255, 255, 255, 0.46);
+  }
+
+  nav[aria-label="English navigation"] a[href="/"]::before {
+    width: 17px;
+    height: 17px;
+  }
+
+  nav[aria-label="English navigation"] a[href="/"]::after {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  nav[aria-label="English navigation"] a[href="/"],
+  nav[aria-label="English navigation"] a[href="/"]::after {
+    transition: none;
+  }
+}
