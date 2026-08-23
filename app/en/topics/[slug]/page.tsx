@@ -7,7 +7,7 @@ import {
   ENGLISH_TOPICS,
   getEnglishClassicsForTopic,
   getEnglishTopic
-} from "@/lib/english-classics-expanded";
+} from "@/lib/english-classics-wave2";
 import { englishQueryHref } from "@/lib/english-url";
 
 type PageProps = {
