@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound, permanentRedirect } from "next/navigation";
 import ChengyuCard from "@/components/ChengyuCard";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { chengyuHref, getPreferredChengyuQuery, isChengyuIdiomQuery, isPublishedChengyuQuery, searchChengyu, slugToChengyuQuery } from "@/lib/chengyu-large";
 
 type PageProps = {
@@ -85,6 +86,7 @@ export default async function ChengyuQueryPage({ params }: PageProps) {
       <nav className="nav" aria-label="主导航">
         <a className="brand" href="/"><span className="brand-mark">古</span><span>古人曰</span></a>
         <div className="nav-actions">
+          <LanguageSwitcher />
           <a className="nav-pill" href="/">古文怎么说</a>
           <a className="nav-pill" href="/chengyu">成语怎么说</a>
           <a className="nav-pill" href="/hot">热门反查</a>
