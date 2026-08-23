@@ -7,7 +7,7 @@ import LanguageSwitcher from "@/components/LanguageSwitcher";
 import styles from "@/app/en/english.module.css";
 import { trackEvent } from "@/lib/analytics";
 import { englishQueryHref } from "@/lib/english-url";
-import type { EnglishClassic, EnglishTopic } from "@/lib/english-classics-expanded";
+import type { EnglishClassic, EnglishTopic } from "@/lib/english-classics-wave2";
 
 type TopicPreview = Pick<EnglishTopic, "slug" | "shortTitle" | "description">;
 
@@ -17,12 +17,12 @@ type Props = {
 };
 
 const EXAMPLES = [
-  "I love you but you do not know",
-  "True love survives distance",
-  "When one road closes another opens",
-  "Know yourself",
-  "Practice is better than theory",
-  "May we share the same moon"
+  "We are under the same moon",
+  "Autumn can still be hopeful",
+  "I miss my mother",
+  "Review the old to learn the new",
+  "Treat others as you wish to be treated",
+  "Stay ambitious as you grow older"
 ];
 
 export default function EnglishSearchExperience({ featured, topics }: Props) {
@@ -82,7 +82,7 @@ export default function EnglishSearchExperience({ featured, topics }: Props) {
                 value={query}
                 maxLength={120}
                 onChange={(event: ChangeEvent<HTMLTextAreaElement>) => setQuery(event.target.value)}
-                placeholder="Try: I miss someone, but I do not know how to tell them."
+                placeholder="Try: Looking at the moon makes me miss home."
                 aria-label="Describe what you want to say"
               />
               <div className={styles.searchFooter}>
