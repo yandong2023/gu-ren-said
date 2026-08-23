@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">Gu Ren Said</title>
+  <desc id="desc">Find the classic Chinese line for what you mean. Ancient words, real sources.</desc>
+  <defs>
+    <linearGradient id="paper" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fbf7f0"/>
+      <stop offset="1" stop-color="#eee0cc"/>
+    </linearGradient>
+    <radialGradient id="wash" cx="0.85" cy="0.15" r="0.7">
+      <stop offset="0" stop-color="#365f54" stop-opacity="0.16"/>
+      <stop offset="1" stop-color="#365f54" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#paper)"/>
+  <rect width="1200" height="630" fill="url(#wash)"/>
+  <circle cx="104" cy="100" r="45" fill="#9f2f2f"/>
+  <text x="104" y="118" text-anchor="middle" font-size="50" font-family="serif" fill="#fff8ed">古</text>
+  <text x="174" y="112" font-size="34" font-weight="700" font-family="Georgia, serif" fill="#211b17">Gu Ren Said</text>
+  <text x="86" y="262" font-size="68" font-weight="700" font-family="Georgia, serif" fill="#211b17">Find the classic Chinese line</text>
+  <text x="86" y="344" font-size="68" font-style="italic" font-family="Georgia, serif" fill="#9f2f2f">for what you mean.</text>
+  <text x="88" y="430" font-size="28" font-family="Arial, sans-serif" fill="#75685d">Original Chinese · Pinyin · English meaning · Verified source</text>
+  <line x1="88" y1="488" x2="1112" y2="488" stroke="#3b2b1f" stroke-opacity="0.18"/>
+  <text x="88" y="548" font-size="24" font-family="Arial, sans-serif" fill="#365f54">Ancient words. Real sources. No fabricated quotations.</text>
+</svg>
