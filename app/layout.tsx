@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
-import LanguageSwitcher from "@/components/LanguageSwitcher";
 import "./globals.css";
 import "./ux.css";
 import "./share-card.css";
@@ -48,7 +47,6 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="zh-CN">
       <body>
-        <LanguageSwitcher />
         {children}
         <Script async src="https://www.googletagmanager.com/gtag/js?id=G-V2YG6XD057" strategy="afterInteractive" />
         <Script id="google-analytics" strategy="afterInteractive">
