@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 import "./globals.css";
 import "./ux.css";
 import "./share-card.css";
@@ -8,6 +9,13 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://gurensaid.com"),
   title: "古人曰｜现代话 / 网络热梗，古人早就说过",
   description: "输入一句现代话或网络热梗，反查古诗文中真实存在的相似表达、作者、出处和原文，并生成适合手机传播的知识卡片。",
+  alternates: {
+    languages: {
+      "zh-CN": "/",
+      en: "/en",
+      "x-default": "/"
+    }
+  },
   icons: {
     icon: "/favicon.svg",
     shortcut: "/favicon.svg",
@@ -40,6 +48,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="zh-CN">
       <body>
+        <LanguageSwitcher />
         {children}
         <Script async src="https://www.googletagmanager.com/gtag/js?id=G-V2YG6XD057" strategy="afterInteractive" />
         <Script id="google-analytics" strategy="afterInteractive">
