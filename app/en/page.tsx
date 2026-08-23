@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import EnglishSearchExperience from "@/components/EnglishSearchExperience";
-import { ENGLISH_TOPICS, getEnglishClassicsByIds } from "@/lib/english-classics";
+import { ENGLISH_TOPICS, getEnglishClassicsByIds } from "@/lib/english-classics-expanded";
 import { englishQueryHref } from "@/lib/english-url";
 
 export const metadata: Metadata = {
@@ -50,9 +50,9 @@ export default async function EnglishHomePage({ searchParams }: PageProps) {
   if (query) redirect(englishQueryHref(query));
 
   const featured = getEnglishClassicsByIds([
-    "shijing-love",
-    "wangbo-friend",
-    "su-shi-dingfengbo-letgo"
+    "yue-ren-ge-love",
+    "sushi-shuidiaogetou-reunion",
+    "luyou-youshanxi-turnaround"
   ]);
   const topics = ENGLISH_TOPICS.map(({ slug, shortTitle, description }) => ({ slug, shortTitle, description }));
 
