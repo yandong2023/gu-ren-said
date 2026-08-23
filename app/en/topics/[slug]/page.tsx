@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import EnglishQuoteCard from "@/components/EnglishQuoteCard";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 import styles from "@/app/en/english.module.css";
 import {
   ENGLISH_TOPICS,
@@ -59,7 +60,7 @@ export default async function EnglishTopicPage({ params }: PageProps) {
           <a className={styles.brand} href="/en"><span className={styles.brandSeal} lang="zh-CN">古</span><span>Gu Ren Said</span></a>
           <div className={styles.navLinks}>
             <a className={styles.navLink} href="/en/topics">All themes</a>
-            <a className={styles.navLink} href="/">中文</a>
+            <LanguageSwitcher />
             <a className={styles.navPrimary} href="/en">Find a line</a>
           </div>
         </nav>
