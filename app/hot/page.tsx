@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 import QuoteCard from "@/components/QuoteCard";
 import { getHotPageData, type HotItem } from "@/lib/hot.server";
 
@@ -59,6 +60,7 @@ export default async function HotPage() {
       <nav className="nav" aria-label="主导航">
         <a className="brand" href="/"><span className="brand-mark">古</span><span>古人曰</span></a>
         <div className="nav-actions">
+          <LanguageSwitcher />
           <a className="nav-pill" href="/">返回首页</a>
           <a className="nav-pill" href="/chengyu">成语怎么说</a>
         </div>
