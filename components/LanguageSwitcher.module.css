@@ -1,4 +1,5 @@
 .switcher {
+  order: 99;
   display: inline-flex;
   align-items: center;
   justify-content: center;
