@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import styles from "@/app/en/english.module.css";
+import linkStyles from "@/components/EnglishQuoteCard.module.css";
 import { trackEvent } from "@/lib/analytics";
+import { englishAuthorHref, englishWorkHref } from "@/lib/english-catalog";
 import { englishQueryHref } from "@/lib/english-url";
 import type { EnglishClassic } from "@/lib/english-classics";
 
@@ -18,6 +20,8 @@ export default function EnglishQuoteCard({ item, query, compact = false }: Props
   const [notice, setNotice] = useState<string | null>(null);
   const displayQuery = query?.trim() || item.searchTerms[0] || item.naturalMeaning;
   const sourceLine = `${item.authorEn} · ${item.eraEn} · ${item.titleEn}`;
+  const authorHref = englishAuthorHref(item.authorEn);
+  const workHref = englishWorkHref(item.sourceEn);
   const shareUrl = `${SITE_URL}${englishQueryHref(displayQuery)}?utm_source=share&utm_medium=link&utm_campaign=en_quote`;
   const shareText = [
     `A classical Chinese line for “${displayQuery}”`,
@@ -84,8 +88,11 @@ export default function EnglishQuoteCard({ item, query, compact = false }: Props
 
       <div className={styles.sourceBlock}>
         <span className={styles.label}>Source</span>
-        <strong>{sourceLine}</strong><br />
-        {item.sourceEn}
+        <div className={linkStyles.sourceLine}>
+          {authorHref ? <a className={linkStyles.sourceLink} href={authorHref}>{item.authorEn}</a> : <span>{item.authorEn}</span>}
+          <span>· {item.eraEn} · {item.titleEn}</span>
+        </div>
+        {workHref ? <a className={linkStyles.sourceCollection} href={workHref}>{item.sourceEn}</a> : <span>{item.sourceEn}</span>}
       </div>
 
       {!compact ? (

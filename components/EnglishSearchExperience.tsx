@@ -2,8 +2,8 @@
 
 import { ChangeEvent, FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
+import EnglishNav from "@/components/EnglishNav";
 import EnglishQuoteCard from "@/components/EnglishQuoteCard";
-import LanguageSwitcher from "@/components/LanguageSwitcher";
 import styles from "@/app/en/english.module.css";
 import { trackEvent } from "@/lib/analytics";
 import { englishQueryHref } from "@/lib/english-url";
@@ -18,10 +18,10 @@ type Props = {
 
 const EXAMPLES = [
   "We are under the same moon",
-  "Autumn can still be hopeful",
+  "Looking at the moon makes me miss home",
+  "Spring is beginning quietly",
   "I miss my mother",
-  "Review the old to learn the new",
-  "Treat others as you wish to be treated",
+  "Do not believe every book blindly",
   "Stay ambitious as you grow older"
 ];
 
@@ -58,17 +58,7 @@ export default function EnglishSearchExperience({ featured, topics }: Props) {
   return (
     <main className={styles.page}>
       <div className={styles.container}>
-        <nav className={styles.nav} aria-label="English navigation">
-          <a className={styles.brand} href="/en">
-            <span className={styles.brandSeal} lang="zh-CN">古</span>
-            <span>Gu Ren Said</span>
-          </a>
-          <div className={styles.navLinks}>
-            <a className={styles.navLink} href="/en/topics">Browse themes</a>
-            <LanguageSwitcher />
-            <a className={styles.navPrimary} href="#search">Find a line</a>
-          </div>
-        </nav>
+        <EnglishNav primaryHref="#search" />
 
         <section className={styles.hero}>
           <div className={styles.heroCopy}>
@@ -82,7 +72,7 @@ export default function EnglishSearchExperience({ featured, topics }: Props) {
                 value={query}
                 maxLength={120}
                 onChange={(event: ChangeEvent<HTMLTextAreaElement>) => setQuery(event.target.value)}
-                placeholder="Try: Looking at the moon makes me miss home."
+                placeholder="Try: I miss someone, but I do not know how to tell them."
                 aria-label="Describe what you want to say"
               />
               <div className={styles.searchFooter}>
@@ -137,7 +127,7 @@ export default function EnglishSearchExperience({ featured, topics }: Props) {
               <p className={styles.sectionEyebrow}>Browse by feeling</p>
               <h2 className={styles.sectionTitle}>Start with the theme already on your mind.</h2>
             </div>
-            <a className={styles.textLink} href="/en/topics">See all themes →</a>
+            <a className={styles.textLink} href="/en/explore">Explore themes, authors, and works →</a>
           </div>
           <div className={styles.topicGrid}>
             {topics.slice(0, 16).map((topic) => (
@@ -169,7 +159,7 @@ export default function EnglishSearchExperience({ featured, topics }: Props) {
       <footer className={styles.footer}>
         <div className={`${styles.container} ${styles.footerInner}`}>
           <p><strong>Translation note:</strong> English wording on this site is an original reading aid designed to preserve meaning and make the line understandable. It is not copied from a modern copyrighted translation and is not presented as the only possible literary rendering.</p>
-          <p>Gu Ren Said · <a className={styles.textLink} href="/">Chinese site</a></p>
+          <p>Gu Ren Said · <a className={styles.textLink} href="/en/explore">Explore the corpus</a> · <a className={styles.textLink} href="/">Chinese site</a></p>
         </div>
       </footer>
     </main>

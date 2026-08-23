@@ -1,0 +1,50 @@
+.sourceLine {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 5px;
+  color: #493b31;
+  font-weight: 720;
+}
+
+.sourceLink {
+  color: inherit;
+  text-decoration-color: rgba(159, 47, 47, 0.28);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+.sourceLink:hover {
+  color: #7f2222;
+  text-decoration-color: rgba(159, 47, 47, 0.62);
+}
+
+.sourceCollection {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 5px;
+  color: #75685d;
+  text-decoration: none;
+}
+
+.sourceCollection::after {
+  content: "→";
+  color: #9f2f2f;
+  font-size: 12px;
+  transition: transform 150ms ease;
+}
+
+.sourceCollection:hover {
+  color: #7f2222;
+}
+
+.sourceCollection:hover::after {
+  transform: translateX(2px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sourceCollection::after {
+    transition: none;
+  }
+}

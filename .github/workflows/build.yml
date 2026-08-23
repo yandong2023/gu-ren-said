@@ -76,5 +76,8 @@ jobs:
       - name: English corpus and ranking tests
         run: pnpm exec tsx scripts/evaluate-english-queries.ts
 
+      - name: English author and source catalog tests
+        run: pnpm exec tsx scripts/evaluate-english-catalog.ts
+
       - name: Build
         run: pnpm build

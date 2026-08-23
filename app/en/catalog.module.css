@@ -1,0 +1,293 @@
+.exploreGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.exploreCard,
+.catalogCard {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid rgba(59, 43, 31, 0.14);
+  color: #211b17;
+  background:
+    linear-gradient(145deg, rgba(159, 47, 47, 0.045), transparent 42%),
+    rgba(255, 253, 249, 0.76);
+  text-decoration: none;
+  transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
+}
+
+.exploreCard {
+  min-height: 250px;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 28px;
+  border-radius: 26px;
+}
+
+.exploreCard:hover,
+.catalogCard:hover {
+  transform: translateY(-3px);
+  border-color: rgba(159, 47, 47, 0.28);
+  background:
+    linear-gradient(145deg, rgba(159, 47, 47, 0.065), transparent 42%),
+    rgba(255, 253, 249, 0.94);
+  box-shadow: 0 18px 44px rgba(62, 43, 28, 0.1);
+}
+
+.exploreKicker,
+.catalogKicker {
+  color: #7f2222;
+  font-size: 11px;
+  font-weight: 820;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.exploreCard h2 {
+  max-width: 280px;
+  margin: 18px 0 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 34px;
+  line-height: 1.02;
+  letter-spacing: -0.04em;
+}
+
+.exploreCard p {
+  margin: 16px 0 0;
+  color: #75685d;
+  line-height: 1.65;
+}
+
+.exploreFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 30px;
+  color: #564a41;
+  font-size: 13px;
+  font-weight: 720;
+}
+
+.exploreArrow,
+.catalogArrow {
+  color: #9f2f2f;
+  font-size: 22px;
+  line-height: 1;
+  transition: transform 160ms ease;
+}
+
+.exploreCard:hover .exploreArrow,
+.catalogCard:hover .catalogArrow {
+  transform: translateX(3px);
+}
+
+.catalogGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.catalogCard {
+  min-height: 230px;
+  flex-direction: column;
+  padding: 24px;
+  border-radius: 22px;
+}
+
+.catalogTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.catalogSeal {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  flex: 0 0 auto;
+  border-radius: 14px;
+  color: #fff8ed;
+  background: #9f2f2f;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.22), 0 8px 20px rgba(127, 34, 34, 0.16);
+  font-family: "Songti SC", SimSun, serif;
+  font-size: 22px;
+}
+
+.catalogCount {
+  padding: 6px 9px;
+  border-radius: 999px;
+  color: #365f54;
+  background: rgba(54, 95, 84, 0.09);
+  font-size: 11px;
+  font-weight: 780;
+  white-space: nowrap;
+}
+
+.catalogCard h2,
+.catalogCard h3 {
+  margin: 18px 0 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 25px;
+  line-height: 1.08;
+  letter-spacing: -0.035em;
+}
+
+.catalogChinese {
+  display: block;
+  margin-top: 5px;
+  color: #9f2f2f;
+  font-family: "Songti SC", SimSun, serif;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.catalogMeta {
+  margin-top: 10px;
+  color: #75685d;
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.catalogDescription {
+  margin: 14px 0 0;
+  color: #75685d;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.catalogBottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: auto;
+  padding-top: 24px;
+  color: #564a41;
+  font-size: 12px;
+  font-weight: 720;
+}
+
+.heroStats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.heroStat {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid rgba(59, 43, 31, 0.13);
+  border-radius: 999px;
+  color: #62554b;
+  background: rgba(255, 253, 249, 0.58);
+  font-size: 12px;
+}
+
+.heroStat strong {
+  color: #211b17;
+  font-size: 13px;
+}
+
+.linkSection {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.linkPanel {
+  padding: 24px;
+  border: 1px solid rgba(59, 43, 31, 0.13);
+  border-radius: 22px;
+  background: rgba(255, 253, 249, 0.64);
+}
+
+.linkPanel h2 {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 26px;
+  letter-spacing: -0.035em;
+}
+
+.linkPanel p {
+  margin: 9px 0 0;
+  color: #75685d;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 34px;
+  padding: 0 11px;
+  border: 1px solid rgba(59, 43, 31, 0.13);
+  border-radius: 999px;
+  color: #57493f;
+  background: rgba(255, 255, 255, 0.48);
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 680;
+}
+
+.chip:hover {
+  color: #7f2222;
+  border-color: rgba(159, 47, 47, 0.28);
+  background: rgba(255, 251, 244, 0.92);
+}
+
+.chipCount {
+  color: rgba(87, 73, 63, 0.58);
+  font-size: 10px;
+}
+
+@media (max-width: 980px) {
+  .exploreGrid,
+  .catalogGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+  .exploreGrid,
+  .catalogGrid,
+  .linkSection {
+    grid-template-columns: 1fr;
+  }
+
+  .exploreCard {
+    min-height: 220px;
+    padding: 24px;
+  }
+
+  .catalogCard {
+    min-height: 210px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .exploreCard,
+  .catalogCard,
+  .exploreArrow,
+  .catalogArrow {
+    transition: none;
+  }
+}
