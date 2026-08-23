@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import EnglishSearchExperience from "@/components/EnglishSearchExperience";
-import { ENGLISH_TOPICS, getEnglishClassicsByIds } from "@/lib/english-classics-expanded";
+import { ENGLISH_TOPICS, getEnglishClassicsByIds } from "@/lib/english-classics-wave2";
 import { englishQueryHref } from "@/lib/english-url";
 
 export const metadata: Metadata = {
@@ -42,9 +42,16 @@ export const metadata: Metadata = {
 const HOME_TOPIC_ORDER = [
   "love",
   "missing-someone",
+  "moon-and-night",
+  "seasons-and-nature",
+  "parents-and-filial-love",
+  "solitude-and-reflection",
+  "travel-and-journey",
   "commitment-and-marriage",
-  "farewell-and-distance",
   "family-and-reunion",
+  "teaching-and-mentorship",
+  "critical-thinking-and-empathy",
+  "aging-and-resilience",
   "beauty",
   "friendship",
   "ambition-and-success",
@@ -69,9 +76,9 @@ export default async function EnglishHomePage({ searchParams }: PageProps) {
   if (query) redirect(englishQueryHref(query));
 
   const featured = getEnglishClassicsByIds([
-    "yue-ren-ge-love",
-    "sushi-shuidiaogetou-reunion",
-    "luyou-youshanxi-turnaround"
+    "zhangjiuling-wangyue-shared-moon",
+    "wangwei-shanju-autumn",
+    "mengjiao-youziyin-mother"
   ]);
   const topicBySlug = new Map(ENGLISH_TOPICS.map((topic) => [topic.slug, topic]));
   const topics = HOME_TOPIC_ORDER
