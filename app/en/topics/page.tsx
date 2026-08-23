@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 import styles from "@/app/en/english.module.css";
 import { ENGLISH_SEO_QUERIES, ENGLISH_TOPICS } from "@/lib/english-classics";
 import { englishQueryHref } from "@/lib/english-url";
@@ -24,7 +25,7 @@ export default function EnglishTopicsPage() {
         <nav className={styles.nav} aria-label="English navigation">
           <a className={styles.brand} href="/en"><span className={styles.brandSeal} lang="zh-CN">古</span><span>Gu Ren Said</span></a>
           <div className={styles.navLinks}>
-            <a className={styles.navLink} href="/">中文</a>
+            <LanguageSwitcher />
             <a className={styles.navPrimary} href="/en">Find a line</a>
           </div>
         </nav>
