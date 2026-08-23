@@ -7,7 +7,7 @@ import {
   ENGLISH_TOPICS,
   getEnglishClassicsForTopic,
   getEnglishTopic
-} from "@/lib/english-classics";
+} from "@/lib/english-classics-expanded";
 import { englishQueryHref } from "@/lib/english-url";
 
 type PageProps = {
@@ -104,7 +104,7 @@ export default async function EnglishTopicPage({ params }: PageProps) {
 
       <footer className={styles.footer}>
         <div className={`${styles.container} ${styles.footerInner}`}>
-          <p>Every displayed Chinese line is tied to a work and source in the existing corpus. The product may expand its English explanations, but it does not replace the source with generated text.</p>
+          <p>Every displayed Chinese line is tied to a work and source in the verified corpus. English explanations may expand, but the source line is never replaced with generated text.</p>
           <p><a className={styles.textLink} href="/en">Search in your own words →</a></p>
         </div>
       </footer>
